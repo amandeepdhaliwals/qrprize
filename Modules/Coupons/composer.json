@@ -1,0 +1,31 @@
+{
+    "name": "nasirkhan/coupons",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nasir Khan",
+            "email": "nasir8891@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Coupons\\": "",
+            "Modules\\Coupons\\App\\": "app/",
+            "Modules\\Coupons\\Database\\Factories\\": "database/factories/",
+            "Modules\\Coupons\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Coupons\\Tests\\": "tests/"
+        }
+    }
+}

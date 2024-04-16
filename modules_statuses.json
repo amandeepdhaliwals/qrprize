@@ -1,0 +1,9 @@
+{
+    "Article": true,
+    "Tag": true,
+    "Comment": true,
+    "Category": true,
+    "Coupons": true,
+    "Advertisement": true,
+    "Stores": true
+}
