@@ -1,15 +1,15 @@
 <?php
 
-namespace Modules\Stores\Providers;
+namespace Modules\Customers\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
-class StoresServiceProvider extends ServiceProvider
+class CustomersServiceProvider extends ServiceProvider
 {
-    protected string $moduleName = 'Stores';
+    protected string $moduleName = 'Customers';
 
-    protected string $moduleNameLower = 'stores';
+    protected string $moduleNameLower = 'customers';
 
     /**
      * Boot the application events.
@@ -22,10 +22,6 @@ class StoresServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
-
-         // adding global middleware
-         $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');
-         $kernel->pushMiddleware('Modules\Stores\Http\Middleware\GenerateMenus');
     }
 
     /**

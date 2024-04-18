@@ -30,7 +30,11 @@ return new class extends Migration
             $table->string('qr_code_url')->nullable();
             $table->string('logo')->nullable();
             $table->boolean('active')->default(true);
+            $table->integer('created_by')->unsigned()->nullable();
+            $table->integer('updated_by')->unsigned()->nullable();
+            $table->integer('deleted_by')->unsigned()->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

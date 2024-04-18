@@ -1,0 +1,31 @@
+{
+    "name": "nasirkhan/customers",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nasir Khan",
+            "email": "nasir8891@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Customers\\": "",
+            "Modules\\Customers\\App\\": "app/",
+            "Modules\\Customers\\Database\\Factories\\": "database/factories/",
+            "Modules\\Customers\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Customers\\Tests\\": "tests/"
+        }
+    }
+}
