@@ -116,7 +116,13 @@
         responsive: true,
         ajax: '{{ route("backend.$module_name.index_data") }}',
         columns: [
-            { data: 'id', name: 'id' },
+            { 
+            data: null,
+            name: 'id',
+            render: function (data, type, row, meta) {
+                    return meta.row + 1; // Row index starts from 0, so add 1 to start from 1
+                }
+            },
             { data: 'title', name: 'title' },
             { data: 'description', name: 'description' },
             { data: 'media', name: 'media' },
@@ -125,7 +131,7 @@
             { data: 'created_at', name: 'created_at' },
             { data: 'updated_at', name: 'updated_at' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
-        ]
+        ],
     });
 </script>
 @endpush

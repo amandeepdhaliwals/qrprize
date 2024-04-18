@@ -3,7 +3,14 @@
 @section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 @php
     $data = $$module_name_singular;
-    $data['media'] = url('/storage').'/'.$data['media'];
+    if($data['media_type'] == 'Image'){
+        $data['media'] = url('/storage').'/'.$data['media'];
+    }else{ 
+        $mediaUrl = url('/storage').'/'.$data['media'];
+        $data['media'] = '<video width="380" height="240" controls>';
+        $data['media'] .= '<source src="' . $mediaUrl . '" type="video/mp4">';
+        $data['media'] .= '</video>';
+    }
 @endphp
 
 @section('breadcrumbs')

@@ -71,7 +71,10 @@ class AdvertisementsController extends BackendBaseController
             })
             ->editColumn('title', '<strong>{{$title}}</strong>')
             ->editColumn('description', '{{$description}}')
-            ->editColumn('media', '<img src="{{ Storage::url($media) }}" alt="media Image" class="img-fluid" style="max-width: 100px;">')
+            ->editColumn('media', '@if($media_type == "Image")<img src="{{ Storage::url($media) }}" alt="media Image" class="img-fluid" style="max-width: 100px;">@elseif($media_type == "Video") <video width="150" height="140" controls>
+            <source src="{{ Storage::url($media) }}" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>@else <span> No Media </span> @endif')
             ->editColumn('media_type', '{{$media_type}}')
             ->editColumn('status', '@if($status == 1) <span style="color:green;">Active</span> @else <span style="color:red;">Inactive</span> @endif')
             ->editColumn('created_at', function ($data) {
@@ -112,6 +115,7 @@ class AdvertisementsController extends BackendBaseController
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $module_title = $this->module_title;
         $module_name = $this->module_name;
         $module_path = $this->module_path;
@@ -138,6 +142,11 @@ class AdvertisementsController extends BackendBaseController
             $requestData['media'] = $path;
             $requestData['media_type'] = $media_type;
         }
+        if($request->free_services){
+            $requestData['free_services'] = implode(',', $request->free_services);
+        }
+
+       // dd($requestData);
 
         $$module_name_singular = $module_model::create($requestData);
        
@@ -176,6 +185,7 @@ class AdvertisementsController extends BackendBaseController
             $requestData['media'] = $path;
             $requestData['media_type'] = $media_type;
         }
+        $requestData['free_services'] = implode(',', $request->free_services);
 
         $$module_name_singular = $module_model::findOrFail($id);
 
