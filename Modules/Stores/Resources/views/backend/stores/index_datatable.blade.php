@@ -20,7 +20,7 @@
             </x-slot>
             <x-slot name="toolbar">
                 @can('add_'.$module_name)
-                <x-buttons.create route='{{ route("$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" />
+                <x-buttons.create route='{{ route("backend.$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" />
                 @endcan
 
                 @can('restore_'.$module_name)
@@ -30,7 +30,7 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li>
-                            <a class="dropdown-item" href='{{ route("$module_name.create") }}'>
+                            <a class="dropdown-item" href='{{ route("backend.$module_name.trashed") }}'>
                                 <i class="fas fa-eye-slash"></i> @lang("View trash")
                             </a>
                         </li>
@@ -46,35 +46,11 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>Image</th>
-                            <th>Address</th>
-                            <th>Contact Number</th>
-                            <th>Email</th>
-                            <th>Action</th>
+                            <th>Name</th>
+                            <th>Updated At</th>
+                            <th>Action</th> 
                         </tr>
                     </thead>
-
-                    <tbody>
-                        @foreach($stores as $store)
-                        <tr>
-                            <td>{{ $store->id }}</td>
-                            <td>{{ $store->title }}</td>
-                            <td>{{ $store->description }}</td>
-                            <td>
-                                <img src="{{ asset($store->image) }}" alt="Store Image" class="img-fluid" style="max-width: 100px;">
-                            </td>
-                            <td>{{ $store->address }}</td>
-                            <td>{{ $store->contact_number }}</td>
-                            <td>{{ $store->email }}</td>
-                            <td>
-                                <a href="{{ route('stores.edit', $store->id) }}" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></a>
-                                <a href="{{ route('stores.show', $store->id) }}" class="btn btn-sm btn-success" title="View"><i class="fas fa-eye"></i></a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -83,15 +59,56 @@
         <div class="row">
             <div class="col-7">
                 <div class="float-left">
-                    Total {{ $stores->total() }} Stores
+
                 </div>
             </div>
             <div class="col-5">
                 <div class="float-end">
-                    {!! $stores->render() !!}
+
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 @endsection
+
+@push ('after-styles')
+<!-- DataTables Core and Extensions -->
+<link rel="stylesheet" href="{{ asset('vendor/datatable/datatables.min.css') }}">
+
+@endpush
+
+@push ('after-scripts')
+<!-- DataTables Core and Extensions -->
+<script type="module" src="{{ asset('vendor/datatable/datatables.min.js') }}"></script>
+
+<script type="module">
+    $('#datatable').DataTable({
+        processing: true,
+        serverSide: true,
+        autoWidth: true,
+        responsive: true,
+        ajax: '{{ route("backend.$module_name.index_data") }}',
+        columns: [{
+                data: 'id',
+                name: 'id'
+            },
+            {
+                data: 'name',
+                name: 'name'
+            },
+            {
+                data: 'updated_at',
+                name: 'updated_at'
+            },
+            {
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false
+            }
+        ]
+    });
+</script>
+@endpush
