@@ -2,11 +2,12 @@
 
 namespace Modules\Customers\Entities;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Customers\Database\factories\CustomerFactory;
+use Modules\Coupons\Database\factories\CouponFactory;
+use Illuminate\Support\Facades\DB;
 
-class Customer extends Model
+class Customer extends BaseModel
 {
     use HasFactory;
 
