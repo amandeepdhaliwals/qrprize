@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Advertisement\Http\Controllers\Backend;
+namespace Modules\Advertisements\Http\Controllers\Backend;
 
 use App\Authorizable;
 use App\Http\Controllers\Backend\BackendBaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
-use Modules\Advertisement\Entities\Advertisement;
+use Modules\Advertisements\Entities\Advertisement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,19 +19,19 @@ class AdvertisementsController extends BackendBaseController
     {
        
         // Page Title
-        $this->module_title = 'Advertisement';
+        $this->module_title = 'Advertisements';
 
         // module name
-        $this->module_name = 'advertisement';
+        $this->module_name = 'advertisements';
 
         // directory path of the module
-        $this->module_path = 'advertisement::backend'; // or 'coupons::frontend' depending on where your views are located
+        $this->module_path = 'advertisements::backend'; // or 'coupons::frontend' depending on where your views are located
 
         // module icon
         $this->module_icon = 'fa-regular fa-sun';
 
         // module model name, path
-        $this->module_model = "Modules\Advertisement\Entities\Advertisement";
+        $this->module_model = "Modules\Advertisements\Entities\Advertisement";
         
     }
 

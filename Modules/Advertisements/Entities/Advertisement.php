@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Advertisement\Entities;
+namespace Modules\Advertisements\Entities;
 
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\DB;
 
 class Advertisement extends BaseModel
 {
+
     use HasFactory;
+
+    protected $table = 'advertisements';
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +22,7 @@ class Advertisement extends BaseModel
     
     protected static function newFactory(): AdvertisementFactory
     {
-        //return AdvertisementFactory::new();
+        return AdvertisementFactory::new();
     }
     
 

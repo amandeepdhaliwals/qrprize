@@ -47,6 +47,8 @@
                         <tr>
                             <th>#</th>
                             <th>Name</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
                             <th>Updated At</th>
                             <th>Action</th> 
                         </tr>
@@ -97,6 +99,14 @@
             {
                 data: 'name',
                 name: 'name'
+            },
+            {
+                data: 'email',
+                name: 'email'
+            },
+            {
+                data: 'mobile',
+                name: 'mobile'
             },
             {
                 data: 'updated_at',

@@ -1,15 +1,15 @@
 <?php
 
-namespace Modules\Advertisement\Providers;
+namespace Modules\Advertisements\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class AdvertisementServiceProvider extends ServiceProvider
 {
-    protected string $moduleName = 'Advertisement';
+    protected string $moduleName = 'Advertisements';
 
-    protected string $moduleNameLower = 'advertisement';
+    protected string $moduleNameLower = 'advertisements';
 
     /**
      * Boot the application events.
@@ -25,10 +25,10 @@ class AdvertisementServiceProvider extends ServiceProvider
 
          // adding global middleware
          $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');
-         $kernel->pushMiddleware('Modules\Advertisement\Http\Middleware\GenerateMenus');
+         $kernel->pushMiddleware('Modules\Advertisements\Http\Middleware\GenerateMenus');
 
          // register commands
-        $this->registerCommands('\Modules\Advertisement\Console\Commands');
+        $this->registerCommands('\Modules\Advertisements\Console\Commands');
     }
 
     /**

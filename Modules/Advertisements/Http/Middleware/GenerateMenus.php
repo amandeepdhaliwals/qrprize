@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Advertisement\Http\Middleware;
+namespace Modules\Advertisements\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -15,12 +15,12 @@ class GenerateMenus
         \Menu::make('admin_sidebar', function ($menu) {
             // advertisement
             $menu->add('<i class="nav-icon fa-solid fa-ticket"></i> '.__('Advertisements'), [
-                'route' => 'backend.advertisement.index',
+                'route' => 'backend.advertisements.index',
                 'class' => 'nav-item',
             ])
                 ->data([
                     'order' => 99, // Change the order if necessary
-                    'activematches' => ['admin/advertisement*'], // Adjust the URL pattern if necessary
+                    'activematches' => ['admin/advertisements*'], // Adjust the URL pattern if necessary
                     'permission' => ['view_advertisements'], // Add necessary permissions
                 ])
                 ->link->attr([

@@ -1,5 +1,5 @@
 {
-    "name": "nasirkhan/advertisement",
+    "name": "nasirkhan/advertisements",
     "description": "",
     "authors": [
         {
@@ -17,15 +17,15 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Advertisement\\": "",
-            "Modules\\Advertisement\\App\\": "app/",
-            "Modules\\Advertisement\\Database\\Factories\\": "database/factories/",
-            "Modules\\Advertisement\\Database\\Seeders\\": "database/seeders/"
+            "Modules\\Advertisements\\": "",
+            "Modules\\Advertisements\\App\\": "app/",
+            "Modules\\Advertisements\\Database\\Factories\\": "database/factories/",
+            "Modules\\Advertisements\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Modules\\Advertisement\\Tests\\": "tests/"
+            "Modules\\Advertisements\\Tests\\": "tests/"
         }
     }
 }

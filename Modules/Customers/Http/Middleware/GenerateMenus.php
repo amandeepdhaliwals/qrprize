@@ -20,8 +20,8 @@ class GenerateMenus
             ])
                 ->data([
                     'order' => 100, // Change the order if necessary
-                    'activematches' => ['admin/stores*'], // Adjust the URL pattern if necessary
-                    'permission' => ['view_stores'], // Add necessary permissions
+                    'activematches' => ['admin/customers*'], // Adjust the URL pattern if necessary
+                    'permission' => ['view_customers'], // Add necessary permissions
                 ])
                 ->link->attr([
                     'class' => 'nav-link',

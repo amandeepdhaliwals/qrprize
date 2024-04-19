@@ -61,19 +61,19 @@
                     </thead>
 
                     <tbody>
-                        @foreach($advertisement as $advertisements)
+                        @foreach($advertisements as $advertisement)
                         <tr>
-                            <td>{{ $advertisements->id }}</td>
-                            <td>{{ $advertisements->title }}</td>
-                            <td>{{ $advertisements->description }}</td>
-                            <td><img src="{{ $advertisements->media }}" alt="uploaded media" class="img-fluid" style="max-width: 100px;"></td>
-                            <td>{{ $advertisements->media_type }}</td> 
-                            <td>{{ $advertisements->status }}</td>
-                            <td>{{ $advertisements->created_at }}</td>
-                            <td>{{ $advertisements->updated_at }}</td>
+                            <td>{{ $advertisement->id }}</td>
+                            <td>{{ $advertisement->title }}</td>
+                            <td>{{ $advertisement->description }}</td>
+                            <td><img src="{{ $advertisement->media }}" alt="uploaded media" class="img-fluid" style="max-width: 100px;"></td>
+                            <td>{{ $advertisement->media_type }}</td> 
+                            <td>{{ $advertisement->status }}</td>
+                            <td>{{ $advertisement->created_at }}</td>
+                            <td>{{ $advertisement->updated_at }}</td>
                             <td class="text-end">
-                                <a href="{{ route('backend.coupons.edit', $advertisements->id) }}" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></a>
-                                <a href="{{ route('backend.coupons.show', $advertisements->id) }}" class="btn btn-sm btn-success" title="View"><i class="fas fa-eye"></i></a>
+                                <a href="{{ route('backend.coupons.edit', $advertisement->id) }}" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></a>
+                                <a href="{{ route('backend.coupons.show', $advertisement->id) }}" class="btn btn-sm btn-success" title="View"><i class="fas fa-eye"></i></a>
                             </td>
                         </tr>
                         @endforeach
@@ -86,12 +86,12 @@
         <div class="row">
             <div class="col-7">
                 <div class="float-left">
-                    Total {{ $advertisement->total() }} Advertisements
+                    Total {{ $advertisements->total() }} Advertisements
                 </div>
             </div>
             <div class="col-5">
                 <div class="float-end">
-                    {!! $advertisement->render() !!} <!-- Pagination links -->
+                    {!! $advertisements->render() !!} <!-- Pagination links -->
                 </div>
             </div>
         </div>

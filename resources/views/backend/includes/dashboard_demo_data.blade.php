@@ -11,7 +11,7 @@
                 </div>
             </div>                   
             <div class="card-footer px-3 py-2">
-                <a class="btn-block text-medium-emphasis d-flex justify-content-between align-items-center" href='{{ route("backend.advertisement.index") }}'><span class="small fw-semibold">View More</span>
+                <a class="btn-block text-medium-emphasis d-flex justify-content-between align-items-center" href='{{ route("backend.advertisements.index") }}'><span class="small fw-semibold">View More</span>
                     <i class="fa-solid fa-circle-chevron-right"></i>
                 </a>
             </div>

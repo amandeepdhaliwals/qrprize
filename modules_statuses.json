@@ -4,7 +4,7 @@
     "Comment": true,
     "Category": true,
     "Coupons": true,
-    "Advertisement": true,
+    "Advertisements": true,
     "Stores": true,
     "Customers": true
 }
