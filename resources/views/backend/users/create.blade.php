@@ -127,6 +127,7 @@
                                     <div class="card-body">
                                         @if ($roles->count())
                                         @foreach($roles as $role)
+                                        @if($role->id === 1 || $role->id === 2)
                                         <div class="card mb-3">
                                             <div class="card-header">
                                                 <div class="checkbox">
@@ -147,6 +148,7 @@
                                                 @endif
                                             </div>
                                         </div>
+                                        @endif
                                         <!--card-->
                                         @endforeach
                                         @endif

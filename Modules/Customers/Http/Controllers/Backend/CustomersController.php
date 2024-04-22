@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CustomerExport;
 
 use App\Models\Permission;
 use App\Models\Role;
@@ -58,23 +60,25 @@ class CustomersController extends BackendBaseController
         $role_id=auth()->user()->roles->pluck('id')->toArray();
         $login_role_id = $role_id[0];
 
-        // $$module_name = User::select('id', 'name', 'email','mobile','created_at','updated_at')->whereHas('roles', function ($query) use ($roleNames) {
-        //     $query->whereIn('name', $roleNames);
-        // })->get();
+
         if($login_role_id == 1 ){
-            $$module_name = User::select('id', 'name', 'email','mobile','created_at','updated_at')->whereHas('roles', function ($query) use ($roleNames) {
+            $$module_name = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name', 'users.created_at', 'users.updated_at') 
+            ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
+            ->whereHas('roles', function ($query) use ($roleNames) {
                 $query->whereIn('name', $roleNames);
             })->get();
         }else{
-            $$module_name = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'users.created_at', 'users.updated_at')
+            $$module_name = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name', 'users.created_at', 'users.updated_at')
             ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
             ->where('customers.store_id', $login_role_id) // Replace $storeId with the desired store_id value
             ->whereHas('roles', function ($query) use ($roleNames) {
                 $query->whereIn('name', $roleNames);
             })->get();
         }
 
-       // dd($$module_name);
+        //dd($$module_name);
 
 
         $data = $$module_name;
@@ -82,14 +86,15 @@ class CustomersController extends BackendBaseController
        // dd($data);
 
         return Datatables::of($$module_name)
-            ->addColumn('action', function ($data) {
-                $module_name = $this->module_name;
+            // ->addColumn('action', function ($data) {
+            //     $module_name = $this->module_name;
 
-                return view('backend.includes.action_column', compact('module_name', 'data'));
-            })
+            //     return view('backend.includes.action_column', compact('module_name', 'data'));
+            // })
             ->editColumn('name', '<strong>{{$name}}</strong>')
             ->editColumn('email', '{{$email}}')
             ->editColumn('mobile', '{{$mobile}}')
+            ->editColumn('store_name', '{{$store_name}}')
             ->editColumn('created_at', function ($data) {
                 $module_name = $this->module_name;
 
@@ -112,9 +117,40 @@ class CustomersController extends BackendBaseController
 
                 return $data->updated_at->isoFormat('llll');
             })
-            ->rawColumns(['name','email','mobile','created_at','action'])
+            ->rawColumns(['name','email','mobile','store_name','created_at'])
            // ->orderColumns(['id'], '-:column $1')
             ->make(true);
+    }
+
+    public function exportToExcel()
+    {
+
+        $roleNames = ['user'];
+     
+        $role_id=auth()->user()->roles->pluck('id')->toArray();
+        $login_role_id = $role_id[0];
+
+        if($login_role_id == 1 ){
+           $data = User::select('users.name', 'users.email', 'users.mobile', 'store_users.name as store_name') 
+            ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
+            ->whereHas('roles', function ($query) use ($roleNames) {
+                $query->whereIn('name', $roleNames);
+            })->get();
+        }else{
+            $data = User::select('users.name', 'users.email', 'users.mobile', 'store_users.name as store_name')
+            ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
+            ->where('customers.store_id', $login_role_id) // Replace $storeId with the desired store_id value
+            ->whereHas('roles', function ($query) use ($roleNames) {
+                $query->whereIn('name', $roleNames);
+            })->get();
+        }
+
+        // Transform data if necessary
+
+        // Export data to Excel
+        return Excel::download(new CustomerExport($data), 'customers.xlsx');
     }
 
 }

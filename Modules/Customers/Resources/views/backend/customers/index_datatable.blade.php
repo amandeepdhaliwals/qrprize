@@ -20,11 +20,16 @@
             </x-slot>
             <x-slot name="toolbar">
                 @can('add_'.$module_name)
-                <x-buttons.create route='{{ route("backend.$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" />
-                @endcan
+                <!-- <x-buttons.create route='{{ route("backend.$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" />
+                @endcan -->
+                <button class="btn btn-secondary" type="button" data-coreui-toggle="" aria-expanded="">
+                <a class="" href='{{ route("backend.$module_name.exportToExcel") }}'>
+                Export To Excel
+                            </a>
+                    </button>
 
                 @can('restore_'.$module_name)
-                <div class="btn-group">
+                <!-- <div class="btn-group">
                     <button class="btn btn-secondary dropdown-toggle" type="button" data-coreui-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-cog"></i>
                     </button>
@@ -35,7 +40,7 @@
                             </a>
                         </li>
                     </ul>
-                </div>
+                </div> -->
                 @endcan
             </x-slot>
         </x-backend.section-header>
@@ -49,8 +54,9 @@
                             <th>Name</th>
                             <th>Email</th>
                             <th>Mobile</th>
+                            <th>Store Name</th>
                             <th>Updated At</th>
-                            <th>Action</th> 
+                            <!-- <th>Action</th>  -->
                         </tr>
                     </thead>
                 </table>
@@ -92,9 +98,13 @@
         autoWidth: true,
         responsive: true,
         ajax: '{{ route("backend.$module_name.index_data") }}',
-        columns: [{
-                data: 'id',
-                name: 'id'
+        columns: [
+            { 
+            data: null,
+            name: 'id',
+            render: function (data, type, row, meta) {
+                    return meta.row + 1; // Row index starts from 0, so add 1 to start from 1
+                }
             },
             {
                 data: 'name',
@@ -109,15 +119,19 @@
                 name: 'mobile'
             },
             {
+                data: 'store_name',
+                name: 'store_name'
+            },
+            {
                 data: 'updated_at',
                 name: 'updated_at'
             },
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false,
-                searchable: false
-            }
+            // {
+            //     data: 'action',
+            //     name: 'action',
+            //     orderable: false,
+            //     searchable: false
+            // }
         ]
     });
 </script>

@@ -32,6 +32,7 @@ Route::group(['namespace' => '\Modules\Customers\Http\Controllers\Backend','as' 
      */
     $module_name = 'customers';
     $controller_name = 'CustomersController';
+    Route::get("{$module_name}/exportToExcel", ['as' => "{$module_name}.exportToExcel", 'uses' => "{$controller_name}@exportToExcel"]);
     Route::get("{$module_name}/index", ['as' => "{$module_name}.index", 'uses' => "{$controller_name}@index"]);
     Route::get("{$module_name}/index_list", ['as' => "{$module_name}.index_list", 'uses' => "{$controller_name}@index_list"]);
     Route::get("{$module_name}/index_data", ['as' => "{$module_name}.index_data", 'uses' => "{$controller_name}@index_data"]);
