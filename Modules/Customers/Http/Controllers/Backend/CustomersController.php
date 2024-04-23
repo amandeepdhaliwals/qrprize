@@ -17,6 +17,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Userprofile;
 use App\Modules\Customers\Entities\Customer;
+use Illuminate\Support\Facades\Auth;
 
 
 class CustomersController extends BackendBaseController
@@ -59,6 +60,7 @@ class CustomersController extends BackendBaseController
      
         $role_id=auth()->user()->roles->pluck('id')->toArray();
         $login_role_id = $role_id[0];
+        $login_user_id = Auth::id();
 
 
         if($login_role_id == 1 ){
@@ -72,13 +74,13 @@ class CustomersController extends BackendBaseController
             $$module_name = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name', 'users.created_at', 'users.updated_at')
             ->join('customers', 'users.id', '=', 'customers.user_id')
             ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
-            ->where('customers.store_id', $login_role_id) // Replace $storeId with the desired store_id value
+            ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
             ->whereHas('roles', function ($query) use ($roleNames) {
                 $query->whereIn('name', $roleNames);
             })->get();
         }
 
-        //dd($$module_name);
+        //dd($login_role_id);
 
 
         $data = $$module_name;

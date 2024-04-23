@@ -73,9 +73,14 @@ class UserController extends Controller
 
         $page_heading = ucfirst($module_title);
         $title = $page_heading.' '.ucfirst($module_action);
-
-        $$module_name = $module_model::paginate();
-
+        
+        $roleNames = ['super admin', 'store admin'];
+        // $$module_name = $module_model::paginate();
+        $$module_name =  $module_model::select('*')
+        ->whereHas('roles', function ($query) use ($roleNames) {
+            $query->whereIn('name', $roleNames);
+        })->paginate();
+      
         Log::info("'{$title}' viewed by User:".auth()->user()->name.'(ID:'.auth()->user()->id.')');
 
         return view(

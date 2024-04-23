@@ -20,8 +20,8 @@
             </x-slot>
             <x-slot name="toolbar">
                 @can('add_'.$module_name)
-                <!-- <x-buttons.create route='{{ route("backend.$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" />
-                @endcan -->
+                <!-- <x-buttons.create route='{{ route("backend.$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" /> -->
+                @endcan 
                 <!-- <button id="" class="btn btn-secondary" type="button" data-coreui-toggle="" aria-expanded="">
                 <a class="" href='{{ route("backend.$module_name.exportToExcel") }}'>
                 Export To Excel
