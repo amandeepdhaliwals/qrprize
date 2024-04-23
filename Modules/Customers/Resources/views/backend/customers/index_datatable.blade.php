@@ -22,10 +22,14 @@
                 @can('add_'.$module_name)
                 <!-- <x-buttons.create route='{{ route("backend.$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" />
                 @endcan -->
-                <button class="btn btn-secondary" type="button" data-coreui-toggle="" aria-expanded="">
+                <!-- <button id="" class="btn btn-secondary" type="button" data-coreui-toggle="" aria-expanded="">
                 <a class="" href='{{ route("backend.$module_name.exportToExcel") }}'>
                 Export To Excel
                             </a>
+                    </button> -->
+
+                <button id="exportBtn" class="btn btn-secondary" type="button" data-coreui-toggle="" aria-expanded="">
+                Export To Excel
                     </button>
 
                 @can('restore_'.$module_name)
@@ -134,5 +138,44 @@
             // }
         ]
     });
+
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $('#exportBtn').click(function() {
+    // Get filtered data from DataTable
+    // var filteredData = $('#datatable').DataTable().rows({search:'applied'}).data().toArray();
+
+    var table = $('#datatable').DataTable();
+
+    // Get filtered data from all pages
+    var filteredData = [];
+    table.rows({ search: 'applied' }).every(function() {
+        filteredData.push(this.data());
+    });
+
+    // Send filtered data to server for export
+    $.ajax({
+        url: '{{ route("backend.$module_name.exportToExcel") }}',
+        type: 'POST',
+        contentType: 'application/json',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken // Include CSRF token in the request headers
+        },
+        data: JSON.stringify({ filteredData: filteredData }),
+        xhrFields: {
+            responseType: 'blob' // Set the response type to blob
+        },
+        success: function(response) {
+            var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'customers.xlsx';
+            link.click();
+        },
+        error: function(xhr, status, error) {
+            alert(error)
+        }
+    });
+});
+
 </script>
 @endpush

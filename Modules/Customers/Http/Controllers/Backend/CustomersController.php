@@ -122,35 +122,35 @@ class CustomersController extends BackendBaseController
             ->make(true);
     }
 
-    public function exportToExcel()
+    public function exportToExcel(Request $request)
     {
 
-        $roleNames = ['user'];
+         $roleNames = ['user'];
      
-        $role_id=auth()->user()->roles->pluck('id')->toArray();
-        $login_role_id = $role_id[0];
+        // $role_id=auth()->user()->roles->pluck('id')->toArray();
+        // $login_role_id = $role_id[0];
 
-        if($login_role_id == 1 ){
-           $data = User::select('users.name', 'users.email', 'users.mobile', 'store_users.name as store_name') 
-            ->join('customers', 'users.id', '=', 'customers.user_id')
-            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
-            ->whereHas('roles', function ($query) use ($roleNames) {
-                $query->whereIn('name', $roleNames);
-            })->get();
-        }else{
-            $data = User::select('users.name', 'users.email', 'users.mobile', 'store_users.name as store_name')
-            ->join('customers', 'users.id', '=', 'customers.user_id')
-            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
-            ->where('customers.store_id', $login_role_id) // Replace $storeId with the desired store_id value
-            ->whereHas('roles', function ($query) use ($roleNames) {
-                $query->whereIn('name', $roleNames);
-            })->get();
-        }
+        // if($login_role_id == 1 ){
+        //    $data = User::select('users.name', 'users.email', 'users.mobile', 'store_users.name as store_name') 
+        //     ->join('customers', 'users.id', '=', 'customers.user_id')
+        //     ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
+        //     ->whereHas('roles', function ($query) use ($roleNames) {
+        //         $query->whereIn('name', $roleNames);
+        //     })->get();
+        // }else{
+        //     $data = User::select('users.name', 'users.email', 'users.mobile', 'store_users.name as store_name')
+        //     ->join('customers', 'users.id', '=', 'customers.user_id')
+        //     ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
+        //     ->where('customers.store_id', $login_role_id) // Replace $storeId with the desired store_id value
+        //     ->whereHas('roles', function ($query) use ($roleNames) {
+        //         $query->whereIn('name', $roleNames);
+        //     })->get();
+        // }
 
-        // Transform data if necessary
+        $data = $request->input('filteredData');
+        
+       return Excel::download(new CustomerExport($data), 'customers.xlsx');
 
-        // Export data to Excel
-        return Excel::download(new CustomerExport($data), 'customers.xlsx');
     }
 
 }

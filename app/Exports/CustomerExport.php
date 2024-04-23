@@ -3,6 +3,7 @@
 namespace App\Exports;
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class CustomerExport implements FromCollection, WithHeadings
@@ -16,7 +17,28 @@ class CustomerExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return $this->data;
+        // Transform the array of objects into a Laravel Collection
+        $collection = new Collection($this->data);
+
+        // Transform each object in the collection
+        $transformed = $collection->map(function ($item) {
+            // Convert HTML entities to plain text
+            $name = strip_tags($item['name']);
+            $email = strip_tags($item['email']);
+            // Other fields...
+
+            // Return the transformed object
+            return [
+                'Name' => $name,
+                'Email' => $email,
+                'Mobile' => $item['mobile'],
+                'Store Name' => $item['store_name'],
+                'Created At' => $item['created_at'],
+                'Updated At' => $item['updated_at']
+            ];
+        });
+
+        return $transformed;
     }
 
     public function headings(): array
@@ -27,6 +49,8 @@ class CustomerExport implements FromCollection, WithHeadings
             'Email',
             'Mobile',
             'Store Name',
+            'Create At',
+            'Updated At',
             // Add more headings as needed
         ];
     }
