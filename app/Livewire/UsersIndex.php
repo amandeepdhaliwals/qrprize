@@ -16,15 +16,15 @@ class UsersIndex extends Component
 
     public function render()
     {
-        $roleNames = ['super admin', 'store admin'];
+        $rolesId = [1, 2];
         $searchTerm = '%'.$this->searchTerm.'%';
         // $users = User::where('name', 'like', $searchTerm)->orWhere('email', 'like', $searchTerm)->orderBy('id', 'desc')->with(['permissions', 'roles', 'providers'])->paginate();
         $users = User::where(function ($query) use ($searchTerm) {
             $query->where('name', 'like', $searchTerm)
                   ->orWhere('email', 'like', $searchTerm);
         })
-        ->whereHas('roles', function ($query) use ($roleNames) {
-            $query->whereIn('name', $roleNames);
+        ->whereHas('roles', function ($query) use ($rolesId) {
+            $query->whereIn('id', $rolesId);
         })
         ->with(['permissions', 'roles', 'providers'])
         ->orderBy('id', 'desc')
