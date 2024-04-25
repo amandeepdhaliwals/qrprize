@@ -36,4 +36,9 @@ class FrontendController extends Controller
     {
         return view('frontend.terms');
     }
+
+    public function campaign()
+    {
+        return view('frontend.campaign');
+    }
 }
