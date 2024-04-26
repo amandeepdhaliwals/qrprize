@@ -31,7 +31,12 @@
             $field_name = 'image';
             $field_lable = label_case($field_name);
             $field_placeholder = $field_lable;
-            $required = "required";
+            if($data && $data->image){
+                $required = "";
+            }else{
+                $required = "required";
+            }
+            
             ?>
             {{ html()->label($field_lable, $field_name)->class('form-label') }} {!! fielf_required($required) !!}
             {{ html()->input("file", $field_name)->class('form-control')->attributes(["$required"]) }}
