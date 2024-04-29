@@ -50,7 +50,10 @@
                             <th>Email</th>
                             <th>Mobile</th>
                             <th>Status</th>
+                            <th>Step Completed</th>
+                            <th>Created At</th>
                             <th>Updated At</th>
+                            <th>Add Compaign</th>
                             <th>Action</th> 
                         </tr>
                     </thead>
@@ -114,8 +117,20 @@
                 name: 'status'
             },
             {
+                data: 'step_completed',
+                name: 'step_completed'
+            },
+            {
+                data: 'created_at',
+                name: 'created_at'
+            },
+            {
                 data: 'updated_at',
                 name: 'updated_at'
+            },
+            {
+                data: 'add_compaign',
+                name: 'add_compaign'
             },
             {
                 data: 'action',

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('adv_heading')->nullable();
             $table->integer('adv_primary_image_id');  
             $table->json('adv_secondary_image_ids')->nullable();
-            $table->string('qr_code_url')->nullable();
+            $table->integer('step_completed')->unsigned()->nullable();
             $table->boolean('status')->default(true);
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();

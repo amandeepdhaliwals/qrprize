@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laracasts\Flash\Flash;
 use Yajra\DataTables\DataTables;
+use Modules\Stores\Entities\Store; // Import the Store model
 
 class UserController extends Controller
 {
@@ -243,6 +244,17 @@ class UserController extends Controller
         $roles = $request['roles'];
         $permissions = $request['permissions'];
 
+        if (in_array('store', $roles)) {
+            // Insert entry into store_qrcodes
+            Store::create([
+                'user_id' => $$module_name_singular->id,
+                'status' => '1',
+                'created_by' => '1',
+                'adv_video_id' => '0',
+                'adv_primary_image_id' => '0',
+                'step_completed' => '1'
+            ]);
+        }
         // Sync Roles
         if (isset($roles)) {
             $$module_name_singular->syncRoles($roles);

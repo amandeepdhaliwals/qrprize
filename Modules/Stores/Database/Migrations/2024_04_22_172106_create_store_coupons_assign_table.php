@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('store_coupons_assign', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id'); 
-            $table->integer('qrcode_id'); 
             $table->integer('coupon_id'); 
             $table->integer('total_no_of_coupons'); 
             $table->integer('no_of_winned_coupons'); 
+            $table->string('qr_code_url')->nullable();
+            $table->string('qr_code_image')->nullable();
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->integer('deleted_by')->unsigned()->nullable();
