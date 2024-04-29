@@ -8,11 +8,14 @@
     <!-- ======= Call To Action Section ======= -->
     <div class="banner-img">
     <section id="call-to-action" class="call-to-action">
-
-      <div class="container text-center" data-aos="zoom-out">
-        <a href="https://www.youtube.com/watch?v=LXb3EKWsInQ" class="glightbox play-btn"></a>
-      </div>
-    </section>
+  <div class="container text-center" data-aos="zoom-out">
+    <!-- <iframe id="youtubeLink" width="100%" height="130" src="https://www.youtube.com/embed/LXb3EKWsInQ?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+      <video id="video-player" width="100%" height="130px" controls>
+        <source src="{{ Storage::url('uploads/advertisements/Kmbg4d7faCc2ZzB5sPBGSc9DBa17yG9j3w9QjhMz.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+  </div>
+</section>
   </div>
     <!-- End Call To Action Section -->
 
@@ -174,6 +177,7 @@
             </div>
             
             <div id="shine"></div>
+            <div id="spinner-overlay"> <div id="locked-text"><i class="bi bi-lock custom-lock-icon"></i></div></div> 
         </div>
         
         
@@ -181,6 +185,9 @@
     </section><!-- End spin wheel Section -->
 
   </main><!-- End #main -->
+  <div id="text_to_spin" class="container text-center" style="margin-top: 20px;"><b>Please view the video above to spin the wheel</b></div>
+  <div id="watched-time" class="container text-center" style="margin-top: 20px;">Watched Time: 0 seconds</div>
+
 
   <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -188,7 +195,7 @@
 
 @endsection
   <!-- Vendor JS Files -->
-
+  <script src="https://www.youtube.com/iframe_api"></script>
   <!-- <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script> -->
   <!-- <script src="{{ asset('assets/vendor/aos/aos.js') }}"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -241,7 +248,7 @@ $(document).ready(function(){
 					
 				var aoY = t.offset().top;
 				$("#txt").html(aoY);
-				console.log(aoY);
+				//console.log(aoY);
 				
 				/*23.7 is the minumum offset number that 
 				each section can get, in a 30 angle degree.
@@ -249,7 +256,7 @@ $(document).ready(function(){
 				that it has a 30 degree angle and therefore, 
 				exactly aligned with the spin btn*/
 				if(aoY < 23.89){
-					console.log('<<<<<<<<');
+					//console.log('<<<<<<<<');
 					$('#spin').addClass('spin');
 					setTimeout(function () { 
 						$('#spin').removeClass('spin');
@@ -269,7 +276,92 @@ $(document).ready(function(){
 	
 	
 });//DOCUMENT READY
-	
 
 
   </script>
+ <!-- Add your JavaScript -->
+ <!-- <script>
+  // function handleVideoPlaying() {
+  //   console.log('Video is playing.');
+  // }
+    document.addEventListener("DOMContentLoaded", function() {
+      // var video = document.getElementById("youtubeLink");
+      // video.addEventListener("playing", function() {
+      //     console.log("Video is playing.");
+      //     // Add your code here to handle CSS changes or other actions
+      // });
+        // Function to enable the spinner
+        function enableSpinner() {
+            document.getElementById("spinner-overlay").style.display = "none"; // Hide the overlay
+        }
+
+        // Function to check if YouTube video has been watched
+        function checkVideoWatched() {
+            // Here, you can implement your logic to check if the video has been watched.
+            // For simplicity, let's assume the video is watched after 10 seconds.
+            setTimeout(function() {
+                enableSpinner(); // Enable the spinner after 10 seconds
+            }, 10000); // 10 seconds delay (adjust as needed)
+        }
+
+        // Call checkVideoWatched() function to check if the video has been watched
+        document.getElementById("youtubeLink").addEventListener("click", function() {
+          console.log('jhk');
+            checkVideoWatched();
+        });
+    });
+</script> -->
+<!-- <script>
+window.addEventListener('scroll', function() {
+  var video = document.getElementById('youtubeLink');
+  var position = video.getBoundingClientRect();
+
+  // Pause the video if it's in the viewport
+  if (position.top <= -250 && position.bottom <= window.innerHeight) {
+    console.log('g');
+    console.log(position.top)
+    video.contentWindow.postMessage('{"event":"command","func":"' + 'pauseVideo' + '","args":""}', '*');
+  }
+});
+
+</script> -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+      function enableSpinner() {
+            document.getElementById("spinner-overlay").style.display = "none"; // Hide the overlay
+        }
+        // Get the video element
+        var video = document.getElementById("video-player");
+
+        // Get the video container
+        var videoContainer = document.getElementById("video-container");
+
+        // Function to handle scroll event
+        function handleScroll() {
+          var position = video.getBoundingClientRect();
+            // Pause the video if it's in the viewport
+            if (position.top <= -250 && position.bottom <= window.innerHeight) {
+              video.pause();
+            }
+        }
+
+        // Listen for scroll event
+        window.addEventListener("scroll", handleScroll);
+
+        // Listen for video timeupdate event to get watched time
+        video.addEventListener("timeupdate", function() {
+            // Get the current time in seconds
+            var watchedTime = Math.floor(video.currentTime);
+            var timetext = "Watched time: " + watchedTime + " seconds";
+            document.getElementById("watched-time").textContent = timetext
+
+        });
+        video.addEventListener("play", function() {
+            console.log("Video started playing.");
+            enableSpinner();
+            document.getElementById("text_to_spin").style.display = "none";
+            // You can add additional actions here when the video starts playing
+        });
+    });
+</script>
