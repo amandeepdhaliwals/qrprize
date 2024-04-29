@@ -127,6 +127,9 @@ class AdvertisementsController extends BackendBaseController
    
         $file = $request->file('media');
         if ($file) {
+            $request->validate([
+                'media' => 'required|file|max:20480', // Maximum file size in kilobytes (20 MB in this example)
+            ]);
             // Store the file in the storage directory
             $path = Storage::disk('public')->putFile('uploads/advertisements', $file, 'public');
            
@@ -170,6 +173,9 @@ class AdvertisementsController extends BackendBaseController
 
         $file = $request->file('media');
         if ($file) {
+            $request->validate([
+                'media' => 'required|file|max:20480', // Maximum file size in kilobytes (20 MB in this example)
+            ]);
             // Store the file in the storage directory
             $path = Storage::disk('public')->putFile('uploads/advertisements', $file, 'public');
            
@@ -185,7 +191,9 @@ class AdvertisementsController extends BackendBaseController
             $requestData['media'] = $path;
             $requestData['media_type'] = $media_type;
         }
-        $requestData['free_services'] = implode(',', $request->free_services);
+        if($request->free_services){
+            $requestData['free_services'] = implode(',', $request->free_services);
+        }
 
         $$module_name_singular = $module_model::findOrFail($id);
 
