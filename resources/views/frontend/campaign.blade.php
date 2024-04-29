@@ -11,7 +11,7 @@
   <div class="container text-center" data-aos="zoom-out">
     <!-- <iframe id="youtubeLink" width="100%" height="130" src="https://www.youtube.com/embed/LXb3EKWsInQ?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
       <video id="video-player" width="100%" height="130px" controls>
-        <source src="{{ Storage::url('uploads/advertisements/Kmbg4d7faCc2ZzB5sPBGSc9DBa17yG9j3w9QjhMz.mp4') }}" type="video/mp4">
+        <source src="{{ Storage::url('uploads/advertisements/0SvRTDwZgRcmqkUdrCKArHYRuYon4uUJbqPtRZGV.mp4') }}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
   </div>
