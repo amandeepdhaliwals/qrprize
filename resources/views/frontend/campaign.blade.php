@@ -11,7 +11,7 @@
   <div class="container text-center" data-aos="zoom-out">
     <!-- <iframe id="youtubeLink" width="100%" height="130" src="https://www.youtube.com/embed/LXb3EKWsInQ?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
       <video id="video-player" width="100%" height="130px" controls>
-        <source src="{{ Storage::url('uploads/advertisements/0SvRTDwZgRcmqkUdrCKArHYRuYon4uUJbqPtRZGV.mp4') }}" type="video/mp4">
+        <source src="{{ Storage::url($advertisement_video->media) }}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
   </div>
@@ -34,14 +34,26 @@
             <div class="itinerary-tag">
               <div class="itinerary-box">
                 <ul>
+                  <?php $free_services_str = $primary_image->free_services;
+                  $primary_free_services = explode(",", $free_services_str);
+                  if(in_array('Flight',$primary_free_services)){
+                  ?>
                   <li><img src="{{ asset('assets/img/airplane.svg') }}"></li>
+                  <?php } 
+                  if(in_array('Visa',$primary_free_services)){
+                  ?>
                   <li><img src="{{ asset('assets/img/bed.svg') }}"></li>
+                  <?php } 
+                   if(in_array('Documentation',$primary_free_services)){
+                  ?>
                   <li><img src="{{ asset('assets/img/doc.svg') }}"></li>
+                  <?php } ?>
                 </ul>
               </div>
             </div>
             <div class="bottom-shadow"></div>
-            <img class="vacation-img" src="{{ asset('assets/img/section-2-bg.png') }}">
+            <!-- <img class="vacation-img" src="{{ asset('assets/img/section-2-bg.png') }}"> -->
+            <img class="vacation-img" src="{{ Storage::url($primary_image->media) }}">
             <h5> 7-day trip in Riyadh, Jeddah, & Al Ula</h5>
           </div>
           </div>
@@ -53,32 +65,39 @@
   
   <section id="crousel">
     <div class="container">
-<div id="carouselExampleCaptions" class="carousel slide">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-  </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="{{ asset('assets/img/slider/slider-1.png') }}" class="d-block w-100" alt="...">
-      <div class="carousel-caption  d-md-block">
-                    <!-- <div class="itinerary-tag">
-              <div class="itinerary-box">
-                <ul>
-                  <li><img src="assets/img/airplane.svg"></li>
-                  <li><img src="assets/img/bed.svg"></li>
-                  <li><img src="assets/img/doc.svg"></li>
-                </ul>
-              </div>
-            </div> -->
-        <h5>First slide label</h5>
-      </div>
+    <div id="carouselExampleCaptions" class="carousel slide">
+    <div class="carousel-indicators">
+        @foreach($secondary_images as $key => $secondary_image)
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $key + 1 }}"></button>
+        @endforeach
     </div>
-    <div class="carousel-item">
+    <div class="carousel-inner">
+        @foreach($secondary_images as $key => $secondary_image)
+            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                <div class="itinerary-tag">
+                  <div class="itinerary-box">
+                    <ul>
+                    <?php $free_services_str = $secondary_image->free_services;
+                          $secondary_free_services = explode(",", $free_services_str);
+                    ?>
+                    @if(in_array('Flight',$secondary_free_services)) <li><img src="{{ asset('assets/img/airplane.svg') }}"></li>@endif
+                    @if(in_array('Visa',$secondary_free_services))  <li><img src="{{ asset('assets/img/bed.svg') }}"></li>@endif
+                    @if(in_array('Documentation',$secondary_free_services))  <li><img src="{{ asset('assets/img/doc.svg') }}"></li>@endif
+                    </ul>
+                  </div>
+                </div> 
+                <img src="{{ Storage::url($secondary_image->media) }}" class="d-block w-100" alt="...">
+                <div class="carousel-caption d-md-block">
+            
+                    <!-- Add your dynamic content here if needed -->
+                    <h5>{{ $secondary_image->title }}</h5>
+                </div>
+            </div>
+        @endforeach
+    <!-- <div class="carousel-item">
       <img src="{{ asset('assets/img/slider/slider-2.png') }}" class="d-block w-100" alt="...">
       <div class="carousel-caption  d-md-block">
-                    <!-- <div class="itinerary-tag">
+                     <div class="itinerary-tag">
               <div class="itinerary-box">
                 <ul>
                   <li><img src="assets/img/airplane.svg"></li>
@@ -86,14 +105,14 @@
                   <li><img src="assets/img/doc.svg"></li>
                 </ul>
               </div>
-            </div> -->
+            </div> 
         <h5>First slide label</h5>
       </div>
     </div>
     <div class="carousel-item">
       <img src="{{ asset('assets/img/slider/slider-3.png') }}" class="d-block w-100" alt="...">
       <div class="carousel-caption  d-md-block">
-                    <!-- <div class="itinerary-tag">
+                    <div class="itinerary-tag">
               <div class="itinerary-box">
                 <ul>
                   <li><img src="assets/img/airplane.svg"></li>
@@ -101,10 +120,10 @@
                   <li><img src="assets/img/doc.svg"></li>
                 </ul>
               </div>
-            </div> -->
+            </div> 
         <h5>First slide label</h5>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
 </div>
@@ -185,7 +204,7 @@
     </section><!-- End spin wheel Section -->
 
   </main><!-- End #main -->
-  <div id="text_to_spin" class="container text-center" style="margin-top: 20px;"><b>Please view the video above to spin the wheel</b></div>
+  <div id="text_to_spin" class="container text-center" style="margin-top: 20px;"><b>Please View the video above to spin the wheel</b></div>
   <div id="watched-time" class="container text-center" style="margin-top: 20px;">Watched Time: 0 seconds</div>
 
 
@@ -198,10 +217,12 @@
   <script src="https://www.youtube.com/iframe_api"></script>
   <!-- <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script> -->
   <!-- <script src="{{ asset('assets/vendor/aos/aos.js') }}"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="{{ asset('assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
   <script src="{{ asset('assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/swiper@10.3.1/swiper.min.js"></script>
+  <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.js"></script>
   <!--<script src="{{ asset('assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
   <script src="{{ asset('assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
   <script src="{{ asset('assets/vendor/php-email-form/validate.js') }}"></script> -->
@@ -248,7 +269,7 @@ $(document).ready(function(){
 					
 				var aoY = t.offset().top;
 				$("#txt").html(aoY);
-				//console.log(aoY);
+				console.log(aoY);
 				
 				/*23.7 is the minumum offset number that 
 				each section can get, in a 30 angle degree.
@@ -256,7 +277,7 @@ $(document).ready(function(){
 				that it has a 30 degree angle and therefore, 
 				exactly aligned with the spin btn*/
 				if(aoY < 23.89){
-					//console.log('<<<<<<<<');
+					console.log('<<<<<<<<');
 					$('#spin').addClass('spin');
 					setTimeout(function () { 
 						$('#spin').removeClass('spin');
