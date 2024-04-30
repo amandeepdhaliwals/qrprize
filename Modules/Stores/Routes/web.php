@@ -47,5 +47,8 @@ Route::group(['namespace' => '\Modules\Stores\Http\Controllers\Backend','as' => 
     Route::post("{$module_name}/storeCampaign", ['as' => "{$module_name}.storeCampaign", 'uses' => "{$controller_name}@storeCampaign"]);
     Route::get("{$module_name}/{storeId}/campaign_index", ['as' => "{$module_name}.campaign_index", 'uses' => "{$controller_name}@campaignIndex"]);
 
+    Route::get("{$module_name}/{storeId}/edit-campaign/{campaignId}", ['as' => "{$module_name}.edit-campaign", 'uses' => "{$controller_name}@editCampaign"]);
+    Route::post("{$module_name}/updateCampaign", ['as' => "{$module_name}.updateCampaign", 'uses' => "{$controller_name}@updateCampaign"]);
+
 
 });

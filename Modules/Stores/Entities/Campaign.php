@@ -23,13 +23,24 @@ class Campaign extends Model
     protected $fillable = [
         'coupon_id',
         'qr_code_url',
+        'qr_code_image',
         'user_id',
         'qrcode_id',
         'coupon_id',
         'total_no_of_coupons',
         'no_of_winned_coupons',
-        'qrcode_id',
-        'qrcode_id',
+        'campaign_name',
+        'adv_video_id',
+        'primary_image_id',
+        'secondary_images_id',
+        'coupons_id',
+        'lock_time',
+        'winning_ratio',
+    ];
+
+    protected $casts = [
+        'secondary_images_id' => 'array',
+        'coupons_id' => 'array',
     ];
     
     protected static function newFactory(): CampaignFactory

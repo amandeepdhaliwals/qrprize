@@ -15,6 +15,8 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Userprofile;
 use Modules\Stores\Entities\Store; // Import the Store model
+use Modules\Coupons\Entities\Coupon; // Import the Coupon model
+use Modules\Advertisements\Entities\Advertisement; // Import the Coupon model
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Arr;
@@ -506,12 +508,70 @@ class StoresController extends BackendBaseController
 
         // Find the store by ID
         $store = User::findOrFail($storeId);
+        $coupons = Coupon::where('status', 1)
+        ->where('deleted_at', null) // Assuming 'isdeleted' is a boolean column
+        ->get();
+
+        $adv_videos = Advertisement::where('status', 1)
+        ->where('deleted_at', null) 
+        ->where('media_type', 'Video') 
+        ->get();
+
+        $adv_images = Advertisement::where('status', 1)
+        ->where('deleted_at', null) 
+        ->where('media_type', 'Image') 
+        ->get();
+
+        // dd($coupons);
 
         logUserAccess($module_title.' '.$module_action);
 
         return view(
             "{$module_path}.{$module_name}.add_campaign",
-            compact('module_title', 'module_name', 'module_path', 'module_icon', 'module_name_singular', 'module_action', 'store')
+            compact('module_title', 'module_name', 'module_path', 'module_icon', 'module_name_singular', 'module_action', 'store','coupons','adv_videos','adv_images')
+        );
+
+    }
+
+
+    public function editCampaign($storeId,$campaignId)
+    {
+        $module_title = 'Qr Code';
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        // $module_model = $this->module_model;
+        $module_model = 'Modules\Stores\Entities\Campaign';
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = 'Edit';
+
+        // Find the store by ID
+        $store = User::findOrFail($storeId);
+
+        $campaign = $module_model::findOrFail($campaignId);
+
+        $coupons = Coupon::where('status', 1)
+        ->where('deleted_at', null)
+        ->get();
+
+        $adv_videos = Advertisement::where('status', 1)
+        ->where('deleted_at', null) 
+        ->where('media_type', 'Video') 
+        ->get();
+
+        $adv_images = Advertisement::where('status', 1)
+        ->where('deleted_at', null) 
+        ->where('media_type', 'Image') 
+        ->get();
+
+        // dd($coupons);
+
+        logUserAccess($module_title.' '.$module_action);
+
+        return view(
+            "{$module_path}.{$module_name}.edit_campaign",
+            compact('module_title', 'module_name', 'module_path', 'module_icon', 'module_name_singular', 'module_action', 'store','coupons','adv_videos','adv_images','campaign')
         );
 
     }
@@ -560,22 +620,36 @@ class StoresController extends BackendBaseController
 
         // Validate the incoming request data
         $request->validate([
-            'coupon_id' => 'required',
+            'campaign_name' => 'required',
            // 'qr_code_url' => 'required|url',
-             'qr_code_url' => 'required',
+             'coupons_id' => 'required',
         ]);
 
-        $url = $request->qr_code_url;
+        // dd($request);
+
+        $campaignId = $module_model::latest()->value('id') + 1;
+        $storeId = $request->store_id;
+        //$url = $request->qr_code_url;
+        // $hostname = url('/store/1/campaign/'. $nextId);
+        $url = url('/store/' . $storeId . '/campaign/' . $campaignId);
         $qrCode = QrCode::format('png')->size(200)->generate($url);
+        $qr_code_image = base64_encode($qrCode);
 
         // Create a new campaign record
         $$module_name_singular = $module_model::create([
-        'coupon_id' => $request->coupon_id,
-        'user_id'  => '1',
+        'campaign_name' => $request->campaign_name,
+        'coupon_id' => '1',
+        'user_id'  => $storeId,
         'total_no_of_coupons' => '1',
         'no_of_winned_coupons' => '1',
         'qr_code_url' => $url,
-        'qr_code_image' => base64_encode($qrCode)
+        'qr_code_image' => $qr_code_image,
+        'adv_video_id' => $request->video_id,
+        'primary_image_id' => $request->primary_image_id,
+        'secondary_images_id' => $request->secondary_images_id,
+        'coupons_id' => $request->coupons_id,
+        'lock_time' => $request->lock_time,
+        'winning_ratio' => $request->winning_ratio,
         ]);
 
 
@@ -583,6 +657,47 @@ class StoresController extends BackendBaseController
 
         // Log the successful creation of the campaign
         Log::info('Campaign created successfully | Id: ' . $$module_name_singular->id);
+
+        return back();
+    }
+
+    public function updateCampaign(Request $request)
+    {
+        $module_title = 'Campaign';
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_model = 'Modules\Stores\Entities\Campaign';
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = 'Update';
+
+        // Validate the incoming request data
+        $request->validate([
+            'campaign_name' => 'required',
+           // 'qr_code_url' => 'required|url',
+             'coupons_id' => 'required',
+        ]);
+
+        $campaign = $module_model::find($request->campaign_id); // $id is the id of the record you want to update
+        // Check if the model instance exists
+        if ($campaign) {
+            // Update the attributes
+            $campaign->campaign_name = $request->campaign_name;
+            $campaign->adv_video_id = $request->video_id;
+            $campaign->primary_image_id = $request->primary_image_id;
+            $campaign->secondary_images_id = $request->secondary_images_id;
+            $campaign->coupons_id = $request->coupons_id;
+            $campaign->lock_time = $request->lock_time;
+            $campaign->winning_ratio = $request->winning_ratio;
+
+            $campaign->save();
+
+            flash(icon().Str::singular($module_title)." Updated")->success()->important();
+
+        } else {
+            flash("Failed to update " . Str::singular($module_title))->error()->important();
+        }
 
         return back();
     }
@@ -613,8 +728,17 @@ class StoresController extends BackendBaseController
         $$module_name = $$module_name->get();    
 
         return Datatables::of($$module_name)
-        ->editColumn('user_id', '{{$user_id}}')
-        ->rawColumns(['user_id'])
+        ->addColumn('edit_compaign', function ($data) use ($module_name) {
+            $storeId = $data->user_id;
+            $campaignId = $data->id;
+            $route = route("backend.{$module_name}.edit-campaign", ['storeId' => $storeId,'campaignId'=>$campaignId]);
+            $button = '<div class="d-flex justify-content-center">
+                            <a href="' . $route . '" class="btn btn-primary">Edit</a>
+                       </div>';
+            return new HtmlString($button);
+        })     
+        ->editColumn('user_id', '{{$user_id}}', '{{$qr_code_image}}', '{{$capmaign_name}}',)
+        ->rawColumns(['user_id','action'])
         ->make(true);
     }
 
