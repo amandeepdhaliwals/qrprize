@@ -8,8 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use Modules\Advertisements\Entities\Advertisement;
+use Modules\Coupons\Entities\Coupon;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use App\Rules\ValidYouTubeLink;
+use App\Rules\ValidVimeoLink;
 
 class AdvertisementsController extends BackendBaseController
 {
@@ -71,10 +74,16 @@ class AdvertisementsController extends BackendBaseController
             })
             ->editColumn('title', '<strong>{{$title}}</strong>')
             ->editColumn('description', '{{$description}}')
-            ->editColumn('media', '@if($media_type == "Image")<img src="{{ Storage::url($media) }}" alt="media Image" class="img-fluid" style="max-width: 100px;">@elseif($media_type == "Video") <video width="150" height="140" controls>
-            <source src="{{ Storage::url($media) }}" type="video/mp4">
-          Your browser does not support the video tag.
-      </video>@else <span> No Media </span> @endif')
+            ->editColumn('media', '@if($media_type == "Image" || $media_type == "image")<img src="{{ Storage::url($media) }}" alt="media Image" class="img-fluid" style="max-width: 100px;">
+            @elseif($media_type == "Video" || $media_type == "video") <video width="150" height="140" controls>
+                <source src="{{ Storage::url($media) }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            @elseif($media_type == "Youtube" || $media_type == "youtube") 
+                <iframe width="150" height="140" src="{{ $media }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            @elseif($media_type == "Vimeo" || $media_type == "vimeo") 
+                <iframe src="{{ $media }}" width="150" height="140" frameborder="0" allowfullscreen></iframe>
+            @else <span> No Media </span> @endif')
             ->editColumn('media_type', '{{$media_type}}')
             ->editColumn('status', '@if($status == 1) <span style="color:green;">Active</span> @else <span style="color:red;">Inactive</span> @endif')
             ->editColumn('created_at', function ($data) {
@@ -105,6 +114,56 @@ class AdvertisementsController extends BackendBaseController
     }
 
 
+    public function create()
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_model = $this->module_model;
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = 'Create';
+
+        $module_coupons = Coupon::where('status', 1)
+        ->where('deleted_at', null)
+        ->get();
+
+
+
+        logUserAccess($module_title.' '.$module_action);
+
+        return view(
+            "{$module_path}.{$module_name}.create",
+            compact('module_title', 'module_name', 'module_path', 'module_icon', 'module_name_singular', 'module_action', 'module_coupons')
+        );
+    }
+
+    public function edit($id)
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_model = $this->module_model;
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = 'Edit';
+
+        $$module_name_singular = $module_model::findOrFail($id);
+
+        $module_coupons = Coupon::where('status', 1)
+        ->where('deleted_at', null)
+        ->get();
+
+        logUserAccess($module_title.' '.$module_action.' | Id: '.$$module_name_singular->id);
+
+        return view(
+            "{$module_path}.{$module_name}.edit",
+            compact('module_title', 'module_name', 'module_path', 'module_icon', 'module_action', 'module_name_singular', "{$module_name_singular}", 'module_coupons')
+        );
+    }
+
     /**
      * Store a new resource in the database.
      *
@@ -115,7 +174,7 @@ class AdvertisementsController extends BackendBaseController
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+       //  dd($request->all());
         $module_title = $this->module_title;
         $module_name = $this->module_name;
         $module_path = $this->module_path;
@@ -124,27 +183,56 @@ class AdvertisementsController extends BackendBaseController
         $module_name_singular = Str::singular($module_name);
 
         $module_action = 'Store';
-   
-        $file = $request->file('media');
-        if ($file) {
-            $request->validate([
-                'media' => 'required|file|max:20480', // Maximum file size in kilobytes (20 MB in this example)
-            ]);
-            // Store the file in the storage directory
-            $path = Storage::disk('public')->putFile('uploads/advertisements', $file, 'public');
-           
-        }
         $requestData = $request->all();
-        if ($file) {
-            $image_type = 'Image';
-            $video_type = 'Video';
+        if($request->media_type=='image'){
+   
+            $file = $request->file('image_file');
+            if ($file) {
+                $request->validate([
+                    'image_file' => 'required|file|max:20480', // Maximum file size in kilobytes (20 MB in this example)
+                ]);
+                // Store the file in the storage directory
+                $path = Storage::disk('public')->putFile('uploads/advertisements', $file, 'public');
+                $requestData['media'] = $path;
+            
+            }
 
-            $extension = $file->extension();
-
-            $media_type = $extension === 'jpg' || $extension === 'jpeg' || $extension === 'png' || $extension === 'gif' ? $image_type : $video_type;
-            $requestData['media'] = $path;
-            $requestData['media_type'] = $media_type;
         }
+        if($request->media_type=='video'){
+   
+            $file = $request->file('video_file');
+            if ($file) {
+                $request->validate([
+                    'video_file' => 'required|file|max:20480', // Maximum file size in kilobytes (20 MB in this example)
+                ]);
+                // Store the file in the storage directory
+                $path = Storage::disk('public')->putFile('uploads/advertisements', $file, 'public');
+                $requestData['media'] = $path;
+            
+            }
+
+        }
+        if($request->media_type=='youtube'){
+            $request->validate([
+                'youtube_link' => ['required', new ValidYouTubeLink],
+            ]);
+            $videoID = $this->extractVideoID($request->youtube_link);
+
+            // Create the embed link
+            $embedLink = "https://www.youtube.com/embed/" . $videoID;
+            $requestData['media'] = $embedLink;
+        }
+        if($request->media_type=='vimeo'){
+            $request->validate([
+                'vimeo_link' => ['required', new ValidVimeoLink],
+            ]);
+            $videoID = $this->extractVimeoID($request->vimeo_link);
+            $embedLink = "https://player.vimeo.com/video/" . $videoID;
+
+            $requestData['media'] = $embedLink;
+        }
+
+    
         if($request->free_services){
             $requestData['free_services'] = implode(',', $request->free_services);
         }
@@ -171,29 +259,58 @@ class AdvertisementsController extends BackendBaseController
 
         $module_action = 'Update';
 
-        $file = $request->file('media');
-        if ($file) {
-            $request->validate([
-                'media' => 'required|file|max:20480', // Maximum file size in kilobytes (20 MB in this example)
-            ]);
-            // Store the file in the storage directory
-            $path = Storage::disk('public')->putFile('uploads/advertisements', $file, 'public');
-           
-        }
         $requestData = $request->all();
-        if ($file) {
-            $image_type = 'Image';
-            $video_type = 'Video';
+        if($request->media_type=='image'){
+   
+            $file = $request->file('image_file');
+            if ($file) {
+                $request->validate([
+                    'image_file' => 'required|file|max:20480', // Maximum file size in kilobytes (20 MB in this example)
+                ]);
+                // Store the file in the storage directory
+                $path = Storage::disk('public')->putFile('uploads/advertisements', $file, 'public');
+                $requestData['media'] = $path;
+            
+            }
 
-            $extension = $file->extension();
+        }
+        if($request->media_type=='video'){
+   
+            $file = $request->file('video_file');
+            if ($file) {
+                $request->validate([
+                    'video_file' => 'required|file|max:20480', // Maximum file size in kilobytes (20 MB in this example)
+                ]);
+                // Store the file in the storage directory
+                $path = Storage::disk('public')->putFile('uploads/advertisements', $file, 'public');
+                $requestData['media'] = $path;
+            
+            }
 
-            $media_type = $extension === 'jpg' || $extension === 'jpeg' || $extension === 'png' || $extension === 'gif' ? $image_type : $video_type;
-            $requestData['media'] = $path;
-            $requestData['media_type'] = $media_type;
+        }
+        if($request->media_type=='youtube'){
+            $request->validate([
+                'youtube_link' => ['required', new ValidYouTubeLink],
+            ]);
+            $videoID = $this->extractVideoID($request->youtube_link);
+            $embedLink = "https://www.youtube.com/embed/" . $videoID;
+            $requestData['media'] = $embedLink;
+        }
+
+        if($request->media_type=='vimeo'){
+            $request->validate([
+                'vimeo_link' => ['required', new ValidVimeoLink],
+            ]);
+            $videoID = $this->extractVimeoID($request->vimeo_link);
+            $embedLink = "https://player.vimeo.com/video/" . $videoID;
+
+            $requestData['media'] = $embedLink;
         }
         if($request->free_services){
             $requestData['free_services'] = implode(',', $request->free_services);
         }
+
+     //   dd($requestData);
 
         $$module_name_singular = $module_model::findOrFail($id);
 
@@ -234,5 +351,29 @@ class AdvertisementsController extends BackendBaseController
         );
     }
 
+private function extractVideoID($youtubeLink)
+    {
+        // Extract video ID from YouTube link
+        $videoID = '';
+        $queryString = parse_url($youtubeLink, PHP_URL_QUERY);
+        parse_str($queryString, $params);
+        if (isset($params['v'])) {
+            $videoID = $params['v'];
+        } elseif (preg_match('/(?:\/|%3D|v=|vi=)([^\?\&\"\'\s]+)/', $youtubeLink, $match)) {
+            $videoID = $match[1];
+        }
 
+        return $videoID;
+    }
+
+    private function extractVimeoID($vimeoLink)
+    {
+        // Extract video ID from Vimeo link
+        $videoID = '';
+        if (preg_match('/(?:\/|^)(\d+)$/', $vimeoLink, $match)) {
+            $videoID = $match[1];
+        }
+
+        return $videoID;
+    }
 }
