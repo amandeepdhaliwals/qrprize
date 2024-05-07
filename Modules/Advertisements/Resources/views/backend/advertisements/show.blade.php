@@ -3,13 +3,21 @@
 @section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 @php
     $data = $$module_name_singular;
-    if($data['media_type'] == 'Image'){
+    if($data['media_type'] == 'Image' || $data['media_type'] == 'image'){
         $data['media'] = url('/storage').'/'.$data['media'];
-    }else{ 
+    }else if($data['media_type'] == 'Video' || $data['media_type'] == 'video'){ 
         $mediaUrl = url('/storage').'/'.$data['media'];
         $data['media'] = '<video width="380" height="240" controls>';
         $data['media'] .= '<source src="' . $mediaUrl . '" type="video/mp4">';
         $data['media'] .= '</video>';
+    }
+    else if($data['media_type'] == 'Youtube' || $data['media_type'] == 'youtube'){ 
+        $mediaUrl = $data['media'];
+        $data['media'] = ' <iframe width="380" height="240" src="'. $mediaUrl .'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';    
+    }
+    else if($data['media_type'] == 'Vimeo' || $data['media_type'] == 'vimeo'){ 
+        $mediaUrl = $data['media'];
+        $data['media'] = '  <iframe src="'. $mediaUrl .'" width="380" height="240" frameborder="0" allowfullscreen></iframe>';
     }
 @endphp
 
