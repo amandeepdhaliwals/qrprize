@@ -52,7 +52,7 @@ class CouponsController extends BackendBaseController
         $page_heading = label_case($module_title);
         $title = $page_heading.' '.label_case($module_action);
 
-        $$module_name = $module_model::select('id', 'title', 'description','code','image','status','created_at','updated_at');
+        $$module_name = $module_model::select('id', 'title', 'description','code','image','status','category','total_coupons','created_at','updated_at');
 
         $data = $$module_name;
 
@@ -67,6 +67,20 @@ class CouponsController extends BackendBaseController
             ->editColumn('code', '{{$code}}')
             ->editColumn('image', '@if($image)<img src="{{ Storage::url($image) }}" alt="Coupon Image" class="img-fluid" style="max-width: 100px;">@else <span style="">No Image</span> @endif')
             ->editColumn('status', '@if($status == 1) <span style="color:green;">Active</span> @else <span style="color:red;">Inactive</span> @endif')
+            ->editColumn('category', function ($data) {
+                return ($data->category === 'main') ? 'Main' : 'Other';
+            })
+            ->editColumn('total_coupons', function ($data) {
+                $color = '';
+                if ($data->total_coupons >= 10) {
+                    $color = 'green';
+                } elseif ($data->total_coupons >= 5) {
+                    $color = 'orange';
+                } else {
+                    $color = 'red';
+                }
+                return '<span style="color: '.$color.'">'.$data->total_coupons.'</span>';
+            })
             ->editColumn('created_at', function ($data) {
                 $module_name = $this->module_name;
 
@@ -89,11 +103,10 @@ class CouponsController extends BackendBaseController
 
                 return $data->updated_at->isoFormat('llll');
             })
-            ->rawColumns(['title','description','code','image','status','created_at','action'])
+            ->rawColumns(['title','description','code','image','status','category','total_coupons','created_at','action'])
             ->orderColumns(['id'], '-:column $1')
             ->make(true);
     }
-
 
     /**
      * Store a new resource in the database.
@@ -125,6 +138,9 @@ class CouponsController extends BackendBaseController
             $requestData['image'] = $path;
         }
 
+        $requestData['total_coupons'] = $request->input('total_coupons');
+        $requestData['category'] = $request->input('category');
+        
         $$module_name_singular = $module_model::create($requestData);
        
         flash(icon()."New '".Str::singular($module_title)."' Added")->success()->important();

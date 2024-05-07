@@ -53,7 +53,9 @@
                             <th>Description</th>
                             <th>Code</th> 
                             <th>Image</th>
-                             <th>Status</th>
+                            <th>Status</th>
+                            <th>Category</th>
+                            <th>Total Coupons Available</th>
                             <th>Created At</th>
                             <th>Updated At</th>
                             <th class="text-end">Action</th>
@@ -69,6 +71,8 @@
                             <td>{{ $coupon->code }}</td> 
                             <td><img src="{{ $coupon->image }}" alt="Coupon Image" class="img-fluid" style="max-width: 100px;"></td>
                             <td>{{ $coupon->status }}</td>
+                            <td>{{ $coupon->category }}</td>
+                            <td>{{ $coupon->total_coupons }}</td>
                             <td>{{ $coupon->created_at }}</td>
                             <td>{{ $coupon->updated_at }}</td>
                             <td class="text-end">
@@ -128,6 +132,8 @@
             { data: 'code', name: 'code' },
             { data: 'image', name: 'image' },
             { data: 'status', name: 'status' },
+            { data: 'category', name: 'category' },
+            { data: 'total_coupons', name: 'total_coupons' },
             { data: 'created_at', name: 'created_at' },
             { data: 'updated_at', name: 'updated_at' },
             { data: 'action', name: 'action', orderable: false, searchable: false }

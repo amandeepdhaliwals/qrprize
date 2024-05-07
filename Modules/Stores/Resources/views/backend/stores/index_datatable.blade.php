@@ -49,7 +49,7 @@
                             <th>Name</th>
                             <th>Email</th>
                             <th>Mobile</th>
-                            <th>Status</th>
+                            <th>User Status</th>
                             <th>Step Completed</th>
                             <th>Created At</th>
                             <th>Updated At</th>

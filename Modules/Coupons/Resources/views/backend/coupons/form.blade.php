@@ -25,6 +25,36 @@
     </div>
 </div>
 <div class="row mb-3">
+    <div class="col-12 col-sm-6">
+    <div class="form-group">
+            <?php
+            $field_name = 'category';
+            $field_lable = label_case($field_name);
+            $field_placeholder = "-- Select an option --";
+            $required = "required";
+            $select_options = [
+                'other' => 'Other',
+                'main' => 'Main'
+            ];
+            ?>
+            {{ html()->label($field_lable, $field_name)->class('form-label') }} {!! fielf_required($required) !!}
+            {{ html()->select($field_name, $select_options)->placeholder($field_placeholder)->class('form-select')->attributes(["$required"]) }}
+        </div>
+    </div>
+    <div class="col-12 col-sm-6">
+        <div class="form-group">
+            <?php
+            $field_name = 'total_coupons';
+            $field_lable = label_case($field_name);
+            $field_placeholder = $field_lable;
+            $required = "required";
+            ?>
+            {{ html()->label($field_lable, $field_name)->class('form-label') }} {!! fielf_required($required) !!}
+            {{ html()->number($field_name)->placeholder($field_placeholder)->class('form-control')->attributes(["$required"]) }}
+        </div>
+    </div>
+</div>
+<div class="row mb-3">
     <div class="col-8">
         <div class="form-group">
             <?php

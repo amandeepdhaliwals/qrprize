@@ -44,27 +44,23 @@
 
         <hr>
 
-        <div class="step-container">
-            <div class="step-icon">
-                @if($store->status === 1)
+        @if($store->step_completed >= 1)
+            <div class="step-container">
+                <div class="step-icon">
                     <i class="fas fa-check-circle completed"></i>
-                @else
-                    <i class="fas fa-circle"></i>
-                @endif
+                </div>
+                <span>Step 1 - Basic details</span>
             </div>
-            <span>Step 1 - Basic details</span>
-        </div>
+        @endif
 
-        <div class="step-container">
-            <div class="step-icon">
-                @if($store->status === 1)
+        @if($store->step_completed >= 2)
+            <div class="step-container">
+                <div class="step-icon">
                     <i class="fas fa-check-circle completed"></i>
-                @else
-                    <i class="fas fa-circle"></i>
-                @endif
+                </div>
+                <span>Step 2 - Profile details</span>
             </div>
-            <span>Step 2 - Profile details</span>
-        </div>
+        @endif
 
         {{ html()->form('POST', route('backend.stores.storeCampaign'))->class('form-horizontal')->open() }}
         {{ csrf_field() }}
