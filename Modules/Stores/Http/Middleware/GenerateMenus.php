@@ -14,7 +14,7 @@ class GenerateMenus
     {
         \Menu::make('admin_sidebar', function ($menu) {
             // Stores
-            $menu->add('<i class="nav-icon fa-solid fa-ticket"></i> '.__('Stores'), [
+            $menu->add('<i class="nav-icon fas fa-store"></i> '.__('Stores'), [
                 'route' => 'backend.stores.index',
                 'class' => 'nav-item',
             ])

@@ -1,0 +1,31 @@
+{
+    "name": "nasirkhan/otherprizes",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nasir Khan",
+            "email": "nasir8891@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Otherprizes\\": "",
+            "Modules\\Otherprizes\\App\\": "app/",
+            "Modules\\Otherprizes\\Database\\Factories\\": "database/factories/",
+            "Modules\\Otherprizes\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Otherprizes\\Tests\\": "tests/"
+        }
+    }
+}

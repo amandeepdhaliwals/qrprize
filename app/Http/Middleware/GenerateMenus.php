@@ -28,6 +28,66 @@ class GenerateMenus
                     'class' => 'nav-link',
                 ]);
 
+                \Menu::make('admin_sidebar', function ($menu) {
+                    // gallery images
+                    $accessControl = $menu->add('<i class="nav-icon fa-solid fas fa-photo-video"></i> Gallery', [
+                        'class' => 'nav-group',
+                    ])
+                        ->data([
+                            'order' => 2,
+                            'activematches' => [
+                                'admin/gallery*',
+                            ],
+                            'permission' => ['view_gallery'],
+                        ]);
+                    $accessControl->link->attr([
+                        'class' => 'nav-link nav-group-toggle',
+                        'href' => '#',
+                    ]);
+        
+                    $accessControl->add('<i class="nav-icon fa-solid fa-image"></i> Images', [
+                        'route' => 'backend.gallery.index',
+                        'class' => 'nav-item',
+                    ])
+                        ->data([
+                            'order' => 2,
+                            'activematches' => 'admin/gallery*',
+                            'permission' => ['view_gallery'],
+                        ])
+                            ->link->attr([
+                                'class' => 'nav-link',
+                            ]);
+                
+                    /// Submenu Videos
+                    $accessControl->add('<i class="nav-icon fa-solid fa-video"></i> Videos', [
+                        'route' => 'backend.videos.index',
+                        'class' => 'nav-item',
+                    ])
+                        ->data([
+                            'order' => 3,
+                            'activematches' => 'admin/videos*',
+                            'permission' => ['view_videos'],
+                        ])
+                        ->link->attr([
+                            'class' => 'nav-link',
+                        ]);  
+                    
+                    /// Submenu Other Prize
+                    $accessControl->add('<i class="nav-icon fa-solid fa-image"></i> Other Prize Images', [
+                        'route' => 'backend.otherprizes.index',
+                        'class' => 'nav-item',
+                    ])
+                        ->data([
+                            'order' => 3,
+                            'activematches' => 'admin/otherprizes*',
+                            'permission' => ['view_otherprizes'],
+                        ])
+                        ->link->attr([
+                            'class' => 'nav-link',
+                     ]);
+                            
+                    })->sortBy('order'); 
+
             // // Notifications
             // $menu->add('<i class="nav-icon fas fa-bell"></i> Notifications', [
             //     'route' => 'backend.notifications.index',

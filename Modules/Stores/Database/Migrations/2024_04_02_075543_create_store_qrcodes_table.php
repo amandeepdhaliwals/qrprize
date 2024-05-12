@@ -14,11 +14,8 @@ return new class extends Migration
         Schema::create('store_qrcodes', function (Blueprint $table) {
             $table->id();   
             $table->integer('user_id'); 
-            $table->integer('adv_video_id');  
-            $table->string('adv_heading')->nullable();
-            $table->integer('adv_primary_image_id');  
-            $table->json('adv_secondary_image_ids')->nullable();
             $table->integer('step_completed')->unsigned()->nullable();
+            $table->string('store_name')->nullable();
             $table->boolean('status')->default(true);
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();

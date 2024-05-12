@@ -249,9 +249,7 @@ class UserController extends Controller
             Store::create([
                 'user_id' => $$module_name_singular->id,
                 'status' => '1',
-                'created_by' => '1',
-                'adv_video_id' => '0',
-                'adv_primary_image_id' => '0',
+                'store_name' => $data_array['name'],
                 'step_completed' => '1'
             ]);
         }

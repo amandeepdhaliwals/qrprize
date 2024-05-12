@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use Modules\Stores\Entities\Campaign; 
-use Modules\Advertisements\Entities\Advertisement; 
+use Modules\Videos\Entities\Advertisement; 
 use Modules\Coupons\Entities\Coupon; 
 use Illuminate\Http\Response;
 

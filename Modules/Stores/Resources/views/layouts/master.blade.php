@@ -17,6 +17,12 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <link href="{{ asset('assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet"> 
+    <link href="{{ asset('assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet"> 
+  <link href="{{ asset('assets/css/wheel.css') }}" rel="stylesheet"> 
     {{-- Vite CSS --}}
     {{-- {{ module_vite('build-stores', 'resources/assets/sass/app.scss') }} --}}
 </head>

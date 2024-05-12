@@ -17,7 +17,7 @@ class CouponsController extends BackendBaseController
     public function __construct()
     {
         // Page Title
-        $this->module_title = 'Coupons';
+        $this->module_title = 'Winning Prize';
 
         // module name
         $this->module_name = 'coupons';
@@ -140,6 +140,7 @@ class CouponsController extends BackendBaseController
 
         $requestData['total_coupons'] = $request->input('total_coupons');
         $requestData['category'] = $request->input('category');
+        $requestData['terms_and_condition'] = $request->input('terms_and_condition');
         
         $$module_name_singular = $module_model::create($requestData);
        
