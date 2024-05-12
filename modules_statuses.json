@@ -4,7 +4,9 @@
     "Comment": true,
     "Category": true,
     "Coupons": true,
-    "Advertisements": true,
+    "Videos": true,
     "Stores": true,
-    "Customers": true
+    "Customers": true,
+    "Gallery": true,
+    "Otherprizes": true
 }

@@ -14,7 +14,7 @@ class GenerateMenus
     {
         \Menu::make('admin_sidebar', function ($menu) {
             // Coupons
-            $menu->add('<i class="nav-icon fa-solid fa-ticket"></i> '.__('Coupons'), [
+            $menu->add('<i class="nav-icon fas fa-ticket-alt"></i> '.__('Winning Prizes'), [
                 'route' => 'backend.coupons.index',
                 'class' => 'nav-item',
             ])

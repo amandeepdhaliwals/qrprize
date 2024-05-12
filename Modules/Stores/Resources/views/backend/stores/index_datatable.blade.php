@@ -46,14 +46,15 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Name</th>
+                            <th><b>Store Name</b></th>
+                            <th>Username</th>
                             <th>Email</th>
                             <th>Mobile</th>
                             <th>User Status</th>
                             <th>Step Completed</th>
                             <th>Created At</th>
                             <th>Updated At</th>
-                            <th>Add Compaign</th>
+                            <th>Add Campaign</th>
                             <th>Action</th> 
                         </tr>
                     </thead>
@@ -99,6 +100,10 @@
         columns: [{
                 data: 'id',
                 name: 'id'
+            },
+            {
+                data: 'store_name',
+                name: 'store_name'
             },
             {
                 data: 'name',

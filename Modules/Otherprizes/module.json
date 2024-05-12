@@ -1,0 +1,11 @@
+{
+    "name": "Otherprizes",
+    "alias": "otherprizes",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Otherprizes\\Providers\\OtherprizesServiceProvider"
+    ],
+    "files": []
+}

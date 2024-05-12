@@ -50,5 +50,14 @@ Route::group(['namespace' => '\Modules\Stores\Http\Controllers\Backend','as' => 
     Route::get("{$module_name}/{storeId}/edit-campaign/{campaignId}", ['as' => "{$module_name}.edit-campaign", 'uses' => "{$controller_name}@editCampaign"]);
     Route::post("{$module_name}/updateCampaign", ['as' => "{$module_name}.updateCampaign", 'uses' => "{$controller_name}@updateCampaign"]);
 
+    //Advertisement
+    Route::get("{$module_name}/{storeId}/advertisement_create", ['as' => "{$module_name}.advertisement_create", 'uses' => "{$controller_name}@addAdvertisement"]);
+    Route::post("{$module_name}/storeAdvertisement", ['as' => "{$module_name}.storeAdvertisement", 'uses' => "{$controller_name}@storeAdvertisement"]);
+    Route::get("{$module_name}/{storeId}/advertisement_index", ['as' => "{$module_name}.advertisement_index", 'uses' => "{$controller_name}@advertisementIndex"]);
+
+    ////Preview Advertisement
+    Route::get("{$module_name}/{storeId}/{request_action}/preview_advertisement", ['as' => "{$module_name}.preview_advertisement", 'uses' => "{$controller_name}@previewAdvertisement"]);
+
+
 
 });

@@ -15,32 +15,21 @@ class Campaign extends Model
      *
      * @var string
      */
-    protected $table = 'store_coupons_assign';
+    protected $table = 'campaign';
 
     /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'coupon_id',
+        'campaign_name',
+        'store_id',
         'qr_code_url',
         'qr_code_image',
-        'user_id',
-        'qrcode_id',
-        'coupon_id',
-        'total_no_of_coupons',
-        'no_of_winned_coupons',
-        'campaign_name',
-        'adv_video_id',
-        'primary_image_id',
-        'secondary_images_id',
-        'coupons_id',
-        'lock_time',
-        'winning_ratio',
+        'advertisement_ids'
     ];
 
     protected $casts = [
-        'secondary_images_id' => 'array',
-        'coupons_id' => 'array',
+        'advertisement_ids' => 'array',
     ];
     
     protected static function newFactory(): CampaignFactory

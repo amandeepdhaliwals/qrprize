@@ -28,6 +28,35 @@
     .completed {
         color: green; /* Change to your tick color */
     }
+    .note {
+    color: #777; /* Adjust color as needed */
+    font-size: 14px; /* Adjust font size as needed */
+    margin-top: 5px; /* Adjust margin as needed */
+    .step-container {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+  }
+  h5 {
+    margin: 0;
+    color: #333;
+  }
+  .note-line {
+    color: #007bff; /* Blue color for the note */
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .step-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Adjust margin as needed */
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+  }
+}
 </style>
 <div class="card">
     <div class="card-body">
@@ -42,9 +71,18 @@
             </x-slot>
         </x-backend.section-header>
 
+        <div class="step-container">
+        <h5>{{$store->store_name}}</h5>
+        </div>
+        <div class="note-line">Note: Add advertisement here for the store and then assign it to ad campaigns.</div>
         <hr>
 
-        @if($store->step_completed >= 1)
+        <hr>
+        @php
+        $stepCompleted = $store->step_completed;
+        @endphp
+
+        @if($stepCompleted >= 1)
             <div class="step-container">
                 <div class="step-icon">
                     <i class="fas fa-check-circle completed"></i>
@@ -53,7 +91,7 @@
             </div>
         @endif
 
-        @if($store->step_completed >= 2)
+        @if($stepCompleted >= 2)
             <div class="step-container">
                 <div class="step-icon">
                     <i class="fas fa-check-circle completed"></i>
@@ -62,99 +100,101 @@
             </div>
         @endif
 
-        {{ html()->form('POST', route('backend.stores.storeCampaign'))->class('form-horizontal')->open() }}
+        @if($stepCompleted == 2)
+            <div class="step-container active">
+                <div class="step-icon">
+                    <i class="fas fa-check-circle" style="color: orange;"></i>
+                </div>
+                <div>
+                    <span style="color: orange;font-weight: bold;" >Step 3 - Add Advertisements</span>
+                    <span class="ml-2 text-muted">Note: You can add advertisements here by selecting video and entering the details.</span>
+                </div>
+            </div>
+            <div class="mt-2"> 
+                <div class="mt-2"> 
+                <a href="{{ route('backend.stores.advertisement_create', ['storeId' => $storeId]) }}" class="btn btn-primary">Add Advertisement</a>
+                </div> 
+            </div> 
+            <br> 
+        @endif
+
+        @if($stepCompleted >= 3)
+            <div class="step-container active">
+                <div class="step-icon">
+                    <i class="fas fa-check-circle completed" ></i>
+                </div>
+                <div>
+                    <span style="font-weight: bold;" >Step 3 - Add Advertisements</span>
+                    <span class="ml-2 text-muted">Note: You can add more advertisements here by selecting video and entering the details.</span>
+                </div>
+            </div>
+            <div class="mt-2"> 
+                <div class="mt-2"> 
+                <a href="{{ route('backend.stores.advertisement_create', ['storeId' => $storeId]) }}" class="btn btn-primary">Add More Advertisement</a>
+                </div> 
+            </div> 
+            <br> 
+        @endif
+
+        @if($stepCompleted == 3)
+            <div class="step-container">
+                <div class="step-icon">
+                <i class="fas fa-check-circle" style="color: orange;"></i>
+                </div>
+                <span style="color: orange;font-weight: bold;" >Step 4 - Add Campaign</span>
+
+            </div>
+        @elseif($stepCompleted == 2)
+            <div class="step-container disabled">
+                <div class="step-icon">
+                    <i class="fas fa-circle"></i>
+                </div>
+                <span>Step 4 - Add Campaign</span>
+            </div>
+        @endif
+
+        @if($stepCompleted == 4)
+            <div class="step-container">
+                <div class="step-icon">
+                <i class="fas fa-check-circle completed"></i>
+                </div>
+                <span style="font-weight: bold;" >Step 4 - Add Campaign - </span>
+                <span class="ml-2 text-muted">Note: You can add more campaign by selecting advertisements</span>
+            </div>
+        @endif
+
+         <hr>
+         @if($stepCompleted >= 3)
+         {{ html()->form('POST', route('backend.stores.storeCampaign'))->class('form-horizontal')->open() }}
         {{ csrf_field() }}
-        <h2>Step 3 - Add Campaign</h2>
+        
+        <div class="row">    
+                <div class="columns medium-12 small-centered">
+                    <h4 class="float-left"><a href="#" style="color:#000;">Select Advertisement</a>
+                    <div class="note">Select multiple advertisement from list that you already creted in 3rd Step.</div>
+                </div>
+                </div>
         <div class="row mt-4">
             <div class="col">
-            <div class="form-group row mb-3">
-                    <label class="col-sm-2 form-control-label">Campaign Name</label>
-                    <div class="col-sm-10">
-                    <input type="hidden" class="form-control" name="store_id" value="{{ $store->id }}">
-                        <!-- Input for QR code URL -->
-                        <input type="text" class="form-control" name="campaign_name" placeholder="Enter campaign name" required>
-                    </div>
-                </div>
                 <div class="form-group row mb-3">
                     <label class="col-sm-2 form-control-label">Advertisement Video</label>
                     <div class="col-sm-10">
-                        <!-- Dropdown for coupon -->
-                        <!-- Replace the placeholder with your dropdown options -->
-                        <select class="form-control" name="video_id" required>
+  
+                        <select class="form-control" name="advertisement_ids[]" multiple required>
                         <option value="">--Select--</option>
-                            @foreach($adv_videos as $adv_video)
-                            <option value="{{ $adv_video->id }}">{{ $adv_video->title }}</option>
+                            @foreach($advertisements as $advertisement)
+                            <option value="{{ $advertisement->id }}">{{ $advertisement->advertisement_name }}</option>
                             @endforeach
-                            <!-- Add more options as needed -->
                         </select>
                     </div>
                 </div>
                 <div class="form-group row mb-3">
-                    <label class="col-sm-2 form-control-label">Primary Image</label>
+                    <label class="col-sm-2 form-control-label">Campaign Name</label>
                     <div class="col-sm-10">
-                        <!-- Dropdown for coupon -->
-                        <!-- Replace the placeholder with your dropdown options -->
-                        <select class="form-control" name="primary_image_id" required>
-                            <option value="">--Select--</option>
-                            @foreach($adv_images as $adv_image)
-                            <option value="{{ $adv_image->id }}">{{ $adv_image->title }}</option>
-                            @endforeach
-                            <!-- Add more options as needed -->
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row mb-3">
-                    <label class="col-sm-2 form-control-label">Secondary Images(carousel)</label>
-                    <div class="col-sm-10">
-                        <!-- Dropdown for coupon -->
-                        <!-- Replace the placeholder with your dropdown options -->
-                        <select class="form-control" name="secondary_images_id[]"  multiple required>
-                            @foreach($adv_images as $adv_image)
-                            <option value="{{ $adv_image->id }}">{{ $adv_image->title }}</option>
-                            @endforeach
-                            <!-- Add more options as needed -->
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row mb-3">
-                    <label class="col-sm-2 form-control-label">Coupon</label>
-                    <div class="col-sm-10">
-                        <!-- Dropdown for coupon -->
-                        <!-- Replace the placeholder with your dropdown options -->
-                        <select class="form-control" name="coupons_id[]" multiple required>
-                            @foreach($coupons as $coupon)
-                            <option value="{{ $coupon->id }}">{{ $coupon->title }}</option>
-                            @endforeach
-                            <!-- Add more options as needed -->
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row mb-3">
-                    <label class="col-sm-2 form-control-label">Lock Time</label>
-                    <div class="col-sm-10">
-                        <!-- Dropdown for coupon -->
-                        <!-- Replace the placeholder with your dropdown options -->
-                        <select class="form-control" name="lock_time" required>
-                        <option value="">--Select--</option>
-                        <option value="1">1 hour</option>
-                        <option value="6">6 hours</option>
-                        <option value="12">12 hours</option>
-                        <option value="18">18 hours</option>
-                        <option value="24">24 hours</option>
-                        <option value="30">30 hours</option>
-                        <option value="36">36 hours</option>
-                        <option value="42">42 hours</option>
-                        <option value="48">48 hours</option>
-                        <!-- Add more options as needed -->
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row mb-3">
-                    <label class="col-sm-2 form-control-label">Winning Ratio</label>
-                    <div class="col-sm-10">
-                    <span>1</span>
-                    <label for="denominator">out of : </label>
-                    <input type="number" name="winning_ratio" class="ratio-input" required>
+                    <input type="hidden" class="form-control" name="store_id" value="{{ $store->user_id }}">
+                    <input type="hidden" class="form-control" name="campaign_name_hid" value="{{ $store->user_id }}">
+                        <!-- Input for QR code URL -->
+                        <input type="text" class="form-control" name="campaign_name" placeholder="Enter campaign name" required>
                     </div>
                 </div>
             </div>
@@ -176,6 +216,7 @@
             </div>
         </div>
         {{ html()->form()->close() }}
+        @endif
     </div>
 
     <div class="card-footer">
@@ -223,7 +264,7 @@
         serverSide: true,
         autoWidth: true,
         responsive: true,
-        ajax: '{{ route("backend.$module_name.campaign_index", ['storeId' => ':storeId']) }}',
+        ajax: '{{ route("backend.$module_name.campaign_index", ['storeId' => ':storeId']) }}'.replace(':storeId', '{{ $store->user_id }}'),
         columns: [{
                 data: 'id',
                 name: 'id'
@@ -235,13 +276,10 @@
             {
                 data: 'qr_code_image', 
                 name: 'qr_code_image',
-                render: function(data, type, full, meta){
-                    return '<img src="data:image/png;base64,' + data + '" alt="QR Code" />';
-                }
             },
             {
-                data: 'edit_compaign',
-                name: 'edit_compaign'
+                data: 'edit_campaign',
+                name: 'edit_campaign'
             },
         ]
     });

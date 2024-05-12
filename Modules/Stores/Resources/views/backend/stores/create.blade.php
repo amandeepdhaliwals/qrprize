@@ -2,6 +2,14 @@
 
 @section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 
+<style>
+    .required::after {
+    content: "*";
+    color: red;
+    margin-left: 5px; /* Adjust the spacing as needed */
+}
+</style>
+
 @section('breadcrumbs')
 <x-backend-breadcrumbs>
     <x-backend-breadcrumb-item route='{{route("backend.$module_name.index")}}' icon='{{ $module_icon }}'>
@@ -32,8 +40,18 @@
         {{ csrf_field() }}
         <div class="row mt-4">
             <div class="col">
+               <div class="form-group row  mb-3">
+                    <label class="col-sm-2 form-control-label required">Store Name</label>
+                    <div class="col-sm-10">
+                        {{ html()->text('store_name')
+                                ->class('form-control')
+                                ->placeholder(__('Store Name'))
+                                ->attribute('maxlength', 191)
+                                ->required() }}
+                    </div>
+                </div>
                 <div class="form-group row  mb-3">
-                    {{ html()->label(__('labels.backend.users.fields.first_name'))->class('col-sm-2 form-control-label')->for('first_name') }}
+                    {{ html()->label(__('labels.backend.users.fields.first_name'))->class('col-sm-2 form-control-label required')->for('first_name') }}
                     <div class="col-sm-10">
                         {{ html()->text('first_name')
                                 ->class('form-control')
@@ -44,7 +62,7 @@
                 </div>
 
                 <div class="form-group row  mb-3">
-                    {{ html()->label(__('labels.backend.users.fields.last_name'))->class('col-sm-2 form-control-label')->for('last_name') }}
+                    {{ html()->label(__('labels.backend.users.fields.last_name'))->class('col-sm-2 form-control-label required')->for('last_name') }}
                     <div class="col-sm-10">
                         {{ html()->text('last_name')
                                 ->class('form-control')
@@ -55,7 +73,7 @@
                 </div>
 
                 <div class="form-group row  mb-3">
-                    {{ html()->label(__('labels.backend.users.fields.email'))->class('col-sm-2 form-control-label')->for('email') }}
+                    {{ html()->label(__('labels.backend.users.fields.email'))->class('col-sm-2 form-control-label required')->for('email') }}
 
                     <div class="col-sm-10">
                         {{ html()->email('email')
@@ -66,7 +84,7 @@
                     </div>
                 </div>
 
-                <div class="form-group row  mb-3">
+                <!-- <div class="form-group row  mb-3">
                     {{ html()->label(__('labels.backend.users.fields.password'))->class('col-sm-2 form-control-label')->for('password') }}
 
                     <div class="col-sm-10">
@@ -86,7 +104,7 @@
                                 ->placeholder(__('labels.backend.users.fields.password_confirmation'))
                                 ->required() }}
                     </div>
-                </div>
+                </div> -->
 
                 <div class="form-group row  mb-3">
                     {{ html()->label(__('labels.backend.users.fields.status'))->class('col-6 col-sm-2 form-control-label')->for('status') }}
@@ -96,13 +114,13 @@
                     </div>
                 </div>
 
-                <div class="form-group row  mb-3">
+                <!-- <div class="form-group row  mb-3">
                     {{ html()->label(__('labels.backend.users.fields.confirmed'))->class('col-6 col-sm-2 form-control-label')->for('confirmed') }}
 
                     <div class="col-6 col-sm-10">
                         {{ html()->checkbox('confirmed', true, '1') }} @lang('Email Confirmed')
                     </div>
-                </div>
+                </div> -->
 
                 <div class="form-group row  mb-3">
                     {{ html()->label(__('labels.backend.users.fields.email_credentials'))->class('col-6 col-sm-2 form-control-label')->for('confirmed') }}
@@ -135,10 +153,10 @@
                             $field_name = 'mobile';
                             $field_lable = label_case($field_name);
                             $field_placeholder = $field_lable;
-                            $required = "";
+                            $required = "required";
                             ?>
                             {{ html()->label($field_lable, $field_name)->class('form-label') }} {!! fielf_required($required) !!}
-                            {{ html()->text($field_name)->placeholder($field_placeholder)->class('form-control')->attributes(["$required"]) }}
+                            {{ html()->text($field_name)->placeholder($field_placeholder)->class('form-control required')->attributes(["$required"]) }}
                         </div>
                 </div>
                 </div>
