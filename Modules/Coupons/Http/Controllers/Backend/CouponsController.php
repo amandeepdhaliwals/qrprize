@@ -68,7 +68,7 @@ class CouponsController extends BackendBaseController
             ->editColumn('image', '@if($image)<img src="{{ Storage::url($image) }}" alt="Coupon Image" class="img-fluid" style="max-width: 100px;">@else <span style="">No Image</span> @endif')
             ->editColumn('status', '@if($status == 1) <span style="color:green;">Active</span> @else <span style="color:red;">Inactive</span> @endif')
             ->editColumn('category', function ($data) {
-                return ($data->category === 'main') ? 'Main' : 'Other';
+                return ($data->category === 'physical') ? 'Physical' : 'Service';
             })
             ->editColumn('total_coupons', function ($data) {
                 $color = '';

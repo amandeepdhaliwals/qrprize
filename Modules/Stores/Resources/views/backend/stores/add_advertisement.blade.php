@@ -149,7 +149,7 @@
       </div>
       <div class="note-line">Note: Add advertisement here for the store and then assign it to ad campaigns.</div>
       <hr>
-      {{ html()->form('POST', route('backend.stores.storeAdvertisement'))->class('form-horizontal')->open() }}
+      {{ html()->form('POST', route('backend.stores.storeAdvertisement'))->class('form-horizontal')->id('myForm')->open() }}
       {{ csrf_field() }}
       <div class="row mt-4">
          <div class="col">
@@ -192,7 +192,7 @@
                      <!-- Search / Filter -->
                      <div class="row">
                         <div class="columns medium-3">
-                           <select name="category" class="select-video" id="filter">
+                           <select name="category" id="category" class="select-video" id="filter">
                               <option selected="selected" value="">View All Videos</option>
                               <option value="Uploaded Video">Upload Video</option>
                               <option value="Youtube Link">Youtube Link</option>
@@ -425,7 +425,7 @@
                      <!-- Search / Filter -->
                      <div class="row">
                         <div class="columns medium-3">
-                           <select name="category_coupon" class="select-video" id="filter_coupon">
+                           <select name="category_coupon" id="category_coupon" class="select-video" id="filter_coupon">
                               <option selected="selected" value="">View All Coupons</option>
                               <option value="physical">Physical Coupon Prize</option>
                               <option value="service">Service Coupon Prize</option>
@@ -501,7 +501,7 @@
                <label class="form-control-label">Lock Time</label>
                <div class="note">Lock advertisement for specific time in hours</div>
                <div class="col-sm-3">
-                  <select class="form-control" name="lock_time" required>
+                  <select class="form-control" name="lock_time" id="lock_time" required>
                      <option value="">--Select--</option>
                      <option value="1">1 hour</option>
                      <option value="6">6 hours</option>
@@ -531,10 +531,10 @@
          <div class="col">
             <div class="form-group">
                <!-- Buttons for submitting and canceling the form -->
-               <button type="submit" name="action" value="preview_winning" class="btn btn-warning">
+               <button type="submit" id="preview_winning" name="action" value="preview_winning" class="btn btn-warning">
                     Preview Winning
                 </button>
-                <button type="submit" name="action" value="preview_lose" class="btn btn-warning">
+                <button type="submit" id="preview_lose" name="action" value="preview_lose" class="btn btn-warning">
                     Preview Lose
                 </button>
                <x-buttons.create title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}">
@@ -732,4 +732,207 @@
     @endif
 
 </script>
+
+<script>
+$(document).ready(function(){
+    $('#preview_winning').click(function(e){
+      var form = $('#myForm')[0];
+      if(form.checkValidity()) {
+        e.preventDefault(); // Prevent normal form submission
+        
+      //   var formData = $('#myForm').serialize(); // Serialize form data
+
+
+
+      var other_coupon_image_ids_checkedValues = $('input[name="other_coupon_image_ids[]"]:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        var coupon_id_checkedValues = $('input[name="coupon_id[]"]:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        var no_of_coupon_checkedValues = $('input[name="no_of_coupon[]"]').map(function() {
+            return $(this).val();
+        }).get();
+
+        var secondary_image_id_checkedValues = $('input[name="secondary_image_id[]"]:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+
+
+        var customData = {
+         advertisement_name: $('input[name="advertisement_name"]').val(),
+         advertisement_name_hid: $('input[name="advertisement_name_hid"]').val(),
+         category: $('select[name="category"]').val(),
+         video_id: $('input[name="video_id"]').val(),
+         heading: $('input[name="heading"]').val(),
+         primary_image_id: $('input[name="primary_image_id"]').val(),
+         secondary_image_id: secondary_image_id_checkedValues,
+         heading_other_prize: $('input[name="heading_other_prize"]').val(),
+         other_coupon_image_ids: other_coupon_image_ids_checkedValues,
+         category_coupon: $('select[name="category_coupon"]').val(),
+         coupon_id: coupon_id_checkedValues,
+         no_of_coupon: no_of_coupon_checkedValues,
+         lock_time: $('select[name="lock_time"]').val(),
+         winning_ratio: $('input[name="winning_ratio"]').val(),
+         user_id: $('input[name="user_id"]').val(),
+         action: 'preview_winning',
+         _token: '{{csrf_token()}}'
+        };
+
+      console.log(customData);
+
+      //   var formData = $.param(customData);
+
+      $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+        
+    var jsonData = JSON.stringify(customData);
+        $.ajax({
+            type: 'POST',
+            url: '{{ route("backend.stores.storeAdvertisement") }}', // URL to submit form data
+            data: jsonData,
+            contentType : "application/json",
+            success: function(response){
+           
+                // Handle success response
+                console.log(response);
+
+                var APP_URL = {!! json_encode(url('/')) !!}
+
+                var url = APP_URL+'/admin/stores/'+response.storeId+'/'+response.request_action+'/preview_advertisement';
+                
+      
+                window.open(url, '_blank');
+            },
+            error: function(xhr, status, error){
+                // Handle error
+                console.error(error);
+            }
+        });
+      } else {
+                // Form is invalid, let the browser handle the validation messages
+                form.reportValidity();
+            }
+    });
+
+
+   $('#preview_lose').click(function(e){
+      var form = $('#myForm')[0];
+      if(form.checkValidity()) {
+         e.preventDefault(); // Prevent normal form submission
+         
+         //   var formData = $('#myForm').serialize(); // Serialize form data
+
+         var other_coupon_image_ids_checkedValues = $('input[name="other_coupon_image_ids[]"]:checked').map(function() {
+               return $(this).val();
+         }).get();
+
+         var coupon_id_checkedValues = $('input[name="coupon_id[]"]:checked').map(function() {
+               return $(this).val();
+         }).get();
+
+         var no_of_coupon_checkedValues = $('input[name="no_of_coupon[]"]').map(function() {
+               return $(this).val();
+         }).get();
+
+         var secondary_image_id_checkedValues = $('input[name="secondary_image_id[]"]:checked').map(function() {
+               return $(this).val();
+         }).get();
+
+
+
+         var customData = {
+            advertisement_name: $('input[name="advertisement_name"]').val(),
+            advertisement_name_hid: $('input[name="advertisement_name_hid"]').val(),
+            category: $('select[name="category"]').val(),
+            video_id: $('input[name="video_id"]').val(),
+            heading: $('input[name="heading"]').val(),
+            primary_image_id: $('input[name="primary_image_id"]').val(),
+            secondary_image_id: secondary_image_id_checkedValues,
+            heading_other_prize: $('input[name="heading_other_prize"]').val(),
+            other_coupon_image_ids: other_coupon_image_ids_checkedValues,
+            category_coupon: $('select[name="category_coupon"]').val(),
+            coupon_id: coupon_id_checkedValues,
+            no_of_coupon: no_of_coupon_checkedValues,
+            lock_time: $('select[name="lock_time"]').val(),
+            winning_ratio: $('input[name="winning_ratio"]').val(),
+            user_id: $('input[name="user_id"]').val(),
+            action: 'preview_lose',
+            _token: '{{csrf_token()}}'
+         };
+
+         console.log(customData);
+
+         //   var formData = $.param(customData);
+
+         $.ajaxSetup({
+         headers: {
+               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+         }
+      });
+         
+      var jsonData = JSON.stringify(customData);
+         $.ajax({
+               type: 'POST',
+               url: '{{ route("backend.stores.storeAdvertisement") }}', // URL to submit form data
+               data: jsonData,
+               contentType : "application/json",
+               success: function(response){
+            
+                  // Handle success response
+                  console.log(response);
+
+                  var APP_URL = {!! json_encode(url('/')) !!}
+
+                  var url = APP_URL+'/admin/stores/'+response.storeId+'/'+response.request_action+'/preview_advertisement';
+                  
+         
+                  window.open(url, '_blank');
+               },
+               error: function(xhr, status, error){
+                  // Handle error
+                  console.error(error);
+               }
+         });
+      } else {
+                // Form is invalid, let the browser handle the validation messages
+                form.reportValidity();
+            }
+      });
+});
+
+
+$(document).ready(function(){
+        // Event listener for checkbox change
+      //   $('input[name="coupon_id[]"]').prop('checked', true);
+        
+        // Set corresponding inputs as required based on checkbox state
+        $('input[name="coupon_id[]"]').each(function() {
+            var $this = $(this);
+            var $input = $this.closest('div').find('input[name="no_of_coupon[]"]');
+            if($this.is(':checked')) {
+                $input.prop('required', true);
+            } else {
+                $input.prop('required', false);
+            }
+        });
+        $('input[name="coupon_id[]"]').change(function(){
+            var $this = $(this);
+            var $input = $this.closest('div').find('input[name="no_of_coupon[]"]');
+            if($this.is(':checked')) {
+                // Checkbox is checked, make corresponding input required
+                $input.prop('required', true);
+            } else {
+                // Checkbox is unchecked, remove required attribute from input
+                $input.prop('required', false);
+            }
+        });
+    });
+   </script>
 @endpush

@@ -1140,15 +1140,10 @@ class StoresController extends BackendBaseController
             return back();
         }
         else {
-            // Store the route and parameters in session
-            session(['new_tab_route' => [
-                'route' => 'backend.stores.preview_advertisement',
-                'parameters' => ['storeId' => $store_id , 'request_action' => $request_action] // Pass storeId as an associative array
-            ]]);
-
-            // Return back to the previous page
-            return back();
- 
+            return response()->json([
+                'storeId' => $store_id,
+                'request_action' => $request_action
+            ]);
         }        
        
     }
