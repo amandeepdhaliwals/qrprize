@@ -9,6 +9,7 @@
             ?>
             {{ html()->label($field_lable, $field_name)->class('form-label') }} {!! fielf_required($required) !!}
             {{ html()->text($field_name)->placeholder($field_placeholder)->class('form-control')->attributes(["$required"]) }}
+            <small class="form-text text-muted">This title is used for internal use only.</small>
         </div>
     </div>
     <!-- <div class="col-12 col-sm-6">
@@ -68,6 +69,7 @@
             ?>
             {{ html()->label($field_lable, $field_name)->class('form-label') }} {!! fielf_required($required) !!}
             {{ html()->textarea($field_name)->placeholder($field_placeholder)->class('form-control')->attributes(["$required"]) }}
+            <small class="form-text text-muted">This field is used for internal use only.</small>
         </div>
     </div>
 </div>

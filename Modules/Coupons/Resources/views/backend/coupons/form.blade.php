@@ -75,17 +75,17 @@
     </div> -->
   
     @if($data)
-    <div class="col-4">
+    <!-- <div class="col-4">
         <div class="float-end">
             <figure class="figure">
                 <a href="{{ Storage::url($data->image) }}" data-lightbox="image-set" data-title="Path: {{ Storage::url($data->image) }}">
                     <img src="{{ Storage::url($data->image) }}" class="figure-img img-fluid rounded img-thumbnail" alt="">
                 </a>
-                <!-- <figcaption class="figure-caption">Path: </figcaption> -->
+               
             </figure>
         </div>
     </div>
-    <x-library.lightbox />
+    <x-library.lightbox /> -->
     @endif
     @if($data && $data->getMedia($module_name)->first())
     <div class="col-4">
