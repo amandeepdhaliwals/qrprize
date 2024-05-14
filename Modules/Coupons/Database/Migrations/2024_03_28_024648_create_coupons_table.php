@@ -16,13 +16,15 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('code')->unique();
-            $table->decimal('discount', 8, 2);
+            $table->decimal('discount')->nullable()->change();
             $table->dateTime('start_date')->nullable();
             $table->dateTime('end_date')->nullable();
             $table->string('image')->nullable();
             $table->string('video')->nullable();
             $table->integer('usage_count')->default(0);
-            $table->boolean('is_active')->default(true);
+            $table->enum('category', ['physical', 'service'])->default('physical');
+            $table->unsignedInteger('total_coupons')->default(0);
+            $table->boolean('status')->default(true);
             $table->dateTime('redemption_date')->nullable();
             $table->boolean('is_redeemed')->default(false);
             $table->string('redeemed_by')->nullable();
@@ -30,7 +32,11 @@ return new class extends Migration
             $table->integer('usage_limit_per_user')->nullable();
             $table->json('redemption_history')->nullable();
             $table->string('redemption_location')->nullable();
+            $table->integer('created_by')->unsigned()->nullable();
+            $table->integer('updated_by')->unsigned()->nullable();
+            $table->integer('deleted_by')->unsigned()->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
