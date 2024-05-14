@@ -52,7 +52,7 @@
                             <th>Title</th>
                             <th>Description</th>
                             <th>Code</th> 
-                            <th>Image</th>
+                            <!-- <th>Image</th> -->
                             <th>Status</th>
                             <th>Category</th>
                             <th>Total Coupons Available</th>
@@ -69,7 +69,7 @@
                             <td>{{ $coupon->title }}</td>
                             <td>{{ $coupon->description }}</td>
                             <td>{{ $coupon->code }}</td> 
-                            <td><img src="{{ $coupon->image }}" alt="Coupon Image" class="img-fluid" style="max-width: 100px;"></td>
+                            <!-- <td><img src="{{ $coupon->image }}" alt="Coupon Image" class="img-fluid" style="max-width: 100px;"></td> -->
                             <td>{{ $coupon->status }}</td>
                             <td>{{ $coupon->category }}</td>
                             <td>{{ $coupon->total_coupons }}</td>
@@ -130,7 +130,7 @@
             { data: 'title', name: 'title' },
             { data: 'description', name: 'description' },
             { data: 'code', name: 'code' },
-            { data: 'image', name: 'image' },
+            // { data: 'image', name: 'image' },
             { data: 'status', name: 'status' },
             { data: 'category', name: 'category' },
             { data: 'total_coupons', name: 'total_coupons' },

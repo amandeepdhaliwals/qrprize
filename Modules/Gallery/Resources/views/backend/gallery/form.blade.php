@@ -92,9 +92,10 @@
                 '1' => 'Active',
                 '0' => 'Inactive'
             ];
+            $selected_option = '1';
             ?>
             {{ html()->label($field_lable, $field_name)->class('form-label') }} {!! fielf_required($required) !!}
-            {{ html()->select($field_name, $select_options)->placeholder($field_placeholder)->class('form-select')->attributes(["$required"]) }}
+            {{ html()->select($field_name, $select_options, $selected_option)->placeholder($field_placeholder)->class('form-select')->attributes(["$required"]) }}
         </div>
     </div>
 </div>
