@@ -1137,12 +1137,16 @@ class StoresController extends BackendBaseController
             Log::info(
                 "Advertisement created successfully | Id: " . $$module_name_singular->id
             );
-            return back();
+            // return back();
+            return response()->json([
+                'response_type' => 'store'
+            ]);
         }
         else {
             return response()->json([
                 'storeId' => $store_id,
-                'request_action' => $request_action
+                'request_action' => $request_action,
+                'response_type' => 'preview'
             ]);
         }        
        
