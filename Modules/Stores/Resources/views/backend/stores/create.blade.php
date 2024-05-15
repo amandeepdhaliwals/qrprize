@@ -36,7 +36,7 @@
 
         <hr>
         <h2>Step 1 - Basic details</h2>
-        {{ html()->form('POST', route('backend.stores.store'))->class('form-horizontal')->open() }}
+        {{ html()->form('POST', route('backend.stores.store'))->class('form-horizontal')->attributes(['enctype'=>"multipart/form-data"])->open() }}
         {{ csrf_field() }}
         <div class="row mt-4">
             <div class="col">

@@ -319,6 +319,13 @@ class StoresController extends BackendBaseController
         $id = $$module_name_singular->id;
         $username = config("app.initial_username") + $id;
         $$module_name_singular->username = $username;
+        if ($request->hasFile('avatar')) {
+            if ($$module_name_singular->getMedia($module_name)->first()) {
+                $$module_name_singular->getMedia($module_name)->first()->delete();
+            }
+            $media = $$module_name_singular->addMedia($request->file('avatar'))->toMediaCollection($module_name);
+            $$module_name_singular->avatar = $media->getUrl();
+        }
         $$module_name_singular->save();
 
         event(new UserCreated($$module_name_singular));
@@ -338,9 +345,7 @@ class StoresController extends BackendBaseController
             $userprofile->url_linkedin = $request->url_linkedin;
              // Handle Avatar upload
             if ($request->hasFile("avatar")) {
-                // Store the uploaded avatar
-                $avatarPath = $request->file("avatar")->store('avatars');
-                $userprofile->avatar = $avatarPath;
+                $userprofile->avatar = $$module_name_singular->avatar;
             }
             $userprofile->save();
         }
