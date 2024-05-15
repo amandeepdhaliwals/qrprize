@@ -153,7 +153,7 @@
       {{ csrf_field() }}
       <div class="row mt-4">
          <div class="col">
-            <div class="form-group row mb-3">
+            <div class="form-group row mb-3" id="adv_name">
                <label class="col-sm-2 form-control-label">Advertisement Name *</label>
                <div class="col-sm-10">
                   <div class="input-group">
@@ -167,12 +167,13 @@
                   </div>
                   <!-- Note -->
                   <div class="note">This is used for internal use only.</div>
+                  <div id="adv_name_error" style="color: red;"></div>
                </div>
             </div>
             <hr>
             <!-- ////video gallery start -->
             <div class="row">
-               <div class="col-lg-12" >
+               <div class="col-lg-12" id="adv_video" >
                   <div class="row">
                      <div class="columns medium-12 small-centered">
                         <h4 class="float-left">
@@ -232,6 +233,7 @@
                            </div>
                            @endforeach   
                         </div>
+                        <div id="adv_video_error" style="color: red;"></div>
                         <!-- End Row -->
                      </div>
                   </div>
@@ -239,17 +241,18 @@
                </div>
             </div>
             <hr>
-            <div class="form-group row mb-3">
+            <div class="form-group row mb-3" id="adv_heading">
                <label class="col-sm-2 form-control-label">Heading</label>
                <div class="col-sm-10">
                   <input type="text" class="form-control" name="heading" placeholder="Enter heading for frontend" required>
                   <div class="note">This heading is used for frontend.</div>
+                  <div id="adv_heading_error" style="color: red;"></div>
                </div>
             </div>
             <hr>
             <!-- ////image gallery start -->
             <div class="row">
-               <div class="col-lg-12" >
+               <div class="col-lg-12" id="adv_primary" >
                   <div class="row">
                      <div class="columns medium-12 small-centered">
                         <h4 class="float-left">
@@ -289,6 +292,7 @@
                            @endif 
                            @endforeach   
                         </div>
+                        <div id="adv_primary_error" style="color: red;"></div>
                         <!-- End Row -->
                      </div>
                   </div>
@@ -299,7 +303,7 @@
             <hr>
             <!-- ////image secondary gallery start -->
             <div class="row">
-               <div class="col-lg-12" >
+               <div class="col-lg-12" id="adv_secondary" >
                   <div class="row">
                      <div class="columns medium-12 small-centered">
                         <h4 class="float-left">
@@ -339,6 +343,7 @@
                            @endif 
                            @endforeach   
                         </div>
+                        <div id="secondary_error" style="color: red;"></div>
                         <!-- End Row -->
                      </div>
                   </div>
@@ -347,17 +352,18 @@
             </div>
             <!-- ////image secondary gallery end --> 
             <hr>
-            <div class="form-group row mb-3">
+            <div class="form-group row mb-3" id="adv_other">
                <label class="col-sm-2 form-control-label">Other Prizes Heading</label>
                <div class="col-sm-10">
                   <input type="text" class="form-control" name="heading_other_prize" placeholder="Enter other prize heading for frontend" required>
                   <div class="note">This heading is used for other prized - on frontend.</div>
+                  <div id="adv_other_heading_error" style="color: red;"></div>
                </div>
             </div>
             <hr>
             <!-- ////image other coupons start -->
             <div class="row">
-               <div class="col-lg-12" >
+               <div class="col-lg-12" id="adv_other_coupon">
                   <div class="row">
                      <div class="columns medium-12 small-centered">
                         <h4 class="float-left">
@@ -395,6 +401,7 @@
                            @php $firstIteration = false; @endphp
                            @endforeach   
                         </div>
+                        <div id="adv_other_coupon_error" style="color: red;"></div>
                         <!-- End Row -->
                      </div>
                   </div>
@@ -405,7 +412,7 @@
             <hr>
             <!-- ////coupon select -->
             <div class="row">
-               <div class="col-lg-12" >
+               <div class="col-lg-12" id="adv_winning">
                   <div class="row">
                      <div class="columns medium-12 small-centered">
                         <h4 class="float-left">
@@ -490,6 +497,7 @@
                         @endforeach
  
                         </div>
+                        <div id="adv_winning_error" style="color: red;"></div>
                         <!-- End Row -->
                      </div>
                   </div>
@@ -497,7 +505,7 @@
                </div>
             </div>
             <!-- ////coupon end --> 
-            <div class="form-group row mb-3">
+            <div class="form-group row mb-3" id="adv_lock">
                <label class="form-control-label">Lock Time</label>
                <div class="note">Lock advertisement for specific time in hours</div>
                <div class="col-sm-3">
@@ -514,6 +522,7 @@
                      <option value="48">48 hours</option>
                   </select>
                </div>
+               <div id="adv_lock_error" style="color: red;"></div>
             </div>
             <div class="form-group row mb-3">
                <label class="col-sm-2 form-control-label">Winning Ratio</label>
@@ -531,13 +540,13 @@
          <div class="col">
             <div class="form-group">
                <!-- Buttons for submitting and canceling the form -->
-               <button type="submit" id="preview_winning" name="action" value="preview_winning" class="btn btn-warning">
+               <button type="submit" id="preview_winning" name="action" value="preview_winning" class="adv_btn btn btn-warning">
                     Preview Winning
                 </button>
-                <button type="submit" id="preview_lose" name="action" value="preview_lose" class="btn btn-warning">
+                <button type="submit" id="preview_lose" name="action" value="preview_lose" class="adv_btn btn btn-warning">
                     Preview Lose
                 </button>
-               <x-buttons.create title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}">
+               <x-buttons.create title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" class="adv_btn">
                   {{__('Create')}}
                </x-buttons.create>
                <div class="float-end">
@@ -735,14 +744,9 @@
 
 <script>
 $(document).ready(function(){
-    $('#preview_winning').click(function(e){
-      var form = $('#myForm')[0];
-      if(form.checkValidity()) {
-        e.preventDefault(); // Prevent normal form submission
-        
-      //   var formData = $('#myForm').serialize(); // Serialize form data
-
-
+    $('.adv_btn').click(function(e){
+      e.preventDefault(); 
+      var clickedButtonValue = this.value;
 
       var other_coupon_image_ids_checkedValues = $('input[name="other_coupon_image_ids[]"]:checked').map(function() {
             return $(this).val();
@@ -760,93 +764,92 @@ $(document).ready(function(){
             return $(this).val();
         }).get();
 
+      if($('input[name="advertisement_name"]').val() == ''){
+         $('#adv_name_error').text('Please enter advertisement name.');
+            $('html, body').animate({
+               scrollTop: $('#adv_name').offset().top - 150 // Adjust the value as needed
+            }, 1000);
+            setTimeout(function() {
+                $('#adv_name_error').empty();
+            }, 10000);
 
+      }else if($('input[name="video_id"]').val() == ''){
+         $('#adv_video_error').text('Please select advertisement video.');
+            $('html, body').animate({
+               scrollTop: $('#adv_video').offset().top - 150 // Adjust the value as needed
+            }, 1000);
+            setTimeout(function() {
+                $('#adv_video_error').empty();
+            }, 10000);
 
-        var customData = {
-         advertisement_name: $('input[name="advertisement_name"]').val(),
-         advertisement_name_hid: $('input[name="advertisement_name_hid"]').val(),
-         category: $('select[name="category"]').val(),
-         video_id: $('input[name="video_id"]').val(),
-         heading: $('input[name="heading"]').val(),
-         primary_image_id: $('input[name="primary_image_id"]').val(),
-         secondary_image_id: secondary_image_id_checkedValues,
-         heading_other_prize: $('input[name="heading_other_prize"]').val(),
-         other_coupon_image_ids: other_coupon_image_ids_checkedValues,
-         category_coupon: $('select[name="category_coupon"]').val(),
-         coupon_id: coupon_id_checkedValues,
-         no_of_coupon: no_of_coupon_checkedValues,
-         lock_time: $('select[name="lock_time"]').val(),
-         winning_ratio: $('input[name="winning_ratio"]').val(),
-         user_id: $('input[name="user_id"]').val(),
-         action: 'preview_winning',
-         _token: '{{csrf_token()}}'
-        };
+      }else if($('input[name="heading"]').val() == ''){
+         $('#adv_heading_error').text('Please enter heading.');
+            $('html, body').animate({
+               scrollTop: $('#adv_heading').offset().top - 150 // Adjust the value as needed
+            }, 1000);
+            setTimeout(function() {
+                $('#adv_heading_error').empty();
+            }, 10000);
 
-      console.log(customData);
+      }else if($('input[name="primary_image_id"]').val() == ''){
+         $('#adv_primary_error').text('Please select primary image.');
+            $('html, body').animate({
+               scrollTop: $('#adv_primary').offset().top - 150 // Adjust the value as needed
+            }, 1000);
+            setTimeout(function() {
+                $('#adv_primary_error').empty();
+            }, 10000);
 
-      //   var formData = $.param(customData);
+      }else if(secondary_image_id_checkedValues.length == 0){
+         $('#secondary_error').text('Please select at least one secondary image.');
+            // Clear error message after 5 seconds 
+            $('html, body').animate({
+               scrollTop: $('#imageGallerySecondary').offset().top - 150 // Adjust the value as needed
+            }, 1000);
+            setTimeout(function() {
+                $('#secondary_error').empty();
+            }, 10000);
+      }else if($('input[name="heading_other_prize"]').val() == ''){
+         $('#adv_other_heading_error').text('Please enter other prize heading.');
+            // Clear error message after 5 seconds 
+            $('html, body').animate({
+               scrollTop: $('#adv_other').offset().top - 150 // Adjust the value as needed
+            }, 1000);
+            setTimeout(function() {
+                $('#adv_other_heading_error').empty();
+            }, 10000);
 
-      $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-        
-    var jsonData = JSON.stringify(customData);
-        $.ajax({
-            type: 'POST',
-            url: '{{ route("backend.stores.storeAdvertisement") }}', // URL to submit form data
-            data: jsonData,
-            contentType : "application/json",
-            success: function(response){
-           
-                // Handle success response
-                console.log(response);
+      }else if(other_coupon_image_ids_checkedValues == 0){
+         $('#adv_other_coupon_error').text('Please select at leat one other coupon image.');
+            // Clear error message after 5 seconds 
+            $('html, body').animate({
+               scrollTop: $('#adv_other_coupon').offset().top - 150 // Adjust the value as needed
+            }, 1000);
+            setTimeout(function() {
+                $('#adv_other_coupon_error').empty();
+            }, 10000);
 
-                var APP_URL = {!! json_encode(url('/')) !!}
+      }else if(coupon_id_checkedValues == 0){
+         $('#adv_winning_error').text('Please select at leat one winning prize.');
+            // Clear error message after 5 seconds 
+            $('html, body').animate({
+               scrollTop: $('#adv_winning').offset().top - 150 // Adjust the value as needed
+            }, 1000);
+            setTimeout(function() {
+                $('#adv_winning_error').empty();
+            }, 10000);
 
-                var url = APP_URL+'/admin/stores/'+response.storeId+'/'+response.request_action+'/preview_advertisement';
-                
-      
-                window.open(url, '_blank');
-            },
-            error: function(xhr, status, error){
-                // Handle error
-                console.error(error);
-            }
-        });
-      } else {
-                // Form is invalid, let the browser handle the validation messages
-                form.reportValidity();
-            }
-    });
+      }else if($('select[name="lock_time"]').val() == ''){
+         $('#adv_lock_error').text('Please select lock time.');
+            // Clear error message after 5 seconds 
+            $('html, body').animate({
+               scrollTop: $('#adv_lock').offset().top - 150 // Adjust the value as needed
+            }, 1000);
+            setTimeout(function() {
+                $('#adv_lock_error').empty();
+            }, 10000);
 
-
-   $('#preview_lose').click(function(e){
-      var form = $('#myForm')[0];
-      if(form.checkValidity()) {
-         e.preventDefault(); // Prevent normal form submission
-         
-         //   var formData = $('#myForm').serialize(); // Serialize form data
-
-         var other_coupon_image_ids_checkedValues = $('input[name="other_coupon_image_ids[]"]:checked').map(function() {
-               return $(this).val();
-         }).get();
-
-         var coupon_id_checkedValues = $('input[name="coupon_id[]"]:checked').map(function() {
-               return $(this).val();
-         }).get();
-
-         var no_of_coupon_checkedValues = $('input[name="no_of_coupon[]"]').map(function() {
-               return $(this).val();
-         }).get();
-
-         var secondary_image_id_checkedValues = $('input[name="secondary_image_id[]"]:checked').map(function() {
-               return $(this).val();
-         }).get();
-
-
-
+      }else{
          var customData = {
             advertisement_name: $('input[name="advertisement_name"]').val(),
             advertisement_name_hid: $('input[name="advertisement_name_hid"]').val(),
@@ -863,48 +866,43 @@ $(document).ready(function(){
             lock_time: $('select[name="lock_time"]').val(),
             winning_ratio: $('input[name="winning_ratio"]').val(),
             user_id: $('input[name="user_id"]').val(),
-            action: 'preview_lose',
+            action: clickedButtonValue,
             _token: '{{csrf_token()}}'
          };
 
-         console.log(customData);
-
-         //   var formData = $.param(customData);
-
          $.ajaxSetup({
-         headers: {
-               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-         }
-      });
-         
-      var jsonData = JSON.stringify(customData);
-         $.ajax({
-               type: 'POST',
-               url: '{{ route("backend.stores.storeAdvertisement") }}', // URL to submit form data
-               data: jsonData,
-               contentType : "application/json",
-               success: function(response){
-            
-                  // Handle success response
-                  console.log(response);
-
-                  var APP_URL = {!! json_encode(url('/')) !!}
-
-                  var url = APP_URL+'/admin/stores/'+response.storeId+'/'+response.request_action+'/preview_advertisement';
-                  
-         
-                  window.open(url, '_blank');
-               },
-               error: function(xhr, status, error){
-                  // Handle error
-                  console.error(error);
-               }
-         });
-      } else {
-                // Form is invalid, let the browser handle the validation messages
-                form.reportValidity();
+            headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
-      });
+         });
+        
+         var jsonData = JSON.stringify(customData);
+         $.ajax({
+            type: 'POST',
+            url: '{{ route("backend.stores.storeAdvertisement") }}', // URL to submit form data
+            data: jsonData,
+            contentType : "application/json",
+            success: function(response){
+                // Handle success response
+                console.log(response);
+                if(response.response_type == 'store'){
+                  window.scrollTo(0, 0);
+                  setTimeout(function() {
+                     location.reload();
+                  }, 1000); 
+                }else{
+                  var APP_URL = {!! json_encode(url('/')) !!}
+                  var url = APP_URL+'/admin/stores/'+response.storeId+'/'+response.request_action+'/preview_advertisement';
+                  window.open(url, '_blank');
+                }
+            },
+            error: function(xhr, status, error){
+                // Handle error
+                console.error(error);
+            }
+         });
+      }
+   });
 });
 
 
