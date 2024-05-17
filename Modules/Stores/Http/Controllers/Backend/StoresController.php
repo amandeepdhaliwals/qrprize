@@ -874,6 +874,12 @@ class StoresController extends BackendBaseController
             "advertisement_ids" => $request->advertisement_ids,
         ]);
 
+        $store = Store::where('user_id', $storeId)->first();
+        if ($store && $store->step_completed == 3) {
+            $store->step_completed = 4;
+            $store->save();
+        }
+
         flash(icon() . "New '" . Str::singular($module_title) . "' Added")
             ->success()
             ->important();
