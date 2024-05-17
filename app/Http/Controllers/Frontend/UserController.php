@@ -15,6 +15,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Events\Backend\UserCreated;
+use Illuminate\Support\Arr;
+use Laracasts\Flash\Flash;
+use Modules\Customers\Entities\Customer;
 
 class UserController extends Controller
 {
@@ -459,5 +463,122 @@ class UserController extends Controller
 
             return redirect()->back();
         }
+    }
+
+
+    public function create_user(Request $request)
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_model = $this->module_model;
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = 'Details';
+
+        // $request->validate([
+        //     'first_name' => 'required|min:3|max:191',
+        //     'last_name' => 'required|min:3|max:191',
+        //     'email' => 'required|email|regex:/(.+)@(.+)\.(.+)/i|max:191|unique:users',
+        //     // 'password' => 'required|confirmed|min:4',
+        // ]);
+
+        $data_array = $request->except('_token', 'roles', 'permissions', 'password_confirmation');
+        $data_array['name'] = $request->first_name.' '.$request->last_name;
+        $data_array['mobile'] = $request->phone_number;
+        $password = Str::random(8);
+        $data_array['password'] = Hash::make($password);
+
+        $data_array = Arr::add($data_array, 'email_verified_at', null);
+
+        // if ($request->confirmed === 1) {
+        //     $data_array = Arr::add($data_array, 'email_verified_at', Carbon::now());
+        // } else {
+        //     $data_array = Arr::add($data_array, 'email_verified_at', null);
+        // }
+
+        $$module_name_singular = User::create($data_array);
+
+
+        $$module_name_singular->assignRole("user");
+
+        // $roles = $request['roles'];
+        // $permissions = $request['permissions'];
+        $id = $$module_name_singular->id;
+        $username = config('app.initial_username') + $id;
+        Userprofile::create([
+            "user_id" => $$module_name_singular->id,
+            "name" => $request->first_name.' '.$request->last_name,
+            "first_name" => $request->first_name,
+            "last_name" => $request->last_name,
+            "username" => $username,
+            "email" => $request->email,
+            "mobile" => $request->phone_number
+        ]);
+         // Insert entry into store_qrcodes
+         Customer::create([
+            "user_id" => $$module_name_singular->id,
+            "store_id" => $request->store_id,
+        ]);
+        // Sync Roles
+        // if (isset($roles)) {
+        //     $$module_name_singular->syncRoles($roles);
+        // } else {
+        //     $roles = [];
+        //     $$module_name_singular->syncRoles($roles);
+        // }
+
+        // Sync Permissions
+        // if (isset($permissions)) {
+        //     $$module_name_singular->syncPermissions($permissions);
+        // } else {
+        //     $permissions = [];
+        //     $$module_name_singular->syncPermissions($permissions);
+        // }
+
+        // Username
+        // $id = $$module_name_singular->id;
+        // $username = config('app.initial_username') + $id;
+        // $$module_name_singular->username = $username;
+        // if ($request->hasFile('avatar')) {
+        //     if ($$module_name_singular->getMedia($module_name)->first()) {
+        //         $$module_name_singular->getMedia($module_name)->first()->delete();
+        //     }
+        //     $media = $$module_name_singular->addMedia($request->file('avatar'))->toMediaCollection($module_name);
+        //     $$module_name_singular->avatar = $media->getUrl();
+        // }
+        // $$module_name_singular->save();
+
+      //  event(new UserCreated($$module_name_singular));
+        $updateUser = User::where(
+            "id",
+            $$module_name_singular->id
+        )->first();
+
+        if ($updateUser) {
+            $updateUser->username = $username;
+            $updateUser->save();
+        }
+
+        Flash::success("<i class='fas fa-check'></i> New '".Str::singular($module_title)."' Created")->important();
+
+        // if ($request->email_credentials === 1) {
+        //     $data = [
+        //         'password' => $password,
+        //     ];
+        //    $$module_name_singular->notify(new UserAccountCreated($data));
+
+        //     Flash::success(icon('fas fa-envelope').' Account Credentials Sent to User.')->important();
+        // }
+
+        // Log::info(label_case($module_title.' '.$module_action)." | '".$$module_name_singular->name.'(ID:'.$$module_name_singular->id.") ' by User:".auth()->user()->name.'(ID:'.auth()->user()->id.')');
+
+        //return redirect("admin/{$module_name}");
+        return response()->json([
+            // 'storeId' => $store_id,
+            // 'request_action' => $request_action,
+            'response_type' => 'success'
+        ]);
     }
 }
