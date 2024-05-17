@@ -198,17 +198,17 @@
             <!-- <button type="button" class="btn btn-primary spin-btn mt-4 butn butn__new" data-toggle="modal" data-target="#loginModal">
               SPIN!
             </button> -->
-            <a href="#" data-toggle="modal" data-target="#loginModal" class='butn butn__new mt-4'><span>SPIN!</span></a>
+            <a href="#"  class='butn butn__new mt-4'><span>SPIN!</span></a>
           </div>
           <div class="col-12 mt-2">
             <p class="review-text">Please view the video above to spin the wheel.</p>
-            <div id="watched-time" class="container text-center" style="margin-top: 20px;">Watched Time: 0 seconds</div>
+            <!-- <div id="watched-time" class="container text-center" style="margin-top: 20px;">Watched Time: 0 seconds</div> -->
           </div>
         </div>
       </div>
     </section>
     
-          <section class="better-luck" style="display:none">
+          <section class="better-luck" style="display:none;">
             <div class="container">
         <div class="row">
           <div class="col-12">
@@ -308,6 +308,8 @@
         <div class="">
         <div class="login-input">
             <input type="hidden" name="store_id" value="{{$advertisement_detail->store_id}}">
+            <input type="hidden" name="campaign_id" value="{{$campaignId}}">
+            <input type="hidden" name="advertisement_id" value="{{$advertisement_detail->id}}">
             <input type="text" placeholder="First Name" name="first_name">
             <div id="first_name_error" style="color:red"></div>
           </div>
@@ -350,16 +352,23 @@ email & phone number to verify!</h4>
         </div>
         <div class="">
           <div class="login-input">
-            <input type="text" placeholder="Username" name="username">
+            <input type="hidden" name="store_id_otp">
+            <input type="hidden" name="campaign_id_otp">
+            <input type="hidden" name="advertisement_id_otp">
+            <input type="hidden" name="user_id_otp">
+            <input type="text" placeholder="Email OTP" name="email_otp">
+            <div id="email_otp_error"style="color:red" ></div>
           </div>
           <div class="login-input">
-            <input type="password" placeholder="Password" name="password">
+            <input type="text" placeholder="Phone Number OTP" name="phone_number_otp">
+            <div id="phone_number_otp_error"style="color:red" ></div>
           </div>
         </div>
         <div class="otp-resend">
         <span class="receive-top">Didn’t receive OTP?</span> <span class="resend-otp">Resend OTP</span>
         </div>
-        <a href="#" class='butn butn__new mt-4 unlock-results-btn'><span>Unlock Result</span></a>
+        <a href="#" id="otp_verification" class='butn butn__new mt-4 unlock-results-btn'><span>Unlock Result</span></a>
+        <div id="incorrect_error"style="color:red" ></div>
          
       </div>
     </div>
@@ -529,7 +538,7 @@ $(document).ready(function(){
               // Get the current time in seconds
               var watchedTime = Math.floor(video.currentTime);
               var timetext = "Watched time: " + watchedTime + " seconds";
-              document.getElementById("watched-time").textContent = timetext
+              //document.getElementById("watched-time").textContent = timetext
 
           });
           video.addEventListener("play", function() {
@@ -545,7 +554,7 @@ $(document).ready(function(){
 
             var watchedTime = Math.floor(video.currentTime);
             var timetext = "Watched time: " + watchedTime + " seconds";
-            document.getElementById("watched-time").textContent = timetext
+            //document.getElementById("watched-time").textContent = timetext
             // Perform actions when the video ends, like tracking or displaying a message
             // For example, you can send an analytics event to track that the user has watched the entire video.
             // You can also display a message or trigger another action.
@@ -598,6 +607,8 @@ $(document).ready(function(){
       }else{
          var customData = {
             store_id: $('input[name="store_id"]').val(),
+            campaign_id: $('input[name="campaign_id"]').val(),
+            advertisement_id: $('input[name="advertisement_id"]').val(),
             first_name: $('input[name="first_name"]').val(),
             last_name: $('input[name="last_name"]').val(),
             email: $('input[name="email"]').val(),
@@ -622,8 +633,91 @@ $(document).ready(function(){
                 if(response.response_type == 'success'){
                   $('#loginModal').modal('hide');
                   $('#otpModal').modal('show');
+
+                  document.querySelector('input[name="store_id_otp"]').value = response.storeId;
+                  document.querySelector('input[name="campaign_id_otp"]').value = response.campaign_id;
+                  document.querySelector('input[name="advertisement_id_otp"]').value = response.adverisement_id;
+                  document.querySelector('input[name="user_id_otp"]').value = response.user_id;
+
                 }else{
                   
+                }
+            },
+            error: function(xhr, status, error){
+                // Handle error
+                console.error(error);
+            }
+         });
+      }
+   });
+
+
+   ////////////////////////OTP Verfication//////////////////////////////
+   $('#otp_verification').click(function(e){
+      e.preventDefault(); 
+    
+
+      if($('input[name="email_otp"]').val() == ''){
+         $('#email_otp_error').text('Please enter email OTP.');
+            // $('html, body').animate({
+            //    scrollTop: $('#first_name').offset().top - 150 // Adjust the value as needed
+            // }, 1000);
+            setTimeout(function() {
+                $('#email_otp_error').empty();
+            }, 3000);
+
+      }else if($('input[name="phone_number_otp"]').val() == ''){
+         $('#phone_number_otp_error').text('Please enter phone number OTP.');
+            // $('html, body').animate({
+            //    scrollTop: $('#adv_video').offset().top - 150 // Adjust the value as needed
+            // }, 1000);
+            setTimeout(function() {
+                $('#phone_number_otp_error').empty();
+            }, 3000);
+
+      }else{
+         var customData = {
+            store_id: $('input[name="store_id_otp"]').val(),
+            campaign_id: $('input[name="campaign_id_otp"]').val(),
+            advertisement_id: $('input[name="advertisement_id_otp"]').val(),
+            user_id: $('input[name="user_id_otp"]').val(),
+            email_otp: $('input[name="email_otp"]').val(),
+            phone_number_otp: $('input[name="phone_number_otp"]').val(),
+            _token: '{{csrf_token()}}'
+         };
+         $.ajaxSetup({
+            headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+         });
+        
+         var jsonData = JSON.stringify(customData);
+         $.ajax({
+            type: 'POST',
+            url: '{{ route("frontend.otp_verify") }}', // URL to submit form data
+            data: jsonData,
+            contentType : "application/json",
+            success: function(response){
+                // Handle success response
+                console.log(response);
+                
+                if(response.response_type == 'success'){
+                  if(response.result == true){
+                    $('#otpModal').modal('hide');
+                   
+                    var APP_URL = {!! json_encode(url('/')) !!}
+                    var url = APP_URL+'/win/'+response.storeId+'/campaign/'+response.campaign_id;
+                    window.location.href = url;
+                   // window.open(url);
+                  }else{
+                    $('#otpModal').modal('hide');
+                    var APP_URL = {!! json_encode(url('/')) !!}
+                    var url = APP_URL+'/better_luck/'+response.store_id+'/campaign/'+response.campaign_id;
+                    window.location.href = url;
+                    //window.open(url);
+                  }
+                }else{
+                  $('#incorrect_error').text('Please enter correct OTP.');
                 }
             },
             error: function(xhr, status, error){

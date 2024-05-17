@@ -19,6 +19,10 @@ use App\Events\Backend\UserCreated;
 use Illuminate\Support\Arr;
 use Laracasts\Flash\Flash;
 use Modules\Customers\Entities\Customer;
+use Modules\Customers\Entities\OtpVerification;
+use Modules\Customers\Entities\CustomerResult;
+use Carbon\Carbon;
+
 
 class UserController extends Controller
 {
@@ -561,7 +565,27 @@ class UserController extends Controller
             $updateUser->save();
         }
 
-        Flash::success("<i class='fas fa-check'></i> New '".Str::singular($module_title)."' Created")->important();
+        //////////////for email //////////////////////
+
+        $otpCodeEmail = rand(100000, 999999); // Generate a 6-digit OTP code
+        OtpVerification::create([
+            'user_id' => $$module_name_singular->id,
+            'otp_code' => $otpCodeEmail,
+            'type' => 'email', // 'email' or 'mobile'
+            'expires_at' => Carbon::now()->addMinutes(10) // Set expiration time (e.g., 10 minutes)
+        ]);
+
+        //////////////////for mobile///////////////
+        $otpCodeMobile = rand(100000, 999999); // Generate a 6-digit OTP code
+        OtpVerification::create([
+            'user_id' => $$module_name_singular->id,
+            'otp_code' => $otpCodeMobile,
+            'type' => 'mobile', // 'email' or 'mobile'
+            'expires_at' => Carbon::now()->addMinutes(10) // Set expiration time (e.g., 10 minutes)
+        ]);
+        ///////////////////////////////////////////////
+
+
 
         // if ($request->email_credentials === 1) {
         //     $data = [
@@ -576,9 +600,91 @@ class UserController extends Controller
 
         //return redirect("admin/{$module_name}");
         return response()->json([
-            // 'storeId' => $store_id,
-            // 'request_action' => $request_action,
-            'response_type' => 'success'
+            'user_id' => $$module_name_singular->id,
+            'storeId' => $request->store_id,
+            'campaign_id' => $request->campaign_id,
+            'adverisement_id' => $request->advertisement_id,
+            'response_type' => 'success',
+            'email_otp' => $otpCodeEmail,
+            'mobile_otp' => $otpCodeMobile,
         ]);
+    }
+
+    public function otp_verify(Request $request)
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_model = $this->module_model;
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = 'Details';
+        $win =false;
+
+        if ($this->verifyOtp($request->user_id, $request->email_otp, $request->phone_number_otp)) {
+            //////////////////win or lose user///////////
+            $random_no = rand(0, 100);
+            if($random_no == 7){
+                $win = true;
+            }
+
+            if($win){
+                CustomerResult::create([
+                    'customer_id' => $request->user_id,
+                    'store_id' => $request->store_id,
+                    'campaign_id' => $request->campaign_id,
+                    'advertisement_id' => $request->advertisement_id,
+                    'win' => 1
+                ]);
+            }else{
+                CustomerResult::create([
+                    'customer_id' => $request->user_id,
+                    'store_id' => $request->store_id,
+                    'campaign_id' => $request->campaign_id,
+                    'advertisement_id' => $request->advertisement_id,
+                    'win' => 0
+                ]);
+            }
+            //////////////////////////////////////////
+            return response()->json([
+                'response_type' => 'success',
+                'result' => $win,
+                'store_id'=>$request->store_id,
+                'campaign_id'=> $request->campaign_id
+
+            ]);
+        }
+
+        return response()->json([
+            'response_type' => 'failed',
+            'result' => $win
+        ]);
+    }
+
+
+    public function verifyOtp($userId, $otpCodeEmail, $otpCodeMobile) {
+        $otp_email = OtpVerification::where('user_id', $userId)
+                    ->where('otp_code', $otpCodeEmail)
+                    ->where('type', 'email')
+                    ->where('expires_at', '>', Carbon::now())
+                    ->first();
+
+        $otp_mobile = OtpVerification::where('user_id', $userId)
+                    ->where('otp_code', $otpCodeMobile)
+                    ->where('type', 'mobile')
+                    ->where('expires_at', '>', Carbon::now())
+                    ->first();
+    
+        if ($otp_email && $otp_mobile) {
+            $otp_email->is_verified = 1;
+            $otp_email->save();
+
+            $otp_mobile->is_verified = 1;
+            $otp_mobile->save();
+            return true; // OTP is valid
+        }else{
+            return false;
+        }
     }
 }
