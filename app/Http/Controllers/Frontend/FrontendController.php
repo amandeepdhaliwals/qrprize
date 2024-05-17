@@ -68,7 +68,7 @@ class FrontendController extends Controller
 
                 $coupons = Coupon::whereIn('id', $coupon_ids)->get(); 
                 $lock_time = $advertisement_detail->lock_time;
-                return view('frontend.campaign',compact('advertisement_detail','advertisement_video','primary_image','secondary_images','other_images','coupons','lock_time'));
+                return view('frontend.campaign',compact('campaignId','advertisement_detail','advertisement_video','primary_image','secondary_images','other_images','coupons','lock_time'));
             }
 
 
@@ -82,5 +82,14 @@ class FrontendController extends Controller
         }else{
             return abort(Response::HTTP_NOT_FOUND);
         }
+    }
+
+    public function better_luck($storeId,$campaignId)
+    {
+         return view('frontend.betterluck',compact('storeId'));
+    }
+    public function win($storeId,$campaignId)
+    {
+         return view('frontend.win',compact('storeId'));
     }
 }
