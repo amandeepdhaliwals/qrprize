@@ -369,6 +369,8 @@ email & phone number to verify!</h4>
         </div>
         <a href="#" id="otp_verification" class='butn butn__new mt-4 unlock-results-btn'><span>Unlock Result</span></a>
         <div id="incorrect_error"style="color:red" ></div>
+        <div id="otp_email"></div>
+        <div id="otp_mobile"></div>
          
       </div>
     </div>
@@ -639,6 +641,8 @@ $(document).ready(function(){
                   document.querySelector('input[name="advertisement_id_otp"]').value = response.adverisement_id;
                   document.querySelector('input[name="user_id_otp"]').value = response.user_id;
 
+                  document.getElementById("otp_email").textContent = 'Dummy OTP For Email: '+response.email_otp;
+                  document.getElementById("otp_mobile").textContent = 'Dummy OTP For Mobile: '+response.mobile_otp;
                 }else{
                   
                 }
