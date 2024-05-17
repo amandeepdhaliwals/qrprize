@@ -33,6 +33,9 @@ use App\Events\Backend\UserProfileUpdated;
 use Illuminate\Support\HtmlString;
 use App\Events\Backend\UserUpdated;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Response; 
+use PDF;
 
 class StoresController extends BackendBaseController
 {
@@ -953,10 +956,7 @@ class StoresController extends BackendBaseController
             ->addColumn("download", function ($data) use ($module_name) {
                 $storeId = $data->store_id;
                 $campaignId = $data->id;
-                $route = route("backend.{$module_name}.edit-campaign", [
-                    "storeId" => $storeId,
-                    "campaignId" => $campaignId,
-                ]);
+                $route = route('backend.stores.downloadQrCode', ['storeId' => $data->store_id, 'campaignId' => $data->id]);
                 $button = '<div class="d-flex justify-content-center">
                                 <a href="' . $route . '" class="btn btn-primary">Download</a>
                            </div>';
@@ -1329,6 +1329,34 @@ class StoresController extends BackendBaseController
                 "coupons"
             )
         );
+    }
+
+
+    public function downloadQrCode($storeId, $campaignId)
+    {
+        // Fetch the campaign by ID
+        $campaign = Campaign::find($campaignId);
+        $store = Store::where('user_id', $storeId)->first();
+
+        if (!$campaign) {
+            return redirect()->back()->with('error', 'Campaign not found.');
+        }
+
+        // Create an HTML view with the QR code image, store name, and campaign name
+        $html = View::make('stores::backend.stores.qr_code_template', compact('campaign','store'))->render();
+
+        // Convert HTML to image (You can use a package like DomPDF to convert HTML to image)
+        $pdf = PDF::loadHTML($html);
+        $output = $pdf->output();
+
+        // Set the filename with store and campaign name
+        $filename = $campaign->store_id . '_' . $campaign->name . '_qr_code.pdf';
+
+        // Return the image as a download response
+        return Response::make($output, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ]);
     }
     
 
