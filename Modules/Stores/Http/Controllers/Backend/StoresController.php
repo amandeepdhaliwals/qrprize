@@ -21,6 +21,7 @@ use Modules\Coupons\Entities\Coupon; // Import the Coupon model
 use Modules\Videos\Entities\Video; // Import the Video model
 use Modules\Gallery\Entities\Gallery; // Import the gallery(images) model
 use Modules\Otherprizes\Entities\Otherprize; // Import the other prize images model
+use Modules\Stores\Entities\Campaign;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Arr;
@@ -752,6 +753,10 @@ class StoresController extends BackendBaseController
             ->where("deleted_at", null) // Assuming 'isdeleted' is a boolean column
             ->get();
 
+        $campaign_count= Campaign::where("store_id", $storeId)
+        ->count(); 
+        $campaign_count_for_name =  $campaign_count + 1;     
+
         logUserAccess($module_title . " " . $module_action);
 
         return view(
@@ -766,7 +771,8 @@ class StoresController extends BackendBaseController
                 "store",
                 "store",
                 "storeId",
-                "advertisements"
+                "advertisements",
+                "campaign_count_for_name"
             )
         );
     }
@@ -855,9 +861,10 @@ class StoresController extends BackendBaseController
             ->generate($url);
         $qr_code_image = base64_encode($qrCode);
 
+        $campaign_name = $request['campaign_name_hid'].$request['campaign_name'];
         // Create a new campaign record
         $$module_name_singular = $module_model::create([
-            "campaign_name" => $request->campaign_name,
+            "campaign_name" => $campaign_name,
             "store_id" => $storeId,
             "qr_code_url" => $url,
             "qr_code_image" => $qr_code_image,
@@ -943,7 +950,7 @@ class StoresController extends BackendBaseController
         $campaigns = $module_model::select("campaign.*")->where('store_id', $storeId)->get();
     
         return Datatables::of($campaigns)
-            ->addColumn("edit_campaign", function ($data) use ($module_name) {
+            ->addColumn("download", function ($data) use ($module_name) {
                 $storeId = $data->store_id;
                 $campaignId = $data->id;
                 $route = route("backend.{$module_name}.edit-campaign", [
@@ -951,7 +958,7 @@ class StoresController extends BackendBaseController
                     "campaignId" => $campaignId,
                 ]);
                 $button = '<div class="d-flex justify-content-center">
-                                <a href="' . $route . '" class="btn btn-primary">Edit</a>
+                                <a href="' . $route . '" class="btn btn-primary">Download</a>
                            </div>';
                 return new HtmlString($button);
             })
@@ -1054,29 +1061,38 @@ class StoresController extends BackendBaseController
 
         $couponIdArray = $requestData['coupon_id'];
         $noOfCouponArray = array_filter($requestData['no_of_coupon']); // Remove null values
-        $noOfCouponSum = array_sum($requestData['no_of_coupon']);
-
-        $combinedDataCoupon = [];
-
-        // Combine coupon_id with no_of_coupon
-        foreach ($couponIdArray as $index => $couponId) {
-            if (isset($noOfCouponArray[$index])) {
-                $combinedDataCoupon[$couponId] = $noOfCouponArray[$index];
-            }
+        $winningRatioArray = array_filter($requestData['winning_ratio']); // Remove null values
+        $noOfCouponSum = array_sum($noOfCouponArray);
+        
+        // Check if the lengths of coupon ID and number of coupons arrays are equal
+        if (count($couponIdArray) !== count($noOfCouponArray)) {
+            // Return an error response
+            return response()->json(['error' => 'Mismatch in coupon ID and number of coupons.'], 400);
         }
-
+        
+        $combinedDataCoupon = [];
+        
+        // Combine coupon_id with no_of_coupon and winning_ratio
+        foreach ($couponIdArray as $index => $couponId) {
+            $combinedDataCoupon[$couponId] = [
+                'count' => $noOfCouponArray[$index],
+                'winning_ratio' => $winningRatioArray[$index]
+            ];
+        }
+        
         // Convert combined data to JSON format
         $jsonDataCoupon = json_encode($combinedDataCoupon);
-
-        if (empty($couponIdArray) || empty($noOfCouponArray)) {
+        
+        if (empty($couponIdArray) || empty($noOfCouponArray) || empty($winningRatioArray)) {
             // Return an error response
-            return response()->json(['error' => 'Coupon ID or number of coupons is missing.'], 400);
+            return response()->json(['error' => 'Coupon ID or number of coupons or winning ratio is missing.'], 400);
         }
-
+        
         $advertisement_name = $requestData['advertisement_name_hid'].$requestData['advertisement_name'];
         $secondaryImageIdsString = implode(',', $requestData['secondary_image_id']);
         $otherCouponImageIdsString = implode(',', $requestData['other_coupon_image_ids']);
 
+    
         $data = [
             "advertisement_name" => $advertisement_name,
             "store_id" => $requestData['user_id'],
@@ -1089,10 +1105,10 @@ class StoresController extends BackendBaseController
             "coupons_id" => $jsonDataCoupon,
             "total_no_of_coupons" => $noOfCouponSum,
             "lock_time" => $requestData['lock_time'],
-            "winning_ratio" => $requestData['winning_ratio'],
             "status" => 1
         ];
 
+        
         $request_type='';
        
         if($requestData['action'] == "preview_winning" || $requestData['action'] == "preview_lose")
@@ -1102,7 +1118,7 @@ class StoresController extends BackendBaseController
             $store_id =  $requestData['user_id'];
             $request_type='1';
 
-
+            
             $tableName = (new $module_name)->getTable();
             // Delete records based on criteria
             \DB::table($tableName)
@@ -1123,7 +1139,7 @@ class StoresController extends BackendBaseController
         $store = Store::where("user_id", $requestData['user_id'])->first();
         // Check if the model instance exists
 
-        if($request_type == '2'){  //// preview advertisement
+        if($request_type == '2'){  //// create advertisement
             $module_name_pr_adv = 'Modules\Stores\Entities\Previewadvertisement';
             $tableName = (new $module_name_pr_adv)->getTable();
             // Truncate the table
@@ -1134,6 +1150,20 @@ class StoresController extends BackendBaseController
                 $store->step_completed = 3;
                 $store->save();
             }
+
+            foreach ($couponIdArray as $index => $couponId) {
+                // Calculate the new total_coupon count by subtracting the count value
+                $newTotalCouponCount = Coupon::where('id', $couponId)->first()->total_coupons - $noOfCouponArray[$index];
+                $newAssignesCouponCount = Coupon::where('id', $couponId)->first()->noOfCouponArray + $noOfCouponArray[$index];
+
+                // Update the coupon's total_coupon count in the database
+                Coupon::where('id', $couponId)->update([
+                    'total_coupons' => $newTotalCouponCount,
+                    'no_of_assigned_coupons' => $newAssignesCouponCount
+                ]);
+                
+            }
+            
             flash(icon() . "New '" . Str::singular($module_title) . "' Added")
             ->success()
             ->important();

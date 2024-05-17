@@ -52,7 +52,7 @@ class CouponsController extends BackendBaseController
         $page_heading = label_case($module_title);
         $title = $page_heading.' '.label_case($module_action);
 
-        $$module_name = $module_model::select('id', 'title', 'description','code','image','status','category','total_coupons','created_at','updated_at');
+        $$module_name = $module_model::select('id', 'title', 'description','code','image','status','category','total_coupons','no_of_assigned_coupons','created_at','updated_at');
 
         $data = $$module_name;
 
@@ -103,7 +103,7 @@ class CouponsController extends BackendBaseController
 
                 return $data->updated_at->isoFormat('llll');
             })
-            ->rawColumns(['title','description','code','image','status','category','total_coupons','created_at','action'])
+            ->rawColumns(['title','description','code','image','status','category','total_coupons','no_of_assigned_coupons','created_at','action'])
             ->orderColumns(['id'], '-:column $1')
             ->make(true);
     }

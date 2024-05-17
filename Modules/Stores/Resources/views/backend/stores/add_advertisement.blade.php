@@ -6,6 +6,12 @@
 @section('content')
 <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/foundation/6.2.3/foundation.min.css"> -->
 <style>
+ .required-label::after {
+            content: ' *';
+            color: red;
+            display: contents;
+            margin-left: 5px;
+        }
    .note {
    color: #777; /* Adjust color as needed */
    font-size: 14px; /* Adjust font size as needed */
@@ -131,7 +137,6 @@
    background-repeat: no-repeat;
    padding-right: 1.5rem;
    }
- 
 </style>
 <div class="card">
    <div class="card-body">
@@ -154,7 +159,7 @@
       <div class="row mt-4">
          <div class="col">
             <div class="form-group row mb-3" id="adv_name">
-               <label class="col-sm-2 form-control-label">Advertisement Name *</label>
+               <label class="col-sm-2 form-control-label required-label">Advertisement Name</label>
                <div class="col-sm-10">
                   <div class="input-group">
                      <!-- Static read-only text -->
@@ -176,8 +181,9 @@
                <div class="col-lg-12" id="adv_video" >
                   <div class="row">
                      <div class="columns medium-12 small-centered">
-                        <h4 class="float-left">
-                        <a href="#" style="color:#000;">Select Video</a>
+                        <!-- <h4 class="float-left"> -->
+                        <label class="required-label">Select Video
+                        </label>
                         <div class="note">Select any one video from list.</div>
                      </div>
                   </div>
@@ -193,7 +199,7 @@
                      <!-- Search / Filter -->
                      <div class="row">
                         <div class="columns medium-3">
-                           <select name="category" id="category" class="select-video" id="filter">
+                           <select name="category" class="select-video" id="filter">
                               <option selected="selected" value="">View All Videos</option>
                               <option value="Uploaded Video">Upload Video</option>
                               <option value="Youtube Link">Youtube Link</option>
@@ -220,7 +226,7 @@
                                  @elseif($adv_video->media_type == "Vimeo" || $adv_video->media_type == "vimeo") 
                                  <iframe src="{{ $adv_video->media }}" width="200" height="120" frameborder="0" allowfullscreen></iframe>
                                  @endif
-                                 <input type="radio" id="html" name="video_id" value="{{$adv_video->id}}" {{ $loop->first ? 'checked' : '' }}>
+                                 <input type="radio" id="html" name="video_id" value="{{$adv_video->id}}">
                                  <span class="name"><strong>{{$adv_video->title}}</strong></span><br />
                                  @if($adv_video->media_type == "Video" || $adv_video->media_type == "video") 
                                  <span class="category" style="display: none;">Uploaded Video</span>
@@ -242,7 +248,7 @@
             </div>
             <hr>
             <div class="form-group row mb-3" id="adv_heading">
-               <label class="col-sm-2 form-control-label">Heading</label>
+               <label class="col-sm-2 form-control-label required-label">Heading</label>
                <div class="col-sm-10">
                   <input type="text" class="form-control" name="heading" placeholder="Enter heading for frontend" required>
                   <div class="note">This heading is used for frontend.</div>
@@ -255,8 +261,8 @@
                <div class="col-lg-12" id="adv_primary" >
                   <div class="row">
                      <div class="columns medium-12 small-centered">
-                        <h4 class="float-left">
-                        <a href="#" style="color:#000;">Select Primary Image</a>
+                        <!-- <h4 class="float-left"> -->
+                        <lable class="required-label">Select Primary Image</lable>
                         <div class="note">Select any one image from list.</div>
                      </div>
                   </div>
@@ -277,14 +283,14 @@
                      </div>
                      <div class="video-list">
                         <!-- Thumbnails -->
-                        <div id="thumbnails" class="list row small-up-1 medium-up-2 large-up-3">
+                        <div id="thumbnails1" class="list row small-up-1 medium-up-2 large-up-3">
                            @php $firstIteration = true; @endphp
                            @foreach($adv_images as $key => $adv_image)
                            @if($adv_image->image_type == 'primary')
                            <div class="column">
                               <a href="#">
                               <img src="{{ Storage::url($adv_image->image) }}" class="figure-img img-fluid rounded img-thumbnail" alt="" width="200">
-                              <input type="radio" id="html{{ $key }}" name="primary_image_id" value="{{ $adv_image->id }}" @if($firstIteration) checked @endif >
+                              <input type="radio" id="html{{ $key }}" name="primary_image_id" value="{{ $adv_image->id }}">
                               <span class="name"><strong>{{$adv_image->title}}</strong></span><br />
                               </a>
                            </div>
@@ -306,8 +312,7 @@
                <div class="col-lg-12" id="adv_secondary" >
                   <div class="row">
                      <div class="columns medium-12 small-centered">
-                        <h4 class="float-left">
-                        <a href="#" style="color:#000;">Select Secondary Images</a>
+                        <lable class="required-label">Select Secondary Image</lable>
                         <div class="note">Select multiple images from list for carousel.</div>
                      </div>
                   </div>
@@ -335,7 +340,7 @@
                            <div class="column">
                               <a href="#">
                               <img src="{{ Storage::url($adv_image->image) }}" class="figure-img img-fluid rounded img-thumbnail" alt="" width="200">
-                              <input type="checkbox"  name="secondary_image_id[]" value="{{$adv_image->id}}" @if($firstIteration) checked @endif>
+                              <input type="checkbox"  name="secondary_image_id[]" value="{{$adv_image->id}}">
                               <span class="name"><strong>{{$adv_image->title}}</strong></span><br />
                               </a>
                            </div>
@@ -353,7 +358,7 @@
             <!-- ////image secondary gallery end --> 
             <hr>
             <div class="form-group row mb-3" id="adv_other">
-               <label class="col-sm-2 form-control-label">Other Prizes Heading</label>
+               <label class="col-sm-2 form-control-label required-label">Other Prizes Heading</label>
                <div class="col-sm-10">
                   <input type="text" class="form-control" name="heading_other_prize" placeholder="Enter other prize heading for frontend" required>
                   <div class="note">This heading is used for other prized - on frontend.</div>
@@ -366,8 +371,8 @@
                <div class="col-lg-12" id="adv_other_coupon">
                   <div class="row">
                      <div class="columns medium-12 small-centered">
-                        <h4 class="float-left">
-                        <a href="#" style="color:#000;">Select Other Coupons Images</a>
+                        <!-- <h4 class="float-left"> -->
+                        <label class="required-label">Select Other Coupons Images</label>
                         <div class="note">Select multiple images from list to show other coupons.</div>
                      </div>
                   </div>
@@ -394,7 +399,7 @@
                            <div class="column">
                               <a href="#">
                               <img src="{{ Storage::url($other_image->media) }}" class="figure-img img-fluid rounded img-thumbnail" alt="" width="200">
-                              <input type="checkbox"  name="other_coupon_image_ids[]" value="{{$other_image->id}}" @if($firstIteration) checked @endif>
+                              <input type="checkbox"  name="other_coupon_image_ids[]" value="{{$other_image->id}}">
                               <span class="name"><strong>{{$other_image->title}}</strong></span><br />
                               </a>
                            </div>
@@ -415,8 +420,7 @@
                <div class="col-lg-12" id="adv_winning">
                   <div class="row">
                      <div class="columns medium-12 small-centered">
-                        <h4 class="float-left">
-                        <a href="#" style="color:#000;">Select Winning Prizes</a>
+                        <label class="required-label">Select Winning Prizes</label>
                         <div class="note">Select multiple coupons and add no. of coupons to win</div>
                      </div>
                   </div>
@@ -434,8 +438,8 @@
                         <div class="columns medium-3">
                            <select name="category_coupon" id="category_coupon" class="select-video" id="filter_coupon">
                               <option selected="selected" value="">View All Coupons</option>
-                              <option value="physical">Physical Coupon Prize</option>
-                              <option value="service">Service Coupon Prize</option>
+                              <option value="Physical Coupon Prize">Physical Coupon Prize</option>
+                              <option value="Service Coupon Prize">Service Coupon Prize</option>
                            </select>
                         </div>
                         <div class="columns medium-9">
@@ -451,23 +455,44 @@
                             <div class="column category_coupon" data-category="{{ $coupon->category }}">
                                 <a href="#">
                                     <!-- <img src="{{ Storage::url($coupon->image) }}" class="" alt="" height="100" width="200"> -->
-                                    <span class="category_coupon" style="display: none;"></span>
+                                    <!-- <span class="category_coupon" style="display: none;"></span> -->
                                     @if($coupon->category == "physical" || $coupon->category == "Physical") 
-                                        <span class="category" style="display: none;">Physical Coupon Prize</span>
+                                        <span class="category_coupon" style="display: none;">Physical Coupon Prize</span>
                                     @elseif($coupon->category == "service" || $coupon->category == "Service")
-                                        <span class="category" style="display: none;">Service Coupon Prize</span>
+                                        <span class="category_coupon" style="display: none;">Service Coupon Prize</span>
                                     @endif
                                 </a>
                                 @if($coupon->total_coupons > 0)
-                                <input type="checkbox" name="coupon_id[]" value="{{$coupon->id}}"  @if($firstIteration_c) checked @endif>
+                                <input type="checkbox" name="coupon_id[]" value="{{$coupon->id}}">
                                     <span class="name"><strong>
                                         @if(strlen($coupon->title) > 12)
                                             {{ substr($coupon->title, 0, 12) }}...
                                         @else
                                             {{ $coupon->title }}
                                         @endif
-                                    </strong></span><br />
-                                    <input type="text" name="no_of_coupon[]" placeholder="Enter no. of coupons" value=""><br/>
+                                    </strong>
+                                    @php
+                                    $color = '';
+                                    if ($coupon->total_coupons >= 10) {
+                                        $color = 'green';
+                                    } elseif ($coupon->total_coupons >= 5) {
+                                        $color = 'orange';
+                                    } else {
+                                        $color = 'red';
+                                    }
+                                @endphp
+                                <!-- color: {{ $color }} -->
+                                <span style="color:gray;">available-<span style="">{{ $coupon->total_coupons }}</span></span>
+                         
+                                 </span><br />
+                                 <input type="number" name="no_of_coupon[]" placeholder="Enter no. of coupons" class="coupon-input" data-max="{{ $coupon->total_coupons }}" required><br/>
+                                    <!-- <div class="note">e.g- if you enter 100, it means that the prize will be awarded after the 99th customer.</div> -->
+                                 <div class="col-sm-10">
+                                    <span>1</span>
+                                    <label for="denominator">out of : </label>
+                                    <input type="number" name="winning_ratio[]" placeholder="Enter Ratio" class="ratio-input" required>
+                           
+                                 </div>
                                 @else
                                 <input type="checkbox" name="" value="{{$coupon->id}}" disabled >
                                     <span class="name" style="color:grey;"><strong>
@@ -479,18 +504,7 @@
                                     </strong></span><br />
                                     <input type="text" name="" placeholder="Enter no. of coupons" value="" disabled><br/>
                                 @endif
-                                @php
-                                    $color = '';
-                                    if ($coupon->total_coupons >= 10) {
-                                        $color = 'green';
-                                    } elseif ($coupon->total_coupons >= 5) {
-                                        $color = 'orange';
-                                    } else {
-                                        $color = 'red';
-                                    }
-                                @endphp
-                                <span style="color:black;">Available no. Coupons-<span style="color: {{ $color }}">{{ $coupon->total_coupons }}</span></span>
-                            </div>
+                                 </div>
                             @if($coupon->total_coupons > 0)
                             @php $firstIteration_c = false; @endphp
                             @endif  
@@ -498,6 +512,7 @@
  
                         </div>
                         <div id="adv_winning_error" style="color: red;"></div>
+                        <div id="adv_winning_error_ratio" style="color: red;"></div>
                         <!-- End Row -->
                      </div>
                   </div>
@@ -506,7 +521,7 @@
             </div>
             <!-- ////coupon end --> 
             <div class="form-group row mb-3" id="adv_lock">
-               <label class="form-control-label">Lock Time</label>
+               <label class="form-control-label required-label">Lock Time</label>
                <div class="note">Lock advertisement for specific time in hours</div>
                <div class="col-sm-3">
                   <select class="form-control" name="lock_time" id="lock_time" required>
@@ -523,17 +538,18 @@
                   </select>
                </div>
                <div id="adv_lock_error" style="color: red;"></div>
+               <input type="hidden" name="user_id" value="{{$store->user_id}}" >
             </div>
-            <div class="form-group row mb-3">
+            <!-- <div class="form-group row mb-3">
                <label class="col-sm-2 form-control-label">Winning Ratio</label>
                <div class="note">e.g- if you enter 100, it means that the prize will be awarded after the 99th customer.</div>
                <div class="col-sm-10">
                   <span>1</span>
                   <label for="denominator">out of : </label>
                   <input type="number" name="winning_ratio" class="ratio-input" required>
-                  <input type="hidden" name="user_id" value="{{$store->user_id}}" >
+              
                </div>
-            </div>
+            </div> -->
          </div>
       </div>
       <div class="row mt-4">
@@ -576,7 +592,7 @@
                <th>ID</th>
                <th>Advertisement Name</th>
                <th>Video</th>
-               <th>Action</th>
+               <!-- <th>Action</th> -->
             </tr>
          </thead>
          <tbody>
@@ -593,7 +609,16 @@
 <!-- DataTables Core and Extensions -->
 <script type="module" src="{{ asset('vendor/datatable/datatables.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+
 <script type="module">
+   $('.coupon-input').on('input', function() {
+    var enteredValue = parseInt($(this).val());
+    var maxAllowed = parseInt($(this).data('max'));
+    if (enteredValue > maxAllowed) {
+        $(this).val(maxAllowed);
+    }
+});
+
    $('#datatable').DataTable({
        processing: true,
        serverSide: true,
@@ -612,10 +637,10 @@
                data: 'media', 
                name: 'media',
            },
-           {
-               data: 'edit_advertisement',
-               name: 'edit_advertisement'
-           },
+         //   {
+         //       data: 'edit_advertisement',
+         //       name: 'edit_advertisement'
+         //   },
        ]
    });
    
@@ -652,13 +677,12 @@
            };
        var videoListCoupon = new List('videoGalleryCoupon', options_coupons);
    
-       $('#filter_coupon').change(function () {
+       $('#category_coupon').change(function () {
            var selection = $(this).val();
            videoListCoupon.filter(function(item) {
                return !selection || item.values().category_coupon === selection;
            });
        });
-   
    
    
         ////image search
@@ -743,12 +767,32 @@
 </script>
 
 <script>
-$(document).ready(function(){
-    $('.adv_btn').click(function(e){
-      e.preventDefault(); 
-      var clickedButtonValue = this.value;
+$(document).ready(function() {
+    $('.adv_btn').click(function(e) {
+        e.preventDefault();
+        var clickedButtonValue = this.value;
 
-      var other_coupon_image_ids_checkedValues = $('input[name="other_coupon_image_ids[]"]:checked').map(function() {
+        // Function to show error messages to the respective field
+        function showError(errorField, errorMessage) {
+            $(errorField).text(errorMessage);
+        }
+        function removeError(errorField) {
+            $(errorField).text('');
+        }
+
+        var validations = [
+            { field: 'advertisement_name', error: 'Please enter advertisement name.', container: '#adv_name', errorField: '#adv_name_error' },
+            { field: 'video_id:checked', error: 'Please select advertisement video.', container: '#adv_video', errorField: '#adv_video_error' },
+            { field: 'heading', error: 'Please enter heading.', container: '#adv_heading', errorField: '#adv_heading_error' },
+            { field: 'primary_image_id:checked', error: 'Please select primary image.', container: '#adv_primary', errorField: '#adv_primary_error' },
+            { field: 'heading_other_prize', error: 'Please enter other prize heading.', container: '#adv_other', errorField: '#adv_other_heading_error' }
+        ];
+
+        var secondary_image_id_checkedValues = $('input[name="secondary_image_id[]"]:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        var other_coupon_image_ids_checkedValues = $('input[name="other_coupon_image_ids[]"]:checked').map(function() {
             return $(this).val();
         }).get();
 
@@ -760,103 +804,105 @@ $(document).ready(function(){
             return $(this).val();
         }).get();
 
-        var secondary_image_id_checkedValues = $('input[name="secondary_image_id[]"]:checked').map(function() {
+        var no_of_winning_ration_checkedValues = $('input[name="winning_ratio[]"]').map(function() {
             return $(this).val();
         }).get();
 
-      if($('input[name="advertisement_name"]').val() == ''){
-         $('#adv_name_error').text('Please enter advertisement name.');
-            $('html, body').animate({
-               scrollTop: $('#adv_name').offset().top - 150 // Adjust the value as needed
-            }, 1000);
-            setTimeout(function() {
-                $('#adv_name_error').empty();
-            }, 10000);
+        var lock_time_check = $('select[name="lock_time"]').val();
 
-      }else if($('input[name="video_id"]').val() == ''){
-         $('#adv_video_error').text('Please select advertisement video.');
-            $('html, body').animate({
-               scrollTop: $('#adv_video').offset().top - 150 // Adjust the value as needed
-            }, 1000);
-            setTimeout(function() {
-                $('#adv_video_error').empty();
-            }, 10000);
+        var hasError = false;
 
-      }else if($('input[name="heading"]').val() == ''){
-         $('#adv_heading_error').text('Please enter heading.');
-            $('html, body').animate({
-               scrollTop: $('#adv_heading').offset().top - 150 // Adjust the value as needed
-            }, 1000);
-            setTimeout(function() {
-                $('#adv_heading_error').empty();
-            }, 10000);
+        for (let i = 0; i < validations.length; i++) {
+            let field = validations[i].field.includes(':checked') ? `input[name="${validations[i].field.split(':')[0]}"]:checked` : `input[name="${validations[i].field}"]`;
 
-      }else if($('input[name="primary_image_id"]').val() == ''){
-         $('#adv_primary_error').text('Please select primary image.');
-            $('html, body').animate({
-               scrollTop: $('#adv_primary').offset().top - 150 // Adjust the value as needed
-            }, 1000);
-            setTimeout(function() {
-                $('#adv_primary_error').empty();
-            }, 10000);
+            if ($(field).length === 0 || $(field).val() == '') {
+                showError(validations[i].errorField, validations[i].error, validations[i].container);
+                hasError = true;
+            }
+            else{
+               removeError(validations[i].errorField);
+               hasError = false;
+            }
+        }
 
-      }else if(secondary_image_id_checkedValues.length == 0){
-         $('#secondary_error').text('Please select at least one secondary image.');
-            // Clear error message after 5 seconds 
-            $('html, body').animate({
-               scrollTop: $('#imageGallerySecondary').offset().top - 150 // Adjust the value as needed
-            }, 1000);
-            setTimeout(function() {
-                $('#secondary_error').empty();
-            }, 10000);
-      }else if($('input[name="heading_other_prize"]').val() == ''){
-         $('#adv_other_heading_error').text('Please enter other prize heading.');
-            // Clear error message after 5 seconds 
-            $('html, body').animate({
-               scrollTop: $('#adv_other').offset().top - 150 // Adjust the value as needed
-            }, 1000);
-            setTimeout(function() {
-                $('#adv_other_heading_error').empty();
-            }, 10000);
+        if (secondary_image_id_checkedValues.length === 0) {
+            showError('#secondary_error', 'Please select at least one secondary image.', '#imageGallerySecondary');
+            hasError = true;
+        }
+        else{
+            removeError('#secondary_error');
+            hasError = false;
+        }
 
-      }else if(other_coupon_image_ids_checkedValues == 0){
-         $('#adv_other_coupon_error').text('Please select at leat one other coupon image.');
-            // Clear error message after 5 seconds 
-            $('html, body').animate({
-               scrollTop: $('#adv_other_coupon').offset().top - 150 // Adjust the value as needed
-            }, 1000);
-            setTimeout(function() {
-                $('#adv_other_coupon_error').empty();
-            }, 10000);
+        if (other_coupon_image_ids_checkedValues.length === 0) {
+            showError('#adv_other_coupon_error', 'Please select at least one other coupon image.', '#adv_other_coupon');
+            hasError = true;
+        }
+        else{
+            removeError('#adv_other_coupon_error');
+            hasError = false;
+        }
 
-      }else if(coupon_id_checkedValues == 0){
-         $('#adv_winning_error').text('Please select at leat one winning prize.');
-            // Clear error message after 5 seconds 
-            $('html, body').animate({
-               scrollTop: $('#adv_winning').offset().top - 150 // Adjust the value as needed
-            }, 1000);
-            setTimeout(function() {
-                $('#adv_winning_error').empty();
-            }, 10000);
+        if (coupon_id_checkedValues.length === 0) {
+            showError('#adv_winning_error', 'Please select at least one winning prize.', '#adv_winning');
+            hasError = true;
+        }
+        else{
+            removeError('#adv_winning_error');
+            hasError = false;
+        }
 
-      }else if($('select[name="lock_time"]').val() == ''){
-         $('#adv_lock_error').text('Please select lock time.');
-            // Clear error message after 5 seconds 
-            $('html, body').animate({
-               scrollTop: $('#adv_lock').offset().top - 150 // Adjust the value as needed
-            }, 1000);
-            setTimeout(function() {
-                $('#adv_lock_error').empty();
-            }, 10000);
+        if (lock_time_check == '') {
+            showError('#adv_lock_error', 'Please select at least one winning prize.', '#adv_lock');
+            hasError = true;
+        }
+        else{
+            removeError('#adv_lock_error');
+            hasError = false;
+        }
 
-      }else{
-         var customData = {
+        var couponCheckboxes = $('input[name="coupon_id[]"]');
+        var numberOfCouponsInputs = $('input[name="no_of_coupon[]"]');
+        var winningRatioInputs = $('input[name="winning_ratio[]"]');
+
+         for (var i = 0; i < couponCheckboxes.length; i++) {
+            if (couponCheckboxes[i].checked) {
+               if (!numberOfCouponsInputs[i].value) {
+                     // Show error message or perform validation here
+                     hasError = true;
+                     showError('#adv_winning_error', 'Please enter no of coupons.', '#adv_winning');
+                     // For example, you can show an error message or perform other validation logic
+               }
+               else{
+                  removeError('#adv_winning_error');
+                  hasError = false;
+               }
+               if (!winningRatioInputs[i].value) {
+                     // Show error message or perform validation for missing winning ratio
+                     hasError = true;
+                     showError('#adv_winning_error_ratio', 'Please enter ratio.', '#adv_winning');
+                     // For example, you can show an error message or perform other validation logic
+               }
+               else{
+                  removeError('#adv_winning_error_ratio');
+                  hasError = false;
+               }
+            }
+         }
+
+
+     
+        if (hasError) {
+            return;
+        }
+
+      
+        var customData = {
             advertisement_name: $('input[name="advertisement_name"]').val(),
             advertisement_name_hid: $('input[name="advertisement_name_hid"]').val(),
-            category: $('select[name="category"]').val(),
-            video_id: $('input[name="video_id"]').val(),
+            video_id: $('input[name="video_id"]:checked').val(),
             heading: $('input[name="heading"]').val(),
-            primary_image_id: $('input[name="primary_image_id"]').val(),
+            primary_image_id: $('input[name="primary_image_id"]:checked').val(),
             secondary_image_id: secondary_image_id_checkedValues,
             heading_other_prize: $('input[name="heading_other_prize"]').val(),
             other_coupon_image_ids: other_coupon_image_ids_checkedValues,
@@ -864,28 +910,27 @@ $(document).ready(function(){
             coupon_id: coupon_id_checkedValues,
             no_of_coupon: no_of_coupon_checkedValues,
             lock_time: $('select[name="lock_time"]').val(),
-            winning_ratio: $('input[name="winning_ratio"]').val(),
+            winning_ratio: no_of_winning_ration_checkedValues,
             user_id: $('input[name="user_id"]').val(),
             action: clickedButtonValue,
             _token: '{{csrf_token()}}'
-         };
+        };
 
-         $.ajaxSetup({
+        $.ajaxSetup({
             headers: {
-                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
-         });
-        
-         var jsonData = JSON.stringify(customData);
-         $.ajax({
+        });
+
+        var jsonData = JSON.stringify(customData);
+        $.ajax({
             type: 'POST',
             url: '{{ route("backend.stores.storeAdvertisement") }}', // URL to submit form data
             data: jsonData,
-            contentType : "application/json",
-            success: function(response){
-                // Handle success response
-                console.log(response);
-                if(response.response_type == 'store'){
+            contentType: "application/json",
+            success: function(response) {
+                //console.log(response);
+                   if(response.response_type == 'store'){
                   window.scrollTo(0, 0);
                   setTimeout(function() {
                      location.reload();
@@ -896,41 +941,30 @@ $(document).ready(function(){
                   window.open(url, '_blank');
                 }
             },
-            error: function(xhr, status, error){
-                // Handle error
+            error: function(xhr, status, error) {
                 console.error(error);
-            }
-         });
-      }
-   });
-});
-
-
-$(document).ready(function(){
-        // Event listener for checkbox change
-      //   $('input[name="coupon_id[]"]').prop('checked', true);
-        
-        // Set corresponding inputs as required based on checkbox state
-        $('input[name="coupon_id[]"]').each(function() {
-            var $this = $(this);
-            var $input = $this.closest('div').find('input[name="no_of_coupon[]"]');
-            if($this.is(':checked')) {
-                $input.prop('required', true);
-            } else {
-                $input.prop('required', false);
-            }
-        });
-        $('input[name="coupon_id[]"]').change(function(){
-            var $this = $(this);
-            var $input = $this.closest('div').find('input[name="no_of_coupon[]"]');
-            if($this.is(':checked')) {
-                // Checkbox is checked, make corresponding input required
-                $input.prop('required', true);
-            } else {
-                // Checkbox is unchecked, remove required attribute from input
-                $input.prop('required', false);
             }
         });
     });
+
+    // Remove error message when input is changed
+    $('input, select').on('input change', function() {
+        var errorField = $(this).data('error-field');
+        if (errorField) {
+            $(errorField).empty();
+        }
+    });
+
+    // Initialize checkbox and related input fields
+    $('input[name="coupon_id[]"]').each(function() {
+        var $this = $(this);
+        var $input = $this.closest('div').find('input[name="no_of_coupon[]"]');
+        $input.prop('required', $this.is(':checked'));
+    }).change(function() {
+        var $this = $(this);
+        var $input = $this.closest('div').find('input[name="no_of_coupon[]"]');
+        $input.prop('required', $this.is(':checked'));
+    });
+});
    </script>
 @endpush

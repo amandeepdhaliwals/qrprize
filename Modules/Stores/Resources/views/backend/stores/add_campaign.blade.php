@@ -189,14 +189,23 @@
                     </div>
                 </div>
                 <div class="form-group row mb-3">
-                    <label class="col-sm-2 form-control-label">Campaign Name</label>
-                    <div class="col-sm-10">
-                    <input type="hidden" class="form-control" name="store_id" value="{{ $store->user_id }}">
-                    <input type="hidden" class="form-control" name="campaign_name_hid" value="{{ $store->user_id }}">
-                        <!-- Input for QR code URL -->
-                        <input type="text" class="form-control" name="campaign_name" placeholder="Enter campaign name" required>
-                    </div>
-                </div>
+               <label class="col-sm-2 form-control-label required-label">Campaign Name</label>
+               <div class="col-sm-10">
+                  <div class="input-group">
+                     <!-- Static read-only text -->
+                     <div class="input-group-prepend">
+                        <span class="input-group-text">{{$store->store_name}}{{$campaign_count_for_name}}_campaign-</span>
+                     </div>
+                     <!-- Input text field -->
+                    <input type="text" class="form-control" name="campaign_name" placeholder="Enter campaign name" required>
+                     <input type="hidden" class="form-control" name="campaign_name_hid" value="{{$store->store_name}}{{$campaign_count_for_name}}_campaign-">
+                     <input type="hidden" class="form-control" name="store_id" value="{{ $store->user_id }}">
+                  </div>
+                  <!-- Note -->
+                  <div class="note">This is used for internal use only.</div>
+                  <div id="adv_name_error" style="color: red;"></div>
+               </div>
+            </div>
             </div>
         </div>
 
@@ -278,8 +287,8 @@
                 name: 'qr_code_image',
             },
             {
-                data: 'edit_campaign',
-                name: 'edit_campaign'
+                data: 'download',
+                name: 'download'
             },
         ]
     });

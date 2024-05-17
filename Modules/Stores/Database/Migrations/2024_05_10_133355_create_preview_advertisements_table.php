@@ -25,7 +25,6 @@ return new class extends Migration
             $table->integer('total_no_of_coupons'); 
             $table->string('winning_type'); 
             $table->integer('lock_time');
-            $table->integer('winning_ratio');
             $table->boolean('status')->default(true);
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();

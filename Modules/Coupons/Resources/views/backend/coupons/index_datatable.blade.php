@@ -55,7 +55,8 @@
                             <!-- <th>Image</th> -->
                             <th>Status</th>
                             <th>Category</th>
-                            <th>Total Coupons Available</th>
+                            <th>Total Coupons</th>
+                            <th>Assigned Coupons</th>
                             <th>Created At</th>
                             <th>Updated At</th>
                             <th class="text-end">Action</th>
@@ -134,6 +135,7 @@
             { data: 'status', name: 'status' },
             { data: 'category', name: 'category' },
             { data: 'total_coupons', name: 'total_coupons' },
+            { data: 'no_of_assigned_coupons', name: 'no_of_assigned_coupons' },
             { data: 'created_at', name: 'created_at' },
             { data: 'updated_at', name: 'updated_at' },
             { data: 'action', name: 'action', orderable: false, searchable: false }

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->integer('usage_count')->default(0);
             $table->enum('category', ['physical', 'service'])->default('physical');
             $table->unsignedInteger('total_coupons')->default(0);
+            $table->unsignedInteger('no_of_assigned_coupons')->default(0);
             $table->boolean('status')->default(true);
             $table->dateTime('redemption_date')->nullable();
             $table->boolean('is_redeemed')->default(false);

@@ -29,7 +29,7 @@ class Coupon extends BaseModel
         $columns  = DB::select('SHOW COLUMNS FROM '.$table_name);
 
         $filteredColumns = array_filter($columns, function ($column) {
-            return in_array($column->Field, ['title', 'description', 'code', 'status','category','terms_and_condition','total_coupons','updated_at', 'created_at']);
+            return in_array($column->Field, ['title', 'description', 'code', 'status','category','terms_and_condition','total_coupons','no_of_assigned_coupons','updated_at', 'created_at']);
         });
         return  $filteredColumns;
     }
