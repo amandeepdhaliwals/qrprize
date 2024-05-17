@@ -35,6 +35,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Frontend', 'as' => 'frontend.
 
     Route::get('store/{store_id}/campaign/{campaign_id}', 'FrontendController@campaign')->name('campaign');
 
+    Route::post('user/create_user', 'UserController@create_user')->name('create_user');
+
     Route::group(['middleware' => ['auth']], function () {
         /*
         *
