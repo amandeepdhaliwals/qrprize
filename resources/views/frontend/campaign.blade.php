@@ -566,6 +566,11 @@ $(document).ready(function(){
 </script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 <script>
+    $.ajaxSetup({
+            headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+         });
   $(document).ready(function(){
     $('#create_user').click(function(e){
       e.preventDefault(); 
@@ -617,11 +622,6 @@ $(document).ready(function(){
             phone_number: $('input[name="phone_number"]').val(),
             _token: '{{csrf_token()}}'
          };
-         $.ajaxSetup({
-            headers: {
-                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-         });
         
          var jsonData = JSON.stringify(customData);
          $.ajax({
@@ -689,11 +689,6 @@ $(document).ready(function(){
             phone_number_otp: $('input[name="phone_number_otp"]').val(),
             _token: '{{csrf_token()}}'
          };
-         $.ajaxSetup({
-            headers: {
-                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-         });
         
          var jsonData = JSON.stringify(customData);
          $.ajax({
