@@ -483,16 +483,32 @@ class UserController extends Controller
 
         $module_action = 'Details';
 
-        $request->validate([
-            'first_name' => 'required|min:3|max:191',
-            'last_name' => 'required|min:3|max:191',
-            'email' => 'required|email|regex:/(.+)@(.+)\.(.+)/i|max:191|unique:users',
-            'phone_number' => 'required|max:15'
-        ]);
+       
+        if(empty($request->first_name) || empty($request->last_name)){
+                // Validation has failed
+                return response()->json([
+                    'response_type' => 'error',
+                    'errors' => 'Please enter first and lastname'
+                ]);
+            }
+
+            $user = User::where('email', $request->email)
+            ->orWhere('mobile', $request->mobile)
+            ->first();
+
+            if ($user) {
+                $error = $user->email === $request->email ? 'Email already exist' : 'Phone No. already exist';
+                
+                return response()->json([
+                    'response_type' => 'error',
+                    'errors' => $error
+                ]);
+            }
+
 
         $data_array = $request->except('_token', 'roles', 'permissions', 'password_confirmation');
         $data_array['name'] = $request->first_name.' '.$request->last_name;
-        $data_array['mobile'] = $request->phone_number;
+        $data_array['mobile'] = $request->mobile;
         $password = Str::random(8);
         $data_array['password'] = Hash::make($password);
 
@@ -511,7 +527,7 @@ class UserController extends Controller
             "last_name" => $request->last_name,
             "username" => $username,
             "email" => $request->email,
-            "mobile" => $request->phone_number
+            "mobile" => $request->mobile
         ]);
          // Insert entry into store_qrcodes
          Customer::create([
@@ -559,7 +575,6 @@ class UserController extends Controller
             'campaign_id' => $request->campaign_id,
             'adverisement_id' => $request->advertisement_id,
             'response_type' => 'success',
-            'email_otp' => $otpCodeEmail, /// will remove
             'mobile_otp' => $otpCodeMobile,  /// will remove
         ]);
     }
@@ -576,7 +591,7 @@ class UserController extends Controller
         $module_action = 'Details';
         $win =false;
 
-        if ($this->verifyOtp($request->user_id, $request->email_otp, $request->phone_number_otp)) {
+        if ($this->verifyOtp($request->user_id, $request->email_otp, $request->mobile_otp)) {
             //////////////////win or lose user///////////
             $random_no = rand(0, 100);
             if($random_no == 7){
