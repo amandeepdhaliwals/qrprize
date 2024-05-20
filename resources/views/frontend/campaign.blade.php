@@ -620,7 +620,7 @@ $(document).ready(function(){
             first_name: $('input[name="first_name"]').val(),
             last_name: $('input[name="last_name"]').val(),
             email: $('input[name="email"]').val(),
-            phone_number: $('input[name="phone_number"]').val(),
+            mobile: $('input[name="phone_number"]').val(),
             _token: '{{csrf_token()}}'
          };
         
@@ -650,6 +650,40 @@ $(document).ready(function(){
             },
             error: function(xhr, status, error){
                 // Handle error
+                if (xhr.status === 422) {
+                  console.log(xhr.responseJSON);
+                            var errors = xhr.responseJSON.errors;
+                            let firstErrorKey = Object.keys(errors)[0]; // Get the first key
+                            if(firstErrorKey == 'first_name'){
+                              $('#first_name_error').text(errors[firstErrorKey][0]);
+                              setTimeout(function() {
+                                  $('#first_name_error').empty();
+                              }, 2000);
+                            }
+                            if(firstErrorKey == 'last_name'){
+                              $('#last_name_error').text(errors[firstErrorKey][0]);
+                              setTimeout(function() {
+                                  $('#last_name_error').empty();
+                              }, 2000);
+                            }
+                            if(firstErrorKey == 'email'){
+                              $('#email_error').text(errors[firstErrorKey][0]);
+                              setTimeout(function() {
+                                  $('#email_error').empty();
+                              }, 2000);
+                            }
+                            if(firstErrorKey == 'mobile'){
+                              $('#phone_number_error').text(errors[firstErrorKey][0]);
+                              setTimeout(function() {
+                                  $('#phone_number_error').empty();
+                              }, 2000);
+                            }
+                        
+                          //  displayErrors(errors);
+                        } else {
+                            // Handle other errors
+                            console.error('An error occurred');
+                        }
                 console.error(error);
             }
          });
@@ -687,7 +721,7 @@ $(document).ready(function(){
             advertisement_id: $('input[name="advertisement_id_otp"]').val(),
             user_id: $('input[name="user_id_otp"]').val(),
             email_otp: $('input[name="email_otp"]').val(),
-            phone_number_otp: $('input[name="phone_number_otp"]').val(),
+            mobile_otp: $('input[name="phone_number_otp"]').val(),
             _token: '{{csrf_token()}}'
          };
         
