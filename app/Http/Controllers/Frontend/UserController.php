@@ -22,6 +22,8 @@ use Modules\Customers\Entities\Customer;
 use Modules\Customers\Entities\OtpVerification;
 use Modules\Customers\Entities\CustomerResult;
 use Carbon\Carbon;
+use App\Notifications\OTPNotification;
+use Illuminate\Support\Facades\Notification;
 
 
 class UserController extends Controller
@@ -481,12 +483,12 @@ class UserController extends Controller
 
         $module_action = 'Details';
 
-        // $request->validate([
-        //     'first_name' => 'required|min:3|max:191',
-        //     'last_name' => 'required|min:3|max:191',
-        //     'email' => 'required|email|regex:/(.+)@(.+)\.(.+)/i|max:191|unique:users',
-        //     // 'password' => 'required|confirmed|min:4',
-        // ]);
+        $request->validate([
+            'first_name' => 'required|min:3|max:191',
+            'last_name' => 'required|min:3|max:191',
+            'email' => 'required|email|regex:/(.+)@(.+)\.(.+)/i|max:191|unique:users',
+            'mobile' => 'required|max:15|unique:users'
+        ]);
 
         $data_array = $request->except('_token', 'roles', 'permissions', 'password_confirmation');
         $data_array['name'] = $request->first_name.' '.$request->last_name;
@@ -496,19 +498,10 @@ class UserController extends Controller
 
         $data_array = Arr::add($data_array, 'email_verified_at', null);
 
-        // if ($request->confirmed === 1) {
-        //     $data_array = Arr::add($data_array, 'email_verified_at', Carbon::now());
-        // } else {
-        //     $data_array = Arr::add($data_array, 'email_verified_at', null);
-        // }
-
         $$module_name_singular = User::create($data_array);
-
 
         $$module_name_singular->assignRole("user");
 
-        // $roles = $request['roles'];
-        // $permissions = $request['permissions'];
         $id = $$module_name_singular->id;
         $username = config('app.initial_username') + $id;
         Userprofile::create([
@@ -525,36 +518,7 @@ class UserController extends Controller
             "user_id" => $$module_name_singular->id,
             "store_id" => $request->store_id,
         ]);
-        // Sync Roles
-        // if (isset($roles)) {
-        //     $$module_name_singular->syncRoles($roles);
-        // } else {
-        //     $roles = [];
-        //     $$module_name_singular->syncRoles($roles);
-        // }
 
-        // Sync Permissions
-        // if (isset($permissions)) {
-        //     $$module_name_singular->syncPermissions($permissions);
-        // } else {
-        //     $permissions = [];
-        //     $$module_name_singular->syncPermissions($permissions);
-        // }
-
-        // Username
-        // $id = $$module_name_singular->id;
-        // $username = config('app.initial_username') + $id;
-        // $$module_name_singular->username = $username;
-        // if ($request->hasFile('avatar')) {
-        //     if ($$module_name_singular->getMedia($module_name)->first()) {
-        //         $$module_name_singular->getMedia($module_name)->first()->delete();
-        //     }
-        //     $media = $$module_name_singular->addMedia($request->file('avatar'))->toMediaCollection($module_name);
-        //     $$module_name_singular->avatar = $media->getUrl();
-        // }
-        // $$module_name_singular->save();
-
-      //  event(new UserCreated($$module_name_singular));
         $updateUser = User::where(
             "id",
             $$module_name_singular->id
@@ -585,28 +549,18 @@ class UserController extends Controller
         ]);
         ///////////////////////////////////////////////
 
+           // Send the OTP via email
+        Notification::send($user, new OTPNotification($otpCodeEmail));
 
 
-        // if ($request->email_credentials === 1) {
-        //     $data = [
-        //         'password' => $password,
-        //     ];
-        //    $$module_name_singular->notify(new UserAccountCreated($data));
-
-        //     Flash::success(icon('fas fa-envelope').' Account Credentials Sent to User.')->important();
-        // }
-
-        // Log::info(label_case($module_title.' '.$module_action)." | '".$$module_name_singular->name.'(ID:'.$$module_name_singular->id.") ' by User:".auth()->user()->name.'(ID:'.auth()->user()->id.')');
-
-        //return redirect("admin/{$module_name}");
         return response()->json([
             'user_id' => $$module_name_singular->id,
             'storeId' => $request->store_id,
             'campaign_id' => $request->campaign_id,
             'adverisement_id' => $request->advertisement_id,
             'response_type' => 'success',
-            'email_otp' => $otpCodeEmail,
-            'mobile_otp' => $otpCodeMobile,
+            'email_otp' => $otpCodeEmail, /// will remove
+            'mobile_otp' => $otpCodeMobile,  /// will remove
         ]);
     }
 
@@ -655,6 +609,19 @@ class UserController extends Controller
 
             ]);
         }
+
+                // if ($request->email_credentials === 1) {
+        //     $data = [
+        //         'password' => $password,
+        //     ];
+        //    $$module_name_singular->notify(new UserAccountCreated($data));
+
+        //     Flash::success(icon('fas fa-envelope').' Account Credentials Sent to User.')->important();
+        // }
+
+        // Log::info(label_case($module_title.' '.$module_action)." | '".$$module_name_singular->name.'(ID:'.$$module_name_singular->id.") ' by User:".auth()->user()->name.'(ID:'.auth()->user()->id.')');
+
+        //return redirect("admin/{$module_name}");
 
         return response()->json([
             'response_type' => 'failed',

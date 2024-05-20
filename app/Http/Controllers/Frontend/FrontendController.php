@@ -48,7 +48,7 @@ class FrontendController extends Controller
     public function campaign($storeId,$campaignId)
     {
         $campaign = Campaign::where('id',$campaignId)->where('store_id',$storeId)->first();
-//dd($campaign->advertisement_ids[0]);
+
         if($campaign){
             $advertisement_id = $campaign->advertisement_ids[0];
             if($advertisement_id){
@@ -70,14 +70,6 @@ class FrontendController extends Controller
                 $lock_time = $advertisement_detail->lock_time;
                 return view('frontend.campaign',compact('campaignId','advertisement_detail','advertisement_video','primary_image','secondary_images','other_images','coupons','lock_time'));
             }
-
-
-            // $advertisement_video = Advertisement::where('id',$campaign->adv_video_id)->select('media')->first();
-            // $primary_image = Advertisement::where('id',$campaign->primary_image_id)->select('media','free_services')->first();
-            // $secondary_images = Advertisement::whereIn('id',$campaign->secondary_images_id)->select('media','free_services')->get();
-            // $lock_time = $campaign->lock_time;
-//dd($secondary_images);
-            // return view('frontend.campaign',compact('advertisement_video','primary_image','secondary_images','lock_time'));
 
         }else{
             return abort(Response::HTTP_NOT_FOUND);
