@@ -487,7 +487,7 @@ class UserController extends Controller
             'first_name' => 'required|min:3|max:191',
             'last_name' => 'required|min:3|max:191',
             'email' => 'required|email|regex:/(.+)@(.+)\.(.+)/i|max:191|unique:users',
-            'phone_number' => 'required|max:15|unique:users'
+            'phone_number' => 'required|max:15'
         ]);
 
         $data_array = $request->except('_token', 'roles', 'permissions', 'password_confirmation');
