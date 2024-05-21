@@ -10,7 +10,8 @@
   </title>
   <meta content="" name="description">
   <meta content="" name="keywords">
-
+  <meta name="permissions-policy" content="fullscreen=(), geolocation=()">
+  <script src="https://www.youtube.com/iframe_api"></script>
   <!-- Favicons -->
 <!--   <link href="" rel="icon">
   <link href="" rel="apple-touch-icon" -->
@@ -56,7 +57,7 @@
       @elseif($advertisement_video->media_type == "Youtube" || $advertisement_video->media_type == "youtube") 
       <iframe id="youtube-player" width="100%" height="100%" src="{{ $advertisement_video->media }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       @elseif($advertisement_video->media_type == "Vimeo" || $advertisement_video->media_type == "vimeo") 
-      <iframe src="{{ $advertisement_video->media }}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+      <iframe id="vimeo-player" src="{{ $advertisement_video->media }}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       @endif
       </div>
        </div>
@@ -414,8 +415,8 @@ var x = setInterval(function() {
 
 
   <!-- Vendor JS Files -->
+  <script src="https://player.vimeo.com/api/player.js"></script>
 
-  <script src="https://www.youtube.com/iframe_api"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="{{ asset('assets/Impact/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
@@ -562,7 +563,67 @@ $(document).ready(function(){
             // You can also display a message or trigger another action.
           });
         }
-    });
+        var vimeo = document.getElementById('vimeo-player');
+        if (vimeo) {
+            var player = new Vimeo.Player(vimeo);
+
+            // Listen for the 'play' event
+            player.on('play', function() {
+                console.log('The video started playing');
+            });
+
+            // Listen for the 'ended' event
+            player.on('ended', function() {
+                console.log('The video has ended');
+                enableSpinner();
+                var watchedTime = Math.floor(video.currentTime);
+                var timetext = "Watched time: " + watchedTime + " seconds";
+            });
+        } 
+      });
+        var youtube = document.getElementById('youtube-player');
+        if (youtube) {
+            function getYouTubeVideoId(url) {
+              const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+              const matches = url.match(regex);
+              return matches ? matches[1] : null;
+            }
+            // Get the src attribute of the iframe
+            var src = youtube.src;
+            var videoId = getYouTubeVideoId(src);
+            console.log("Extracted Video ID:", videoId);
+
+            var player;
+            // This function creates an <iframe> (and YouTube player) after the API code downloads.
+            function onYouTubeIframeAPIReady() {
+              console.log('Creating YT.Player instance');
+                player = new YT.Player('youtube-player', {
+                    height: '390',
+                    width: '640',
+                    videoId: videoId,  // Known YouTube video ID for testing
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+
+            // The API will call this function when the video player is ready.
+            function onPlayerReady(event) {
+                console.log('Player is ready');
+            }
+
+            // The API calls this function when the player's state changes.
+            function onPlayerStateChange(event) {
+                console.log('Player state changed:', event.data); // Log the state change
+                if (event.data == YT.PlayerState.PLAYING) {
+                    console.log('Video is playing');
+                } else if (event.data == YT.PlayerState.ENDED) {
+                    console.log('Video has ended');
+                }
+            }
+        }
+    
 </script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
