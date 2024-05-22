@@ -11,7 +11,6 @@
   <meta content="" name="description">
   <meta content="" name="keywords">
   <meta name="permissions-policy" content="fullscreen=(), geolocation=()">
-  <script src="https://www.youtube.com/iframe_api"></script>
   <!-- Favicons -->
 <!--   <link href="" rel="icon">
   <link href="" rel="apple-touch-icon" -->
@@ -55,7 +54,8 @@
         Your browser does not support the video tag.
       </video>
       @elseif($advertisement_video->media_type == "Youtube" || $advertisement_video->media_type == "youtube") 
-      <iframe id="youtube-player" width="100%" height="100%" src="{{ $advertisement_video->media }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div id="player"></div>
+      <!-- <iframe id="youtube-player" width="100%" height="100%" src="{{ $advertisement_video->media }}" frameborder="0" allowfullscreen></iframe> -->
       @elseif($advertisement_video->media_type == "Vimeo" || $advertisement_video->media_type == "vimeo") 
       <iframe id="vimeo-player" src="{{ $advertisement_video->media }}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
       @endif
@@ -579,50 +579,19 @@ $(document).ready(function(){
                 var watchedTime = Math.floor(video.currentTime);
                 var timetext = "Watched time: " + watchedTime + " seconds";
             });
+
+            function handleScroll() {
+            var position = vimeo.getBoundingClientRect();
+              // Pause the video if it's in the viewport
+              if (position.top <= -150 && position.bottom <= window.innerHeight) {
+                player.pause();
+              }
+          }
+
+          // Listen for scroll event
+          window.addEventListener("scroll", handleScroll);
         } 
       });
-        var youtube = document.getElementById('youtube-player');
-        if (youtube) {
-            function getYouTubeVideoId(url) {
-              const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-              const matches = url.match(regex);
-              return matches ? matches[1] : null;
-            }
-            // Get the src attribute of the iframe
-            var src = youtube.src;
-            var videoId = getYouTubeVideoId(src);
-            console.log("Extracted Video ID:", videoId);
-
-            var player;
-            // This function creates an <iframe> (and YouTube player) after the API code downloads.
-            function onYouTubeIframeAPIReady() {
-              console.log('Creating YT.Player instance');
-                player = new YT.Player('youtube-player', {
-                    height: '390',
-                    width: '640',
-                    videoId: videoId,  // Known YouTube video ID for testing
-                    events: {
-                        'onReady': onPlayerReady,
-                        'onStateChange': onPlayerStateChange
-                    }
-                });
-            }
-
-            // The API will call this function when the video player is ready.
-            function onPlayerReady(event) {
-                console.log('Player is ready');
-            }
-
-            // The API calls this function when the player's state changes.
-            function onPlayerStateChange(event) {
-                console.log('Player state changed:', event.data); // Log the state change
-                if (event.data == YT.PlayerState.PLAYING) {
-                    console.log('Video is playing');
-                } else if (event.data == YT.PlayerState.ENDED) {
-                    console.log('Video has ended');
-                }
-            }
-        }
     
 </script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
@@ -825,6 +794,76 @@ $(document).ready(function(){
 });
 
 </script>
+<script>
+     var advertisementVideo = {
+        media_type: "<?php echo addslashes($advertisement_video->media_type); ?>"
+    };
+  if(advertisementVideo.media_type == "Youtube" || advertisementVideo.media_type == "youtube"){ 
+      function getYouTubeVideoId(url) {
+              const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+              const matches = url.match(regex);
+              return matches ? matches[1] : null;
+      }
+
+      var videoUrl = "{{ $advertisement_video->media }}"; // Static video URL for testing
+      var videoId = getYouTubeVideoId(videoUrl);
+      console.log("Extracted Video ID:", videoId);
+      if(videoId){
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+          player = new YT.Player('player', {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            events: {
+              'onReady': onPlayerReady,
+              'onStateChange': onPlayerStateChange
+            }
+          });
+        }
+
+        function onPlayerReady(event) {
+          console.log('ready')
+          event.target.playVideo();
+        }
+
+        function onPlayerStateChange(event) {
+                  console.log('Player state changed:', event.data); // Log the state change
+                if (event.data == YT.PlayerState.PLAYING) {
+                    console.log('Video is playing');
+                } else if (event.data == YT.PlayerState.ENDED) {
+                    console.log('Video has ended');
+                    document.getElementById("spinner-overlay").style.display = "none";
+                }
+        }
+       
+        function pauseVideo() {
+          if (player) {
+            player.pauseVideo();
+          }
+        }
+
+        function NotPlayerInViewport() {
+          const rect = document.getElementById('player').getBoundingClientRect();
+          console.log(rect.top);
+          return (
+            rect.top <= -150 && rect.bottom <= window.innerHeight
+          );
+        }
+
+        window.addEventListener('scroll', function() {
+          if (NotPlayerInViewport()) {
+            pauseVideo();
+          }
+        });
+      }
+    }
+  </script>
 </body>
 
 </html>
