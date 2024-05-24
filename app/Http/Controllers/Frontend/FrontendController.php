@@ -27,8 +27,8 @@ class FrontendController extends Controller
      */
     public function index()
     {
-       // return view('frontend.index');
-        return redirect()->route('login');
+        return view('frontend.index');
+       // return redirect()->route('login');
     }
 
     /**
