@@ -265,8 +265,7 @@ class StoresController extends BackendBaseController
             "last_name" => "required|min:3|max:191",
             "store_name" => "required|min:3|max:191",
             "mobile" => "required",
-            "email" =>
-                "required|email|regex:/(.+)@(.+)\.(.+)/i|max:191|unique:users",
+            "email" => "required|email|regex:/(.+)@(.+)\.(.+)/i|max:191|unique:users",
             // "password" => "required|confirmed|min:4",
         ]);
 
@@ -360,12 +359,11 @@ class StoresController extends BackendBaseController
                 "' Created"
         )->important();
 
-        if ($request->email_credentials === 1) {
+        if ($request->email_credentials == 1) {
             $data = [
                 "password" => $password,
             ];
             $$module_name_singular->notify(new UserAccountCreated($data));
-
             Flash::success(
                 icon("fas fa-envelope") . " Account Credentials Sent to User."
             )->important();

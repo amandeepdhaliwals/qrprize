@@ -57,10 +57,9 @@ class FrontendController extends Controller
 
         if($campaign){
             //$advertisement_id = $campaign->advertisement_ids[0];
-            $advertisementIds = explode(',', $campaign->advertisement_ids);
+            $advertisementIds = $campaign->advertisement_ids;
             $hour = now()->hour;
-
-            // Calculate the index of the advertisement ID based on the current hour
+            // Calculate the advertisement index
             $advertisementIndex = ($hour - 1) % count($advertisementIds);
             $advertisement_id = $advertisementIds[$advertisementIndex];
 
