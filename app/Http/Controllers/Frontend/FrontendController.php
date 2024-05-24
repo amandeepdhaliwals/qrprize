@@ -175,7 +175,7 @@ class FrontendController extends Controller
 
         if ($adminUsers->isNotEmpty()) {
             $adminUser = $adminUsers->first();
-            $adminUser->notify(new ClaimRequestNotification($request->name, $request->address, $request->coupon_id));
+            $adminUser->notify(new ClaimRequestNotification($request->name, $request->address, $coupon->code));
         }
         // Create a new claim record
         Claim::create([

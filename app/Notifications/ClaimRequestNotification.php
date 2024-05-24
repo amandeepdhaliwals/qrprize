@@ -13,18 +13,18 @@ class ClaimRequestNotification extends Notification
 
     private $name;
     private $address;
-    private $couponId;
+    private $code;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($name, $address, $couponId)
+    public function __construct($name, $address, $code)
     {
         $this->name = $name;
         $this->address = $address;
-        $this->couponId = $couponId;
+        $this->code = $code;
     }
 
     /**
@@ -47,7 +47,7 @@ class ClaimRequestNotification extends Notification
         ->line('A new claim request has been submitted by a customer.')
         ->line('Customer Name: ' . $this->name)
         ->line('Customer Address: ' . $this->address)
-        ->line('Coupon ID: ' . $this->couponId);
+        ->line('Coupon Code: ' . $this->code);
     
     }
 
@@ -61,7 +61,7 @@ class ClaimRequestNotification extends Notification
         return [
             'name' => $this->name,
             'address' => $this->address,
-            'couponId' => $this->couponId,
+            'code' => $this->code,
         ];
     }
 }
