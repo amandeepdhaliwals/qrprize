@@ -734,6 +734,7 @@ class UserController extends Controller
         ]);
 
         // Send the OTP via email or mobile
+         $user = User::find($userId);
          Notification::send($user, new OTPNotification($otpCodeEmail));
         return [
             'email_otp' => $otpCodeEmail,
