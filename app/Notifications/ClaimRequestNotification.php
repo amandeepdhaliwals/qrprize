@@ -11,12 +11,20 @@ class ClaimRequestNotification extends Notification
 {
     use Queueable;
 
+    private $name;
+    private $address;
+    private $couponId;
+
     /**
      * Create a new notification instance.
+     *
+     * @return void
      */
-    public function __construct()
+    public function __construct($name, $address, $couponId)
     {
-        //
+        $this->name = $name;
+        $this->address = $address;
+        $this->couponId = $couponId;
     }
 
     /**
@@ -51,7 +59,9 @@ class ClaimRequestNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'name' => $this->name,
+            'address' => $this->address,
+            'couponId' => $this->couponId,
         ];
     }
 }

@@ -169,9 +169,13 @@ class FrontendController extends Controller
             // return redirect()->back()->with('error', 'Coupon has already been claimed.');
         }
 
-        $admin = User::where('role', 'admin')->first();
-        if ($admin) {
-            $admin->notify(new ClaimRequestNotification($request->name, $request->address, $request->coupon_id));
+        $adminUsers = User::whereHas('roles', function($query) {
+            $query->where('name', 'super admin');
+        })->get();
+
+        if ($adminUsers->isNotEmpty()) {
+            $adminUser = $adminUsers->first();
+            $adminUser->notify(new ClaimRequestNotification($request->name, $request->address, $request->coupon_id));
         }
         // Create a new claim record
         Claim::create([
