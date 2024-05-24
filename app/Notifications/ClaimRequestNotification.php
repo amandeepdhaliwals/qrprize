@@ -35,9 +35,12 @@ class ClaimRequestNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+        ->subject('New Claim Request')
+        ->line('A new claim request has been submitted by a customer.')
+        ->line('Customer Name: ' . $this->name)
+        ->line('Customer Address: ' . $this->address)
+        ->line('Coupon ID: ' . $this->couponId);
+    
     }
 
     /**
