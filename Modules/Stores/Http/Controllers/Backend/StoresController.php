@@ -854,6 +854,7 @@ class StoresController extends BackendBaseController
         $request->validate([
             "campaign_name" => "required",
             "advertisement_ids" => "required",
+            "lock_time" => "required",
         ]);
 
         $campaignId = $module_model::latest()->value("id") + 1;
@@ -871,6 +872,7 @@ class StoresController extends BackendBaseController
             "store_id" => $storeId,
             "qr_code_url" => $url,
             "qr_code_image" => $qr_code_image,
+            "lock_time" => $request['lock_time'],
             "advertisement_ids" => $request->advertisement_ids,
         ]);
 
@@ -919,7 +921,7 @@ class StoresController extends BackendBaseController
             $campaign->primary_image_id = $request->primary_image_id;
             $campaign->secondary_images_id = $request->secondary_images_id;
             $campaign->coupons_id = $request->coupons_id;
-            $campaign->lock_time = $request->lock_time;
+            // $campaign->lock_time = $request->lock_time;
             $campaign->winning_ratio = $request->winning_ratio;
 
             $campaign->save();
@@ -1110,7 +1112,7 @@ class StoresController extends BackendBaseController
             "other_coupon_images_id" => $otherCouponImageIdsString,
             "coupons_id" => $jsonDataCoupon,
             "total_no_of_coupons" => $noOfCouponSum,
-            "lock_time" => $requestData['lock_time'],
+            // "lock_time" => $requestData['lock_time'],
             "status" => 1
         ];
 

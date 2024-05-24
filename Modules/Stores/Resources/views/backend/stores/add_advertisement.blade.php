@@ -513,6 +513,7 @@
                         </div>
                         <div id="adv_winning_error" style="color: red;"></div>
                         <div id="adv_winning_error_ratio" style="color: red;"></div>
+                        <input type="hidden" name="user_id" value="{{$store->user_id}}" >
                         <!-- End Row -->
                      </div>
                   </div>
@@ -520,7 +521,7 @@
                </div>
             </div>
             <!-- ////coupon end --> 
-            <div class="form-group row mb-3" id="adv_lock">
+            <!-- <div class="form-group row mb-3" id="adv_lock">
                <label class="form-control-label required-label">Lock Time</label>
                <div class="note">Lock advertisement for specific time in hours</div>
                <div class="col-sm-3">
@@ -538,8 +539,8 @@
                   </select>
                </div>
                <div id="adv_lock_error" style="color: red;"></div>
-               <input type="hidden" name="user_id" value="{{$store->user_id}}" >
-            </div>
+             
+            </div> -->
             <!-- <div class="form-group row mb-3">
                <label class="col-sm-2 form-control-label">Winning Ratio</label>
                <div class="note">e.g- if you enter 100, it means that the prize will be awarded after the 99th customer.</div>
@@ -808,7 +809,7 @@ $(document).ready(function() {
             return $(this).val();
         }).get();
 
-        var lock_time_check = $('select[name="lock_time"]').val();
+      //   var lock_time_check = $('select[name="lock_time"]').val();
 
         var hasError = false;
 
@@ -852,14 +853,14 @@ $(document).ready(function() {
             hasError = false;
         }
 
-        if (lock_time_check == '') {
-            showError('#adv_lock_error', 'Please select at least one winning prize.', '#adv_lock');
-            hasError = true;
-        }
-        else{
-            removeError('#adv_lock_error');
-            hasError = false;
-        }
+      //   if (lock_time_check == '') {
+      //       showError('#adv_lock_error', 'Please select at least one winning prize.', '#adv_lock');
+      //       hasError = true;
+      //   }
+      //   else{
+      //       removeError('#adv_lock_error');
+      //       hasError = false;
+      //   }
 
         var couponCheckboxes = $('input[name="coupon_id[]"]');
         var numberOfCouponsInputs = $('input[name="no_of_coupon[]"]');
@@ -909,7 +910,7 @@ $(document).ready(function() {
             category_coupon: $('select[name="category_coupon"]').val(),
             coupon_id: coupon_id_checkedValues,
             no_of_coupon: no_of_coupon_checkedValues,
-            lock_time: $('select[name="lock_time"]').val(),
+           // lock_time: $('select[name="lock_time"]').val(),
             winning_ratio: no_of_winning_ration_checkedValues,
             user_id: $('input[name="user_id"]').val(),
             action: clickedButtonValue,

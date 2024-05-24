@@ -37,9 +37,11 @@ Route::group(['namespace' => 'App\Http\Controllers\Frontend', 'as' => 'frontend.
 
     Route::post('user/create_user', 'UserController@create_user')->name('create_user');
     Route::post('user/otp_verify', 'UserController@otp_verify')->name('otp_verify');
+    Route::post('user/resend_otp', 'UserController@resend_otp')->name('resend_otp');
 
     Route::get('/better_luck/{store_id}/campaign/{campaign_id}', 'FrontendController@better_luck')->name('better_luck');
-    Route::get('/win/{store_id}/campaign/{campaign_id}', 'FrontendController@win')->name('win');
+    Route::get('/win/{cust_results_id}', 'FrontendController@win')->name('win');
+    Route::post('/claim-coupon', 'FrontendController@claim')->name('claim.coupon');
 
     Route::group(['middleware' => ['auth']], function () {
         /*

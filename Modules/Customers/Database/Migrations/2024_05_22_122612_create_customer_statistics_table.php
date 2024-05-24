@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaign', function (Blueprint $table) {
+        Schema::create('customer_statistics', function (Blueprint $table) {
             $table->id();
-            $table->string('campaign_name');
-            $table->integer('store_id'); 
-            $table->text('advertisement_ids')->nullable();
-            $table->string('qr_code_url')->nullable();
-            $table->integer('lock_time');
-            $table->longText('qr_code_image')->nullable();
+            $table->unsignedBigInteger('customer_id');
+            $table->integer('win_count')->default(0);
+            $table->integer('lose_count')->default(0);
+            $table->foreign('customer_id')->references('id')->on('users')->onDelete('cascade');
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->integer('deleted_by')->unsigned()->nullable();
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign');
+        Schema::dropIfExists('customer_statistics');
     }
 };

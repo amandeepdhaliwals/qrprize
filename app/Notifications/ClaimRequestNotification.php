@@ -7,16 +7,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OTPNotification extends Notification
+class ClaimRequestNotification extends Notification
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($otp)
+    public function __construct()
     {
-        $this->otp = $otp;
+        //
     }
 
     /**
@@ -35,9 +35,8 @@ class OTPNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->subject('Your OTP Code')
-                    ->line('Your OTP code is: ' . $this->otp)
-                    ->line('The OTP is valid for the next 5 minutes.')
+                    ->line('The introduction to the notification.')
+                    ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
     }
 

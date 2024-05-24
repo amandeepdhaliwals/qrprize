@@ -24,6 +24,13 @@ use Modules\Customers\Entities\CustomerResult;
 use Carbon\Carbon;
 use App\Notifications\OTPNotification;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\RateLimiter;
+use Modules\Stores\Entities\Advertisement; // Import the advertisement model
+use Modules\Customers\Entities\CustomerStatistics;
+use Modules\Customers\Entities\CustomerWin;
+use Modules\Stores\Entities\Campaign; 
+use Illuminate\Support\Facades\DB;
+use App\Notifications\UserAccountCreated;
 
 
 class UserController extends Controller
@@ -471,9 +478,21 @@ class UserController extends Controller
         }
     }
 
-
     public function create_user(Request $request)
     {
+        $key = 'otp-request-' . $request->ip();
+        $maxAttempts = 50;
+        $decaySeconds = 60;
+
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+            return response()->json([
+                'response_type' => 'failed',
+                'message' => 'Too many requests. Please try again later.'
+            ]);
+        }
+
+        RateLimiter::hit($key, $decaySeconds);
+
         $module_title = $this->module_title;
         $module_name = $this->module_name;
         $module_path = $this->module_path;
@@ -483,43 +502,108 @@ class UserController extends Controller
 
         $module_action = 'Details';
 
-        $request->validate([
-            'first_name' => 'required|max:255',
-            'last_name' => 'required|max:255',
-            'email' => 'required|email|unique:users',
-            'mobile' => 'required|numeric|digits_between:10,12|unique:users',
-        ]);
-    
-        // if ($validator->fails()) {
-        //     // Validation has failed
-        //     return response()->json([
-        //         'status' => 'error',
-        //         'errors' => $validator->errors()
-        //     ], 422);
-        // }
+         // Check if a user already exists with the same email and mobile
+        $existingUser = User::where('email', $request->email)
+        ->where('mobile', $request->mobile)
+        ->first();
 
-       
-        // if(empty($request->first_name) || empty($request->last_name)){
-        //         // Validation has failed
-        //         return response()->json([
-        //             'response_type' => 'error',
-        //             'errors' => 'Please enter first and lastname'
-        //         ]);
-        //     }
+        if ($existingUser) { 
+            $otpVerificationEmail = OtpVerification::where('user_id', $existingUser->id)
+            ->where('type', 'email')
+            ->first();
+            $otpVerificationMobile = OtpVerification::where('user_id', $existingUser->id)
+                        ->where('type', 'mobile')
+                        ->first();
+                      
+            if (($otpVerificationEmail && $otpVerificationEmail->is_verified == 0) ||
+              ($otpVerificationMobile && $otpVerificationMobile->is_verified == 0)) 
+            {    
+              
+                $otpCodes =   $this->generateAndSendOtp($existingUser->id);
+                return response()->json([
+                    'user_id' => $existingUser->id,
+                    'storeId' => $request->store_id,
+                    'campaign_id' => $request->campaign_id,
+                    'adverisement_id' => $request->advertisement_id,
+                    'response_type' => 'success',
+                    'status' => 'otp_send_customerVerify',
+                    'email_otp' => $otpCodes['email_otp'], /// will remove
+                    'mobile_otp' => $otpCodes['mobile_otp'],  /// will remove
+                ]);
+            }
+            else{  //// customer already verified
 
-        //     $user = User::where('email', $request->email)
-        //     ->orWhere('mobile', $request->mobile)
-        //     ->first();
+                $campaign = Campaign::select('lock_time')->where('id',$request->campaign_id)->where('store_id',$request->store_id)->first();
+                if (!$campaign) {
+                    return response()->json(['error' => 'Campaign not found'], 404);
+                }
 
-        //     if ($user) {
-        //         $error = $user->email === $request->email ? 'Email already exist' : 'Phone No. already exist';
+                $latestCustomerResult = CustomerResult::select('created_at')->where('customer_id', $existingUser->id)
+                ->where('campaign_id', $request->campaign_id)
+                ->latest('created_at') 
+                ->first();
+
+                $lockTimeAdded = Carbon::createFromFormat('Y-m-d H:i:s', $latestCustomerResult->created_at);
+
+                // Add 12 hours to the datetime
+                $lockTimeAdded->addHours($campaign->lock_time);
+
+                // Format the new datetime as needed
+                $lockTimeAdded = $lockTimeAdded->format('Y-m-d H:i:s');
+                $currentDateTime = Carbon::now();
+
+                if($lockTimeAdded > $currentDateTime)
+                {
+                    $carbonDate = Carbon::createFromFormat('Y-m-d H:i:s', $lockTimeAdded);
+                    // Format the date to 'Jan 5, 2030 15:37:25'
+                    $formattedDate = $carbonDate->format('M j, Y H:i:s');
+
+                    return response()->json([
+                        'response_type' => 'failed',
+                        'message' => 'Customer is locked for some period',
+                        'status' => 'locked',
+                        'lockDateTime' => $formattedDate
+                    ]);
+                }
                 
-        //         return response()->json([
-        //             'response_type' => 'error',
-        //             'errors' => $error
-        //         ]);
-        //     }
+                if ($latestCustomerResult) {
+                    //// check customer is win or lose and add entry
+                    $resultHandleCustomer =  $this->handleCustomerWinning($existingUser->id, $request->advertisement_id, $request->campaign_id, $request->store_id);
+                    return response()->json([
+                        'user_id' => $existingUser->id,
+                        'storeId' => $request->store_id,
+                        'campaign_id' => $request->campaign_id,
+                        'adverisement_id' => $request->advertisement_id,
+                        'response_type' => $resultHandleCustomer['response_type'],
+                        'status' => $resultHandleCustomer['status'],
+                        'result' => $resultHandleCustomer['result'],
+                        'cust_result_id' => $resultHandleCustomer['cust_result_id'],
+                    ]);
 
+                }
+                //  else {
+                //     $otpCodes =  $this->generateAndSendOtp($existingUser->id);
+                //     return response()->json([
+                //         'user_id' => $existingUser->id,
+                //         'storeId' => $request->store_id,
+                //         'campaign_id' => $request->campaign_id,
+                //         'adverisement_id' => $request->advertisement_id,
+                //         'response_type' => 'success',
+                //         'status' => 'otp_send',
+                //         'email_otp' =>  $otpCodes['email_otp'],  /// will remove
+                //         'mobile_otp' => $otpCodes['mobile_otp'], /// will remove
+                //     ]);
+                // }
+
+            }                      
+        }
+        else{
+            $request->validate([
+                'first_name' => 'required|max:255',
+                'last_name' => 'required|max:255',
+                'email' => 'required|email|unique:users',
+                'mobile' => 'required|numeric|digits_between:10,12|unique:users',
+            ]);
 
         $data_array = $request->except('_token', 'roles', 'permissions', 'password_confirmation');
         $data_array['name'] = $request->first_name.' '.$request->last_name;
@@ -529,12 +613,14 @@ class UserController extends Controller
 
         $data_array = Arr::add($data_array, 'email_verified_at', null);
 
+        ////User Create
         $$module_name_singular = User::create($data_array);
 
         $$module_name_singular->assignRole("user");
-
         $id = $$module_name_singular->id;
         $username = config('app.initial_username') + $id;
+
+        //// User Profile 
         Userprofile::create([
             "user_id" => $$module_name_singular->id,
             "name" => $request->first_name.' '.$request->last_name,
@@ -544,7 +630,7 @@ class UserController extends Controller
             "email" => $request->email,
             "mobile" => $request->mobile
         ]);
-         // Insert entry into store_qrcodes
+         // Insert entry into customer
          Customer::create([
             "user_id" => $$module_name_singular->id,
             "store_id" => $request->store_id,
@@ -560,29 +646,8 @@ class UserController extends Controller
             $updateUser->save();
         }
 
-        //////////////for email //////////////////////
-
-        $otpCodeEmail = rand(100000, 999999); // Generate a 6-digit OTP code
-        OtpVerification::create([
-            'user_id' => $$module_name_singular->id,
-            'otp_code' => $otpCodeEmail,
-            'type' => 'email', // 'email' or 'mobile'
-            'expires_at' => Carbon::now()->addMinutes(10) // Set expiration time (e.g., 10 minutes)
-        ]);
-
-        //////////////////for mobile///////////////
-        $otpCodeMobile = rand(100000, 999999); // Generate a 6-digit OTP code
-        OtpVerification::create([
-            'user_id' => $$module_name_singular->id,
-            'otp_code' => $otpCodeMobile,
-            'type' => 'mobile', // 'email' or 'mobile'
-            'expires_at' => Carbon::now()->addMinutes(10) // Set expiration time (e.g., 10 minutes)
-        ]);
-        ///////////////////////////////////////////////
-
-           // Send the OTP via email
-        Notification::send($user, new OTPNotification($otpCodeEmail));
-
+        ///Generate and Send Otp
+        $otpCodes =  $this->generateAndSendOtp($$module_name_singular->id);
 
         return response()->json([
             'user_id' => $$module_name_singular->id,
@@ -590,9 +655,90 @@ class UserController extends Controller
             'campaign_id' => $request->campaign_id,
             'adverisement_id' => $request->advertisement_id,
             'response_type' => 'success',
-            'email_otp' => $otpCodeEmail,  /// will remove
-            'mobile_otp' => $otpCodeMobile,  /// will remove
+            'status' => 'otp_send',
+            'email_otp' =>  $otpCodes['email_otp'],  /// will remove
+            'mobile_otp' => $otpCodes['mobile_otp'], /// will remove
         ]);
+     }
+    }
+
+    public function resend_otp(Request $request)
+    {
+        $key = 'otp-request-user-' . $request->user_id;
+
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            return response()->json(['message' => 'Too many requests. Please try again later.'], 429);
+        }
+
+        RateLimiter::hit($key, 60);
+        $user = User::find($request->user_id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found.'
+            ], 404);
+        }
+
+        // Check the creation time of the existing OTP records
+        $recentOtp = OtpVerification::where('user_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->first();
+
+        if ($recentOtp && $recentOtp->created_at->addMinutes(2) > now()) {
+            return response()->json([
+                'response_type' => 'failed',
+                'message' => 'Please wait for 2 minutes before requesting a new OTP.'
+            ], 429);
+        }
+
+        $otpCodes = $this->generateAndSendOtp($user->id);
+   
+        return response()->json([
+            'user_id' => $user->id,
+            'storeId' => $request->store_id,
+            'campaign_id' => $request->campaign_id,
+            'adverisement_id' => $request->advertisement_id,
+            'response_type' => 'success',
+            'email_otp' => $otpCodes['email_otp'], /// will remove
+            'mobile_otp' => $otpCodes['mobile_otp'],  /// will remove
+        ]);
+    }
+
+    private function generateAndSendOtp($userId)
+    {
+        // Check if there are any OTP verification records for the user
+        $existingRecords = OtpVerification::where('user_id', $userId)->exists();
+        // If OTP verification records exist for the user, delete them
+        if ($existingRecords) {
+            OtpVerification::where('user_id', $userId)->delete();
+        }
+
+        // Generate new OTP code for email
+        $otpCodeEmail = rand(100000, 999999);
+        OtpVerification::create([
+            'user_id' => $userId,
+            'otp_code' => $otpCodeEmail,
+            'type' => 'email',
+            'is_verified' => 0,
+            'expires_at' => Carbon::now()->addMinutes(5)
+        ]);
+
+        // Generate new OTP code for mobile
+        $otpCodeMobile = rand(100000, 999999);
+        OtpVerification::create([
+            'user_id' => $userId,
+            'otp_code' => $otpCodeMobile,
+            'type' => 'mobile',
+            'is_verified' => 0,
+            'expires_at' => Carbon::now()->addMinutes(5)
+        ]);
+
+        // Send the OTP via email or mobile
+         Notification::send($user, new OTPNotification($otpCodeEmail));
+        return [
+            'email_otp' => $otpCodeEmail,
+            'mobile_otp' => $otpCodeMobile
+        ];
     }
 
     public function otp_verify(Request $request)
@@ -603,86 +749,193 @@ class UserController extends Controller
         $module_icon = $this->module_icon;
         $module_model = $this->module_model;
         $module_name_singular = Str::singular($module_name);
-
+    
         $module_action = 'Details';
-        $win =false;
-
-        if ($this->verifyOtp($request->user_id, $request->email_otp, $request->mobile_otp)) {
-            //////////////////win or lose user///////////
-            $random_no = rand(0, 100);
-            if($random_no == 7){
-                $win = true;
-            }
-
-            if($win){
-                CustomerResult::create([
-                    'customer_id' => $request->user_id,
-                    'store_id' => $request->store_id,
-                    'campaign_id' => $request->campaign_id,
-                    'advertisement_id' => $request->advertisement_id,
-                    'win' => 1
-                ]);
-            }else{
-                CustomerResult::create([
-                    'customer_id' => $request->user_id,
-                    'store_id' => $request->store_id,
-                    'campaign_id' => $request->campaign_id,
-                    'advertisement_id' => $request->advertisement_id,
-                    'win' => 0
-                ]);
-            }
-            //////////////////////////////////////////
+    
+        $verificationResult = $this->verifyOtp($request->user_id, $request->email_otp, $request->mobile_otp);
+    
+        if ($verificationResult['status'] == 'success') {
+            $resultHandleCustomer =  $this->handleCustomerWinning($request->user_id, $request->advertisement_id, $request->campaign_id, $request->store_id);
             return response()->json([
-                'response_type' => 'success',
-                'result' => $win,
-                'store_id'=>$request->store_id,
-                'campaign_id'=> $request->campaign_id
-
+                'user_id' => $request->user_id,
+                'storeId' => $request->store_id,
+                'campaign_id' => $request->campaign_id,
+                'adverisement_id' => $request->advertisement_id,
+                'response_type' => $resultHandleCustomer['response_type'],
+                'status' => $resultHandleCustomer['status'],
+                'result' => $resultHandleCustomer['result'],
+                'cust_result_id' => $resultHandleCustomer['cust_result_id'],
             ]);
+         
         }
-
-                // if ($request->email_credentials === 1) {
-        //     $data = [
-        //         'password' => $password,
-        //     ];
-        //    $$module_name_singular->notify(new UserAccountCreated($data));
-
-        //     Flash::success(icon('fas fa-envelope').' Account Credentials Sent to User.')->important();
-        // }
-
-        // Log::info(label_case($module_title.' '.$module_action)." | '".$$module_name_singular->name.'(ID:'.$$module_name_singular->id.") ' by User:".auth()->user()->name.'(ID:'.auth()->user()->id.')');
-
-        //return redirect("admin/{$module_name}");
-
+    
         return response()->json([
             'response_type' => 'failed',
-            'result' => $win
+            'message' => $verificationResult['message']
         ]);
     }
-
-
+    
     public function verifyOtp($userId, $otpCodeEmail, $otpCodeMobile) {
+        // Fetch the OTP record for email
         $otp_email = OtpVerification::where('user_id', $userId)
                     ->where('otp_code', $otpCodeEmail)
                     ->where('type', 'email')
-                    ->where('expires_at', '>', Carbon::now())
                     ->first();
-
+    
+        // Fetch the OTP record for mobile
         $otp_mobile = OtpVerification::where('user_id', $userId)
                     ->where('otp_code', $otpCodeMobile)
                     ->where('type', 'mobile')
-                    ->where('expires_at', '>', Carbon::now())
                     ->first();
     
-        if ($otp_email && $otp_mobile) {
-            $otp_email->is_verified = 1;
-            $otp_email->save();
-
-            $otp_mobile->is_verified = 1;
-            $otp_mobile->save();
-            return true; // OTP is valid
-        }else{
-            return false;
+        // Check if email OTP is valid and not expired
+        if ($otp_email && $otp_email->expires_at > Carbon::now() && !$otp_email->is_verified) {
+            // Check if mobile OTP is valid and not expired
+            if ($otp_mobile && $otp_mobile->expires_at > Carbon::now() && !$otp_mobile->is_verified) {
+                // Mark both OTPs as verified
+                $otp_email->is_verified = 1;
+                $otp_email->save();
+    
+                $otp_mobile->is_verified = 1;
+                $otp_mobile->save();
+    
+                //// create password for user
+                $password = Str::random(8);
+                $password_hash = Hash::make($password);
+                
+                /// Email verify and password added
+                $user = User::find($userId);
+                $user->email_verified_at = now();
+                $user->password = $password_hash; // Update the password attribute
+                $user->save();
+                
+                // Notify user about account creation
+                $data = ['password' => $password];
+                $user->notify(new UserAccountCreated($data));
+                
+                return ['status' => 'success']; // Both OTPs are valid and verified
+            } else {
+                // Mobile OTP is invalid or expired
+                return ['status' => 'error', 'message' => 'Mobile OTP is invalid or expired'];
+            }
+        } else {
+            // Email OTP is invalid or expired
+            return ['status' => 'error', 'message' => 'Email OTP is invalid or expired'];
         }
+    }
+
+    private function handleCustomerWinning($user_id, $advertisement_id, $campaign_id, $store_id)
+    {
+        // Find the advertisement
+        $advertisement = Advertisement::find($advertisement_id);
+    
+        if (!$advertisement) {
+            return response()->json(['error' => 'Advertisement not found'], 404);
+        }
+    
+        // Decode coupons from the advertisement
+        $coupons = json_decode($advertisement->coupons_id, true);
+    
+        // Check if the customer has already won
+        $winningCount = CustomerResult::where('advertisement_id', $advertisement_id)
+            ->where('campaign_id', $campaign_id)
+            ->where('store_id', $store_id)
+            ->where('customer_id', $user_id)
+            ->where('win', 1)
+            ->count();
+
+        if ($winningCount > 0) { // Customer already won
+           $res =  $this->recordCustomerResult($user_id, $advertisement_id, $campaign_id, $store_id, false, null);
+            return [
+                'response_type' => 'success',
+                'status' => 'customer_result',
+                'result' => false,
+                'store_id' => $store_id,
+                'campaign_id' => $campaign_id,
+                'cust_result_id' => $res
+            ];
+        }
+    
+        // Check for customer win
+        [$win, $coupon_id] = $this->checkCustomerWin($user_id,$advertisement_id,$campaign_id, $store_id, $coupons);
+    
+        // Record customer result
+        $res =  $this->recordCustomerResult($user_id, $advertisement_id, $campaign_id, $store_id, $win, $coupon_id);
+    
+        return [
+            'response_type' => 'success',
+            'status' => 'customer_result',
+            'result' => $win,
+            'store_id' => $store_id,
+            'campaign_id' => $campaign_id,
+            'cust_result_id' => $res
+        ];
+    }
+    
+    private function recordCustomerResult($user_id, $advertisement_id, $campaign_id, $store_id, $win, $coupon_id)
+    {
+        // Create customer result record
+        $customerResult = CustomerResult::create([
+            'customer_id' => $user_id,
+            'advertisement_id' => $advertisement_id,
+            'campaign_id' => $campaign_id,
+            'store_id' => $store_id,
+            'win' => $win
+        ]);
+    
+        // Update customer statistics
+        $customerStatistics = CustomerStatistics::firstOrNew(['customer_id' => $user_id]);
+        if ($win) {
+            $customerStatistics->win_count++;
+            $customerStatistics->save();
+    
+            // Create customer win record
+            CustomerWin::create([
+                'customer_results_id' => $customerResult->id,
+                'customer_id' => $user_id,
+                'coupon_id' => $coupon_id,
+                'win_time' => now()
+            ]);
+       
+        } else {
+            $customerStatistics->lose_count++;
+            $customerStatistics->save();
+       
+        }
+        return $customerResult->id;
+    }
+    
+    private function checkCustomerWin($user_id, $advertisement_id, $campaign_id, $store_id, $coupons)
+    {
+        $uniqueCustomers = CustomerResult::where('advertisement_id', $advertisement_id)
+            ->where('campaign_id', $campaign_id)
+            ->where('store_id', $store_id)
+            ->pluck('customer_id')
+            ->unique()
+            ->toArray();
+  
+        if (!in_array($user_id, $uniqueCustomers)) {
+            $uniqueCustomers[] = $user_id;
+        }
+
+        foreach ($coupons as $coupon_id => $coupon_details) {
+            $winning_ratio = (int)$coupon_details['winning_ratio'];
+            $count = (int)$coupon_details['count'];
+            $uniquePlays = count($uniqueCustomers);
+
+            // Calculate the total wins for this coupon
+            //$totalWins = CustomerWin::where('coupon_id', $coupon_id)->count();
+            $totalWins = CustomerWin::join('customer_results', 'customer_wins.customer_results_id', '=', 'customer_results.id')
+                ->where('customer_results.advertisement_id', $advertisement_id)
+                ->where('customer_wins.coupon_id', $coupon_id)
+                ->count();
+
+            // Check win condition
+            if ($uniquePlays % $winning_ratio == 0 && $totalWins < $count) {
+                return [true, $coupon_id];
+            }
+        }
+
+        return [false, null];
     }
 }

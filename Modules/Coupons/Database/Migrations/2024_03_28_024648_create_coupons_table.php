@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->text('terms_and_condition')->nullable();
             $table->string('code')->unique();
             $table->decimal('discount')->nullable()->change();
             $table->dateTime('start_date')->nullable();

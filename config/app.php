@@ -69,7 +69,9 @@ return [
     |
     */
 
-    'timezone' => 'Asia/Dhaka',
+    //'timezone' => 'Asia/Dhaka',
+    'timezone' => 'Asia/Kolkata',
+
 
     /*
     |--------------------------------------------------------------------------

@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaign', function (Blueprint $table) {
+        Schema::create('claims', function (Blueprint $table) {
             $table->id();
-            $table->string('campaign_name');
-            $table->integer('store_id'); 
-            $table->text('advertisement_ids')->nullable();
-            $table->string('qr_code_url')->nullable();
-            $table->integer('lock_time');
-            $table->longText('qr_code_image')->nullable();
+            $table->unsignedBigInteger('customer_id');;
+            $table->unsignedBigInteger('advertisement_id');
+            $table->string('name');
+            $table->text('address');
+            $table->unsignedBigInteger('coupon_id');
+            $table->foreign('coupon_id')->references('id')->on('coupons')->onDelete('cascade');
+            $table->boolean('is_claimed')->default(false);
+            $table->boolean('request_claim')->default(false);
+            $table->boolean('email_sent')->default(false);
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->integer('deleted_by')->unsigned()->nullable();
@@ -32,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign');
+        Schema::dropIfExists('claims');
     }
 };

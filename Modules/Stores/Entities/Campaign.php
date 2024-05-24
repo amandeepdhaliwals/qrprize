@@ -25,6 +25,7 @@ class Campaign extends Model
         'store_id',
         'qr_code_url',
         'qr_code_image',
+        'lock_time',
         'advertisement_ids'
     ];
 

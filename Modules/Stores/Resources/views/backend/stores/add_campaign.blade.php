@@ -205,6 +205,26 @@
                   <div class="note">This is used for internal use only.</div>
                   <div id="adv_name_error" style="color: red;"></div>
                </div>
+               
+             </div>
+            <div class="form-group row mb-3">
+               <label class="col-sm-2 form-control-label required-label">Lock Time</label>
+           
+               <div class="col-sm-10">
+               <select class="form-control" name="lock_time" id="lock_time" required>
+                     <option value="">--Select--</option>
+                     <option value="1">1 hour</option>
+                     <option value="6">6 hours</option>
+                     <option value="12">12 hours</option>
+                     <option value="18">18 hours</option>
+                     <option value="24">24 hours</option>
+                     <option value="30">30 hours</option>
+                     <option value="36">36 hours</option>
+                     <option value="42">42 hours</option>
+                     <option value="48">48 hours</option>
+                  </select>
+               <div class="note">Lock campaign for specific time in hours</div>
+                </div>
             </div>
             </div>
         </div>

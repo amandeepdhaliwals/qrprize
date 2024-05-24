@@ -11,19 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaign', function (Blueprint $table) {
+        Schema::create('customer_wins', function (Blueprint $table) {
             $table->id();
-            $table->string('campaign_name');
-            $table->integer('store_id'); 
-            $table->text('advertisement_ids')->nullable();
-            $table->string('qr_code_url')->nullable();
-            $table->integer('lock_time');
-            $table->longText('qr_code_image')->nullable();
+            $table->unsignedBigInteger('customer_results_id');
+            $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('coupon_id');
+            $table->timestamp('win_time')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->foreign('customer_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('coupon_id')->references('id')->on('coupons')->onDelete('cascade');
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->integer('deleted_by')->unsigned()->nullable();
             $table->timestamps();
             $table->softDeletes();
+        
         });
     }
 
@@ -32,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign');
+        Schema::dropIfExists('customer_wins');
     }
 };
