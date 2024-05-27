@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -36,6 +37,8 @@ class AuthenticatedSessionController extends Controller
         $email = $request->email;
         $password = $request->password;
         $remember = $request->remember_me;
+        
+        Cache::flush();
 
         if (Auth::attempt(['email' => $email, 'password' => $password, 'status' => 1], $remember)) {
             $request->session()->regenerate();
