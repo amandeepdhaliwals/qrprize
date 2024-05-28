@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Models\Userprofile;
 use App\Modules\Customers\Entities\Customer;
 use Illuminate\Support\Facades\Auth;
+use ConsoleTVs\Charts\Classes\Chartjs\Chart;
 
 
 class CustomersController extends BackendBaseController
@@ -130,6 +131,138 @@ class CustomersController extends BackendBaseController
         
        return Excel::download(new CustomerExport($data), 'customers.xlsx');
 
+    }
+
+    public function stats(Request $request)
+    {
+        
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_action = 'Stats';
+         // Fetching customer data grouped by month
+        //  $customers = User::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+        //  ->groupBy('month')
+        //  ->pluck('count', 'month')
+        //  ->all();
+
+         $rolesId = [5];
+     
+         $role_id=auth()->user()->roles->pluck('id')->toArray();
+         $login_role_id = $role_id[0];
+         $login_user_id = Auth::id();
+ 
+ 
+         if($login_role_id == 1 ){
+             $customers = User::selectRaw('MONTH(users.created_at) as month, COUNT(*) as count')
+             ->join('customers', 'users.id', '=', 'customers.user_id')
+             ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
+             ->whereHas('roles', function ($query) use ($rolesId) {
+                 $query->whereIn('roles.id', $rolesId);
+             })
+             ->groupByRaw('MONTH(users.created_at)')
+             ->pluck('count', 'month')
+             ->all();
+
+             $winCustomers = User::selectRaw('MONTH(users.created_at) as month, COUNT(*) as count')
+            ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
+            ->join('customer_statistics as cs', 'customers.user_id', '=', 'cs.customer_id')
+            ->where('cs.win_count','>',0)
+            ->whereHas('roles', function ($query) use ($rolesId) {
+                $query->whereIn('roles.id', $rolesId);
+            })
+            ->groupByRaw('MONTH(users.created_at)')
+            ->pluck('count', 'month')
+            ->all();
+
+            $loseCustomers = User::selectRaw('MONTH(users.created_at) as month, COUNT(*) as count')
+            ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
+            ->join('customer_statistics as cs', 'customers.user_id', '=', 'cs.customer_id')
+            ->where('cs.lose_count','>',0 )
+            ->where('cs.win_count','=',0 )
+            ->whereHas('roles', function ($query) use ($rolesId) {
+                $query->whereIn('roles.id', $rolesId);
+            })
+            ->groupByRaw('MONTH(users.created_at)')
+            ->pluck('count', 'month')
+            ->all();
+
+
+         }else{
+            $customers = User::selectRaw('MONTH(users.created_at) as month, COUNT(*) as count')
+            ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
+            ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
+            ->whereHas('roles', function ($query) use ($rolesId) {
+                $query->whereIn('roles.id', $rolesId);
+            })
+            ->groupByRaw('MONTH(users.created_at)')
+            ->pluck('count', 'month')
+            ->all();
+
+            $winCustomers = User::selectRaw('MONTH(users.created_at) as month, COUNT(*) as count')
+            ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
+            ->join('customer_statistics as cs', 'customers.user_id', '=', 'cs.customer_id')
+            ->where('cs.win_count','>',0)
+            ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
+            ->whereHas('roles', function ($query) use ($rolesId) {
+                $query->whereIn('roles.id', $rolesId);
+            })
+            ->groupByRaw('MONTH(users.created_at)')
+            ->pluck('count', 'month')
+            ->all();
+
+            $loseCustomers = User::selectRaw('MONTH(users.created_at) as month, COUNT(*) as count')
+            ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
+            ->join('customer_statistics as cs', 'customers.user_id', '=', 'cs.customer_id')
+            ->where('cs.lose_count','>',0 )
+            ->where('cs.win_count','=',0 )
+            ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
+            ->whereHas('roles', function ($query) use ($rolesId) {
+                $query->whereIn('roles.id', $rolesId);
+            })
+            ->groupByRaw('MONTH(users.created_at)')
+            ->pluck('count', 'month')
+            ->all();
+           
+         }
+
+     // Define month labels
+     $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+     
+      // Initialize data arrays with zeros
+      $totalData = array_fill(0, 12, 0);
+      $winData = array_fill(0, 12, 0);
+      $loseData = array_fill(0, 12, 0);
+      
+      // Populate data arrays with customer counts
+      foreach ($customers as $month => $count) {
+          $totalData[$month - 1] = $count;  // $month - 1 to convert 1-based month to 0-based index
+      }
+      foreach ($winCustomers as $month => $count) {
+          $winData[$month - 1] = $count;
+      }
+      foreach ($loseCustomers as $month => $count) {
+          $loseData[$month - 1] = $count;
+      }
+
+      // Create chart
+      $chart = new Chart;
+      $chart->labels($months);
+      $chart->dataset('Total Customers', 'bar', $totalData)
+            ->backgroundColor('rgba(0, 123, 255, 0.7)');
+      $chart->dataset('Win Customers', 'bar', $winData)
+            ->backgroundColor('rgba(40, 167, 69, 0.7)');
+      $chart->dataset('Lose Customers', 'bar', $loseData)
+            ->backgroundColor('rgba(220, 53, 69, 0.7)');
+
+
+     return view("{$module_path}.{$module_name}.stats", compact('module_title', 'module_name', 'module_path', 'module_action','module_icon', 'chart'));
     }
 
 }
