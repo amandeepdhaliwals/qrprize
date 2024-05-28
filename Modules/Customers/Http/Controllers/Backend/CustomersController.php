@@ -135,7 +135,22 @@ class CustomersController extends BackendBaseController
 
     public function stats(Request $request)
     {
-        
+        if ($request->isMethod('post')) {
+            // The request is a POST request
+            // dd($request->all());
+            if($request->year == null){
+                $year = date('Y');
+                $selectedYear = false;
+            }else{
+                $year = $request->year;
+                $selectedYear = true; 
+            }
+            $store_id = $request->store;
+        }else{
+            $year = $request->input('year', date('Y')); 
+            $store_id = null;
+            $selectedYear = false;
+        }
         $module_title = $this->module_title;
         $module_name = $this->module_name;
         $module_path = $this->module_path;
@@ -158,6 +173,10 @@ class CustomersController extends BackendBaseController
              $customers = User::selectRaw('MONTH(users.created_at) as month, COUNT(*) as count')
              ->join('customers', 'users.id', '=', 'customers.user_id')
              ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
+             ->whereYear('users.created_at', $year)
+             ->when($store_id, function ($query) use ($store_id) {
+                $query->where('customers.store_id', $store_id);
+            })
              ->whereHas('roles', function ($query) use ($rolesId) {
                  $query->whereIn('roles.id', $rolesId);
              })
@@ -170,6 +189,10 @@ class CustomersController extends BackendBaseController
             ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
             ->join('customer_statistics as cs', 'customers.user_id', '=', 'cs.customer_id')
             ->where('cs.win_count','>',0)
+            ->whereYear('users.created_at', $year)
+            ->when($store_id, function ($query) use ($store_id) {
+                $query->where('customers.store_id', $store_id);
+            })
             ->whereHas('roles', function ($query) use ($rolesId) {
                 $query->whereIn('roles.id', $rolesId);
             })
@@ -183,6 +206,10 @@ class CustomersController extends BackendBaseController
             ->join('customer_statistics as cs', 'customers.user_id', '=', 'cs.customer_id')
             ->where('cs.lose_count','>',0 )
             ->where('cs.win_count','=',0 )
+            ->whereYear('users.created_at', $year)
+            ->when($store_id, function ($query) use ($store_id) {
+                $query->where('customers.store_id', $store_id);
+            })
             ->whereHas('roles', function ($query) use ($rolesId) {
                 $query->whereIn('roles.id', $rolesId);
             })
@@ -196,6 +223,7 @@ class CustomersController extends BackendBaseController
             ->join('customers', 'users.id', '=', 'customers.user_id')
             ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
             ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
+            ->whereYear('users.created_at', $year)
             ->whereHas('roles', function ($query) use ($rolesId) {
                 $query->whereIn('roles.id', $rolesId);
             })
@@ -209,6 +237,7 @@ class CustomersController extends BackendBaseController
             ->join('customer_statistics as cs', 'customers.user_id', '=', 'cs.customer_id')
             ->where('cs.win_count','>',0)
             ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
+            ->whereYear('users.created_at', $year)
             ->whereHas('roles', function ($query) use ($rolesId) {
                 $query->whereIn('roles.id', $rolesId);
             })
@@ -223,6 +252,7 @@ class CustomersController extends BackendBaseController
             ->where('cs.lose_count','>',0 )
             ->where('cs.win_count','=',0 )
             ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
+            ->whereYear('users.created_at', $year)
             ->whereHas('roles', function ($query) use ($rolesId) {
                 $query->whereIn('roles.id', $rolesId);
             })
@@ -231,6 +261,16 @@ class CustomersController extends BackendBaseController
             ->all();
            
          }
+
+         $stores = User::select('id','name')->whereNull('deleted_at')
+         ->whereHas('roles', function ($query) use ($rolesId) {
+             $query->where('id', 2);
+         })
+         ->get();
+
+         $selected_year = $year;
+
+         //dd($stores);
 
      // Define month labels
      $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -262,7 +302,7 @@ class CustomersController extends BackendBaseController
             ->backgroundColor('rgba(220, 53, 69, 0.7)');
 
 
-     return view("{$module_path}.{$module_name}.stats", compact('module_title', 'module_name', 'module_path', 'module_action','module_icon', 'chart'));
+     return view("{$module_path}.{$module_name}.stats", compact('stores','store_id','selected_year','selectedYear','module_title', 'module_name', 'module_path', 'module_action','module_icon', 'chart'));
     }
 
 }
