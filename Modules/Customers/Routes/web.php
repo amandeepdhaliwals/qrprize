@@ -32,6 +32,8 @@ Route::group(['namespace' => '\Modules\Customers\Http\Controllers\Backend','as' 
      */
     $module_name = 'customers';
     $controller_name = 'CustomersController';
+    Route::post("{$module_name}/stats/filter", ['as' => "{$module_name}.stats.filter", 'uses' => "{$controller_name}@stats"]);
+    Route::get("{$module_name}/stats", ['as' => "{$module_name}.stats", 'uses' => "{$controller_name}@stats"]);
     Route::post("{$module_name}/exportToExcel", ['as' => "{$module_name}.exportToExcel", 'uses' => "{$controller_name}@exportToExcel"]);
     Route::get("{$module_name}/index", ['as' => "{$module_name}.index", 'uses' => "{$controller_name}@index"]);
     Route::get("{$module_name}/index_list", ['as' => "{$module_name}.index_list", 'uses' => "{$controller_name}@index_list"]);

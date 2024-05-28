@@ -88,6 +88,52 @@ class GenerateMenus
                             
                     })->sortBy('order'); 
 
+                    \Menu::make('admin_sidebar', function ($menu) {
+                        // gallery images
+                        $accessControl = $menu->add('<i class="nav-icon fa-solid fas fa-users"></i> Customer', [
+                            'class' => 'nav-group',
+                        ])
+                            ->data([
+                                'order' => 2,
+                                'activematches' => [
+                                    'admin/customers*',
+                                ],
+                                'permission' => ['view_customers'],
+                            ]);
+                        $accessControl->link->attr([
+                            'class' => 'nav-link nav-group-toggle',
+                            'href' => '#',
+                        ]);
+            
+                        $accessControl->add('<i class="nav-icon fa-solid fa-bar-chart"></i> Statistics', [
+                            'route' => 'backend.customers.stats',
+                            'class' => 'nav-item',
+                        ])
+                            ->data([
+                                'order' => 2,
+                                'activematches' => 'admin/customers*',
+                                'permission' => ['view_customers'],
+                            ])
+                                ->link->attr([
+                                    'class' => 'nav-link',
+                                ]);
+                    
+                        /// Submenu Videos
+                        $accessControl->add('<i class="nav-icon fa-solid fa-list"></i> List', [
+                            'route' => 'backend.customers.index',
+                            'class' => 'nav-item',
+                        ])
+                            ->data([
+                                'order' => 3,
+                                'activematches' => 'admin/customers*',
+                                'permission' => ['view_customers'],
+                            ])
+                            ->link->attr([
+                                'class' => 'nav-link',
+                            ]); 
+                                
+                        })->sortBy('order'); 
+
             // // Notifications
             // $menu->add('<i class="nav-icon fas fa-bell"></i> Notifications', [
             //     'route' => 'backend.notifications.index',
