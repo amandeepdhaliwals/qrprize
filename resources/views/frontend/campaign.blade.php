@@ -43,6 +43,24 @@
 			}
 		</style>
 	</head>
+	<style>
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 
 	<body>
 
@@ -51,10 +69,11 @@
 
 			<section id="call-to-action" class="call-to-action">
 				<div class="banner-img">
-					<div class="container text-center" data-aos="zoom-out">
+				<!-- <div class="container text-center" data-aos="zoom-out"> -->
+					<div class="video-container" data-aos="zoom-out">
 
 						@if($advertisement_video->media_type == "Video" || $advertisement_video->media_type == "video")
-						<video id="video-player" width="100%" height="100%" controls>
+						<video id="video-player" style=" position: absolute;top: 0;left: 0; width: 100%; height: 100%;" controls>
 							<source src="{{ Storage::url($advertisement_video->media) }}" type="video/mp4">
 							Your browser does not support the video tag.
 						</video>
@@ -62,7 +81,7 @@
 						<div id="player"></div>
 						<!-- <iframe id="youtube-player" width="100%" height="100%" src="{{ $advertisement_video->media }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
 						@elseif($advertisement_video->media_type == "Vimeo" || $advertisement_video->media_type == "vimeo")
-						<iframe id="vimeo-player" src="{{ $advertisement_video->media }}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+						<iframe id="vimeo-player"  src="{{ $advertisement_video->media }}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
 						@endif
 					</div>
 				</div>
