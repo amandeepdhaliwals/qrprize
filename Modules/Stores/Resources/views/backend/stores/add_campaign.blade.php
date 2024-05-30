@@ -258,7 +258,7 @@
 </div>
 
 <div class="card mt-4">
-    <div class="card-body">
+    <div class="card-body table-responsive">
         <h5 class="card-title">Campaigns</h5>
         <table id="datatable" class="table table-bordered table-hover table-responsive-sm">
             <thead>
