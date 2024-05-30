@@ -44,7 +44,7 @@
         </x-backend.section-header>
 
         <div class="row mt-4">
-            <div class="col">
+            <div class="col table-responsive">
                 <table id="datatable" class="table table-bordered table-hover table-responsive-sm">
                     <thead>
                         <tr>
