@@ -10,7 +10,7 @@
         <x-backend.section-header :data="$data" :module_name="$module_name" :module_title="$module_title" :module_icon="$module_icon" :module_action="$module_action" />
 
         <div class="row mt-4">
-            <div class="col-12">
+            <div class="col-12 table-responsive">
 
                 <x-backend.section-show-table :data="$data" :module_name="$module_name" />
 
