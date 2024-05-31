@@ -60,7 +60,9 @@
    padding:20px 0;
    }
    .column {
-   margin-bottom:40px;
+   margin-bottom:40;
+   padding-right: 15px;
+   display: inline-table;
    }
    .large-up-3>.column, .large-up-3>.columns {
    width: 20%;
@@ -226,8 +228,8 @@
                                  @elseif($adv_video->media_type == "Vimeo" || $adv_video->media_type == "vimeo") 
                                  <iframe src="{{ $adv_video->media }}" width="200" height="120" frameborder="0" allowfullscreen></iframe>
                                  @endif
-                                 <input type="radio" id="html" name="video_id" value="{{$adv_video->id}}">
-                                 <span class="name"><strong>{{$adv_video->title}}</strong></span><br />
+                                
+                                 
                                  @if($adv_video->media_type == "Video" || $adv_video->media_type == "video") 
                                  <span class="category" style="display: none;">Uploaded Video</span>
                                  @elseif($adv_video->media_type == "Youtube" || $adv_video->media_type == "youtube")
@@ -236,6 +238,7 @@
                                  <span class="category" style="display: none;">Vimeo Link</span>
                                  @endif
                               </a>
+                              <div style="display:flex; align-items: baseline;"> <input style="margin-right:6px;" type="radio" id="html" name="video_id" value="{{$adv_video->id}}"><br/><span style="font-size: 14px;" class="name"><strong>{{$adv_video->title}}</strong></span><br /></div>
                            </div>
                            @endforeach   
                         </div>
@@ -290,9 +293,12 @@
                            <div class="column">
                               <a href="#">
                               <img src="{{ Storage::url($adv_image->image) }}" class="figure-img img-fluid rounded img-thumbnail" alt="" width="200">
-                              <input type="radio" id="html{{ $key }}" name="primary_image_id" value="{{ $adv_image->id }}">
-                              <span class="name"><strong>{{$adv_image->title}}</strong></span><br />
+                              
                               </a>
+                              <div style="display:flex; align-items: baseline;">
+                              <input style="margin-right:6px" type="radio" id="html{{ $key }}" name="primary_image_id" value="{{ $adv_image->id }}"><br/>
+                              <span class="name"><strong>{{$adv_image->title}}</strong></span>
+                              </div>
                            </div>
                            @php $firstIteration = false; @endphp <!-- Update flag after the first iteration -->
                            @endif 
@@ -340,9 +346,12 @@
                            <div class="column">
                               <a href="#">
                               <img src="{{ Storage::url($adv_image->image) }}" class="figure-img img-fluid rounded img-thumbnail" alt="" width="200">
-                              <input type="checkbox"  name="secondary_image_id[]" value="{{$adv_image->id}}">
-                              <span class="name"><strong>{{$adv_image->title}}</strong></span><br />
+                              
                               </a>
+                              <div style="display:flex; align-items: baseline;">
+                              <input style="margin-right:6px" type="checkbox"  name="secondary_image_id[]" value="{{$adv_image->id}}"><br />
+                              <span class="name"><strong>{{$adv_image->title}}</strong></span>
+                              </div>
                            </div>
                            @php $firstIteration = false; @endphp
                            @endif 
@@ -399,9 +408,12 @@
                            <div class="column">
                               <a href="#">
                               <img src="{{ Storage::url($other_image->media) }}" class="figure-img img-fluid rounded img-thumbnail" alt="" width="200">
-                              <input type="checkbox"  name="other_coupon_image_ids[]" value="{{$other_image->id}}">
-                              <span class="name"><strong>{{$other_image->title}}</strong></span><br />
+                              
                               </a>
+                              <div style="display:flex; align-items: baseline;">
+                              <input style="margin-right:6px" type="checkbox"  name="other_coupon_image_ids[]" value="{{$other_image->id}}"><br />
+                              <span class="name"><strong>{{$other_image->title}}</strong></span>
+                              </div>
                            </div>
                            @php $firstIteration = false; @endphp
                            @endforeach   
@@ -452,7 +464,7 @@
                         @php $firstIteration_c = true; @endphp
 
                         @foreach($coupons as $key => $coupon)
-                            <div class="column category_coupon" data-category="{{ $coupon->category }}">
+                            <div class="column category_coupon mb-4" data-category="{{ $coupon->category }}">
                                 <a href="#">
                                     <!-- <img src="{{ Storage::url($coupon->image) }}" class="" alt="" height="100" width="200"> -->
                                     <!-- <span class="category_coupon" style="display: none;"></span> -->
@@ -463,7 +475,7 @@
                                     @endif
                                 </a>
                                 @if($coupon->total_coupons > 0)
-                                <input type="checkbox" name="coupon_id[]" value="{{$coupon->id}}">
+                                <input type="checkbox" name="coupon_id[]" value="{{$coupon->id}}" class="mr-2">
                                     <span class="name"><strong>
                                         @if(strlen($coupon->title) > 12)
                                             {{ substr($coupon->title, 0, 12) }}...
@@ -485,9 +497,9 @@
                                 <span style="color:gray;">available-<span style="">{{ $coupon->total_coupons }}</span></span>
                          
                                  </span><br />
-                                 <input type="number" name="no_of_coupon[]" placeholder="Enter no. of coupons" class="coupon-input" data-max="{{ $coupon->total_coupons }}" required><br/>
+                                 <input type="number" name="no_of_coupon[]" placeholder="Enter no. of coupons" class="coupon-input mt-2" data-max="{{ $coupon->total_coupons }}" required><br/>
                                     <!-- <div class="note">e.g- if you enter 100, it means that the prize will be awarded after the 99th customer.</div> -->
-                                 <div class="col-sm-10">
+                                 <div class="col-sm-12 mt-2">
                                     <span>1</span>
                                     <label for="denominator">out of : </label>
                                     <input type="number" name="winning_ratio[]" placeholder="Enter Ratio" class="ratio-input" required>
@@ -502,7 +514,7 @@
                                             {{ $coupon->title }}
                                         @endif
                                     </strong></span><br />
-                                    <input type="text" name="" placeholder="Enter no. of coupons" value="" disabled><br/>
+                                    <input type="text" name=""                                  placeholder="Enter no. of coupons" value="" disabled><br/>
                                 @endif
                                  </div>
                             @if($coupon->total_coupons > 0)
