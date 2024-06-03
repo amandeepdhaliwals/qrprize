@@ -482,6 +482,8 @@
 
 					video.addEventListener("ended", function() {
 						console.log("Video ended.");
+						var visitorId = {{$visitor_id}};
+           				updateView(visitorId);
 						enableSpinner();
 						$('#spin-button').hide();
             			$('#spin-button-a').hide();
@@ -507,6 +509,8 @@
 					// Listen for the 'ended' event
 					player.on('ended', function() {
 						console.log('The video has ended');
+						var visitorId = {{$visitor_id}};
+           				updateView(visitorId);
 						enableSpinner();
 						$('#spin-button').hide();
             			$('#spin-button-a').hide();
@@ -526,6 +530,7 @@
 				// Listen for scroll event
 				window.addEventListener("scroll", handleScroll);
 				} 
+
 			});
 		</script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
@@ -598,7 +603,7 @@
 							contentType: "application/json",
 							success: function(response) {
 								// Handle success response
-                console.log(response);
+                             console.log(response);
 								if (response.response_type == 'success') {
 
                   if(response.status == 'otp_send_customerVerify' || 
@@ -883,6 +888,8 @@
 						console.log('Video is playing');
 					} else if (event.data == YT.PlayerState.ENDED) {
 						console.log('Video has ended');
+						var visitorId = {{$visitor_id}};
+						updateView(visitorId);
 						document.getElementById("spinner-overlay").style.display = "none";
 						$('#spin-button').hide();
             			$('#spin-button-a').hide();
@@ -911,6 +918,29 @@
 				});
 			}
 		}
+
+		function updateView(visitorId) {
+					// Make an AJAX request to update the view
+					var customData = {
+						visitorId: visitorId,
+						_token: '{{csrf_token()}}'
+						};
+					var jsonData = JSON.stringify(customData);
+					   $.ajax({
+							type: 'POST',
+							url: '{{ route("frontend.updateVisitor") }}', // URL to submit form data
+							data: jsonData,
+							contentType: "application/json",
+							success: function(response) {
+								// Handle success response            
+								console.log("View updated successfully.");
+							},
+							error: function(xhr, status, error) {
+								// Handle error
+								console.error(error);
+							}
+						});
+				}
   </script>
 	</body>
 

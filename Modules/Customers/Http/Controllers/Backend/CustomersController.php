@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CustomerExport;
-
+use Modules\Customers\Entities\Visitor;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -19,6 +19,10 @@ use App\Models\Userprofile;
 use App\Modules\Customers\Entities\Customer;
 use Illuminate\Support\Facades\Auth;
 use ConsoleTVs\Charts\Classes\Chartjs\Chart;
+use Illuminate\Support\Facades\Log;
+use Modules\Stores\Entities\Advertisement; // Import the advertisement model
+use Modules\Stores\Entities\Campaign;
+use Modules\Coupons\Entities\Claim; // Import the Claim model
 
 
 class CustomersController extends BackendBaseController
@@ -43,7 +47,47 @@ class CustomersController extends BackendBaseController
         $this->module_model = "Modules\Customers\Entities\Customer";
     }
 
-    public function index_data()
+       /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function index()
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_model = $this->module_model;
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = 'List';
+
+        $$module_name = $module_model::paginate();
+
+        logUserAccess($module_title.' '.$module_action);
+
+        $rolesId = [5];
+
+        $stores = User::select('id','name')->whereNull('deleted_at')
+        ->whereHas('roles', function ($query) use ($rolesId) {
+            $query->where('id', 2);
+        })
+        ->get();
+
+        $campaigns = Campaign::select('id','campaign_name')->whereNull('deleted_at')
+        ->get();
+
+        $advertisements = Advertisement::select('id','advertisement_name')->whereNull('deleted_at')
+        ->get();
+
+        return view(
+            "{$module_path}.{$module_name}.index_datatable",
+            compact('module_title', 'module_name', "{$module_name}", 'module_icon', 'module_name_singular', 'module_action','stores','campaigns','advertisements')
+        );
+    }
+
+    public function index_data_cust(Request $request)
     {
         $module_title = $this->module_title;
         $module_name = $this->module_name;
@@ -64,36 +108,64 @@ class CustomersController extends BackendBaseController
         $login_user_id = Auth::id();
 
 
+        $store_id = $request->input('store'); // Get selected store value from request
+        $campaign_id = $request->input('campaign');
+        $advertisement_id = $request->input('adv'); 
+        $win_lose = $request->input('win_lose');       
+      
         if($login_role_id == 1 ){
-            $$module_name = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name', 'users.created_at', 'users.updated_at') 
+            $query = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name',
+             'users.created_at', 'users.updated_at', 'customer_statistics.win_count','customer_statistics.lose_count') 
             ->join('customers', 'users.id', '=', 'customers.user_id')
             ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
-            ->whereHas('roles', function ($query) use ($rolesId) {
+            ->join('customer_statistics', 'users.id', '=', 'customer_statistics.customer_id')
+            ->when($store_id, function ($query) use ($store_id) {
+                $query->where('customers.store_id', $store_id);
+            })
+            ->when($campaign_id, function ($query) use ($campaign_id) {
+                $query->where('customers.campaign_id', $campaign_id);
+            })
+            ->when($advertisement_id, function ($query) use ($advertisement_id) {
+                $query->where('customers.advertisement_id', $advertisement_id);
+            });
+  
+            if ($win_lose === '1') {
+                $query->where('customer_statistics.win_count', '>', 0);
+            } elseif ($win_lose === '0') {
+                $query->where('customer_statistics.win_count', '=', 0)
+                    ->where('customer_statistics.lose_count', '>', 0);
+            }
+            $query->whereHas('roles', function ($query) use ($rolesId) {
                 $query->whereIn('id', $rolesId);
-            })->get();
+            });  
+            $query->get();
         }else{
-            $$module_name = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name', 'users.created_at', 'users.updated_at')
+            $query = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name', 'users.created_at', 'users.updated_at')
             ->join('customers', 'users.id', '=', 'customers.user_id')
             ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
             ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
-            ->whereHas('roles', function ($query) use ($rolesId) {
+            ->when($campaign_id, function ($query) use ($campaign_id) {
+                $query->where('customers.campaign_id', $campaign_id);
+            })
+            ->when($advertisement_id, function ($query) use ($advertisement_id) {
+                $query->where('customers.advertisement_id', $advertisement_id);
+            });
+            if ($win_lose === '1') {
+                $query->where('customer_statistics.win_count', '>', 0);
+            } elseif ($win_lose === '0') {
+                $query->where('customer_statistics.win_count', '=', 0)
+                    ->where('customer_statistics.lose_count', '>', 0);
+            }
+            $query->whereHas('roles', function ($query) use ($rolesId) {
                 $query->whereIn('id', $rolesId);
-            })->get();
+            });
+            $query->get();
         }
 
-        //dd($login_role_id);
+        $data = $query;
 
 
-        $data = $$module_name;
-
-       // dd($data);
-
-        return Datatables::of($$module_name)
-            // ->addColumn('action', function ($data) {
-            //     $module_name = $this->module_name;
-
-            //     return view('backend.includes.action_column', compact('module_name', 'data'));
-            // })
+        return Datatables::of($query)
             ->editColumn('name', '<strong>{{$name}}</strong>')
             ->editColumn('email', '{{$email}}')
             ->editColumn('mobile', '{{$mobile}}')
@@ -156,12 +228,7 @@ class CustomersController extends BackendBaseController
         $module_path = $this->module_path;
         $module_icon = $this->module_icon;
         $module_action = 'Stats';
-         // Fetching customer data grouped by month
-        //  $customers = User::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
-        //  ->groupBy('month')
-        //  ->pluck('count', 'month')
-        //  ->all();
-
+ 
          $rolesId = [5];
      
          $role_id=auth()->user()->roles->pluck('id')->toArray();
@@ -217,8 +284,17 @@ class CustomersController extends BackendBaseController
             ->pluck('count', 'month')
             ->all();
 
+            $visitors = Visitor::selectRaw('MONTH(visitors.created_at) as month, COUNT(DISTINCT user_id_cookie) as count')
+            ->when($store_id, function ($query) use ($store_id) {
+                $query->where('visitors.store_id', $store_id);
+            })
+            ->whereYear('visitors.created_at', $year)
+            ->groupByRaw('MONTH(visitors.created_at)')
+            ->pluck('count', 'month')
+            ->all();
 
          }else{
+    
             $customers = User::selectRaw('MONTH(users.created_at) as month, COUNT(*) as count')
             ->join('customers', 'users.id', '=', 'customers.user_id')
             ->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
@@ -259,7 +335,14 @@ class CustomersController extends BackendBaseController
             ->groupByRaw('MONTH(users.created_at)')
             ->pluck('count', 'month')
             ->all();
-           
+
+            $visitors = Visitor::selectRaw('MONTH(visitors.created_at) as month, COUNT(DISTINCT user_id_cookie) as count')
+            ->where('visitors.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
+            ->whereYear('visitors.created_at', $year)
+            ->groupByRaw('MONTH(visitors.created_at)')
+            ->pluck('count', 'month')
+            ->all();
+      
          }
 
          $stores = User::select('id','name')->whereNull('deleted_at')
@@ -276,13 +359,21 @@ class CustomersController extends BackendBaseController
      $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
      
       // Initialize data arrays with zeros
-      $totalData = array_fill(0, 12, 0);
+
+      $totalVisiterData = array_fill(0, 12, 0);
+      $totalRegisterUserData = array_fill(0, 12, 0);
+      $totalUnregisteredUserData = array_fill(0, 12, 0);
       $winData = array_fill(0, 12, 0);
       $loseData = array_fill(0, 12, 0);
       
-      // Populate data arrays with customer counts
+ 
+       // Now $totalCounts array contains the total count for each month
+
+      foreach ($visitors as $month => $count) {
+        $totalVisiterData[$month - 1] = $count;  // $month - 1 to convert 1-based month to 0-based index
+      }
       foreach ($customers as $month => $count) {
-          $totalData[$month - 1] = $count;  // $month - 1 to convert 1-based month to 0-based index
+          $totalRegisterUserData[$month - 1] = $count;  // $month - 1 to convert 1-based month to 0-based index
       }
       foreach ($winCustomers as $month => $count) {
           $winData[$month - 1] = $count;
@@ -291,19 +382,172 @@ class CustomersController extends BackendBaseController
           $loseData[$month - 1] = $count;
       }
 
+      $totalUnregisteredUserData = [];
+        for ($i = 0; $i < 12; $i++) {
+            $totalUnregisteredUserData[$i] = ($totalVisiterData[$i] ?? 0) - ($totalRegisterUserData[$i] ?? 0);
+        }
+
       // Create chart
       $chart = new Chart;
       $chart->labels($months);
-      $chart->dataset('Total Customers', 'bar', $totalData)
+      $chart->dataset('Total Visitors', 'bar', $totalVisiterData)
+      ->backgroundColor('rgba(44, 255, 0, 1)');
+
+        $chart->dataset('Total registered Customers', 'bar', $totalRegisterUserData)
             ->backgroundColor('rgba(0, 123, 255, 0.7)');
+
+        $chart->dataset('Total Not registered Customers', 'bar', $totalUnregisteredUserData)
+            ->backgroundColor('rgba(255, 99, 132, 0.7)'); // Assuming you want a different color for unregistered customers
+
       $chart->dataset('Win Customers', 'bar', $winData)
             ->backgroundColor('rgba(40, 167, 69, 0.7)');
       $chart->dataset('Lose Customers', 'bar', $loseData)
             ->backgroundColor('rgba(220, 53, 69, 0.7)');
 
-
+        
      return view("{$module_path}.{$module_name}.stats", compact('stores','store_id','selected_year','selectedYear','module_title', 'module_name', 'module_path', 'module_action','module_icon', 'chart'));
     }
 
+    public function claimed(Request $request)
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_action = 'Claimed';
+        $claims = Claim::all();
+        return view("{$module_path}.{$module_name}.claimed",compact('module_title', 'module_name', 'module_path', 'module_action','module_icon','claims'));
+    
+    }
+
+    public function visitor()
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_action = 'Visitor'; 
+        return view("{$module_path}.{$module_name}.visitor",compact('module_title', 'module_name', 'module_path', 'module_action','module_icon'));
+    }
+
+    public function visitor_data(Request $request)
+    {
+        $role_id = auth()->user()->roles->pluck('id')->toArray();
+        $login_role_id = $role_id[0];
+        $login_user_id = Auth::id();
+
+        // Fetch visitor data based on the login role
+        if ($login_role_id == 1) {
+            $visitorsData = Visitor::select('visitors.user_id_cookie', 'visitors.view', 'advertisement.advertisement_name')
+                ->join('advertisement', 'visitors.advertisement_id', '=', 'advertisement.id')
+                ->get();
+        } else {
+            $visitorsData = Visitor::select('visitors.user_id_cookie', 'visitors.view', 'advertisement.advertisement_name')
+                ->join('advertisement', 'visitors.advertisement_id', '=', 'advertisement.id')
+                ->where('visitors.store_id', '=', $login_user_id)
+                ->get();
+        }
+
+        $organizedData = [];
+
+        foreach ($visitorsData as $visitor) {
+            $userID = $visitor['user_id_cookie'];
+            $advertisementID = $visitor['advertisement_name'];
+            $viewCount = $visitor['view'] == 1 ? 1 : 0;
+            $unviewCount = $visitor['view'] == 0 ? 1 : 0;
+
+            if (!isset($organizedData[$userID])) {
+                $organizedData[$userID] = [
+                    'advertisements' => [],
+                    'count' => 0
+                ];
+            }
+
+            if (!isset($organizedData[$userID]['advertisements'][$advertisementID])) {
+                $organizedData[$userID]['advertisements'][$advertisementID] = [
+                    'view' => 0,
+                    'unview' => 0,
+                ];
+            }
+
+            $organizedData[$userID]['advertisements'][$advertisementID]['view'] += $viewCount;
+            $organizedData[$userID]['advertisements'][$advertisementID]['unview'] += $unviewCount;
+        }
+
+        // Flatten the organized data for DataTables
+        $flattenedData = [];
+        $count = 1; // Initialize count for users
+        foreach ($organizedData as $userID => $data) {
+            $details = '';
+            foreach ($data['advertisements'] as $advertisementID => $views) {
+                $detailParts = [];
+                if ($views['view'] > 0) {
+                    $detailParts[] = "View:{$views['view']}";
+                }
+                if ($views['unview'] > 0) {
+                    $detailParts[] = "Unview:{$views['unview']}";
+                }
+                if (!empty($detailParts)) {
+                    $details .= "<div class='advertisement'><span class='advertisement-name'>{$advertisementID}</span>: " . implode(', ', $detailParts) . "</div>";
+                }
+            }
+
+            $flattenedData[] = [
+                'user' => "User{$count}",
+                'details' => $details
+            ];
+            $count++;
+        }
+
+        return Datatables::of($flattenedData)
+            ->editColumn('user', function ($data) {
+                return "<strong>{$data['user']}</strong>";
+            })
+            ->editColumn('details', function ($data) {
+                return $data['details'];
+            })
+            ->rawColumns(['user', 'details'])
+            ->make(true);
+    }
+    
+    public function claimed_data()
+    {
+        $claims = Claim::select([
+            'claims.customer_id', 
+            'users.name as customer_name', 
+            'claims.advertisement_id', 
+            'advertisement.advertisement_name', 
+            'claims.name', 
+            'claims.address', 
+            'claims.coupon_id',
+            'coupons.title',
+            'claims.request_claim', 
+            'claims.email_sent',  
+            'claims.created_at', 
+            'claims.updated_at', 
+        ])
+        ->join('users', 'claims.customer_id', '=', 'users.id')
+        ->join('coupons', 'claims.coupon_id', '=', 'coupons.id')
+        ->join('advertisement', 'claims.advertisement_id', '=', 'advertisement.id')
+        ->get();
+    
+        return DataTables::of($claims)
+            ->editColumn('request_claim', function ($data) {
+                return $data->request_claim ? 'Yes' : 'No';
+            })
+            ->editColumn('email_sent', function ($data) {
+                return $data->email_sent ? 'Sent to admin' : 'Not Sent';
+            })
+            ->editColumn('created_at', function ($data) {
+                $diff = Carbon::now()->diffInHours($data->created_at);
+                return $diff < 25 ? $data->created_at->diffForHumans() : $data->created_at->isoFormat('llll');
+            })
+            ->editColumn('updated_at', function ($data) {
+                $diff = Carbon::now()->diffInHours($data->updated_at);
+                return $diff < 25 ? $data->updated_at->diffForHumans() : $data->updated_at->isoFormat('llll');
+            })
+            ->rawColumns(['customer_name','request_claim', 'created_at', 'updated_at'])
+            ->make(true);
+    }
 }
 

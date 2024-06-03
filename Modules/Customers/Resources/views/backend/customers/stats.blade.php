@@ -2,6 +2,21 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 
+<style>
+    .advertisement {
+    margin-bottom: 5px;
+}
+
+.advertisement-name {
+    font-weight: bold;
+}
+
+.views, .unviews {
+    margin-left: 10px;
+    color: #888;
+}
+
+</style>
 @section('breadcrumbs')
 <x-backend-breadcrumbs>
     <!-- <x-backend-breadcrumb-item route='{{route("backend.$module_name.index")}}' icon='{{ $module_icon }}'>

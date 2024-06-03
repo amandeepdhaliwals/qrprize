@@ -75,7 +75,7 @@ class UserController extends Controller
         $page_heading = ucfirst($module_title);
         $title = $page_heading.' '.ucfirst($module_action);
 
-        $rolesId = [1, 2, 5]; 
+        $rolesId = [1, 2];
         // $$module_name = $module_model::paginate();
         $$module_name =  $module_model::select('*')
         ->whereHas('roles', function ($query) use ($rolesId) {

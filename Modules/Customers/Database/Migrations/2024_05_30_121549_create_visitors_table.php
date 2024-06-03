@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customers', function (Blueprint $table) {
+        Schema::create('visitors', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
-            $table->integer('store_id');
-            $table->integer('campaign_id');
-            $table->integer('advertisement_id');
+            $table->string('user_id_cookie');
+            $table->unsignedBigInteger('store_id');
+            $table->unsignedBigInteger('campaign_id');
+            $table->unsignedBigInteger('advertisement_id');
+            $table->integer('view');
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->integer('deleted_by')->unsigned()->nullable();
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customers');
+        Schema::dropIfExists('visitors');
     }
 };
