@@ -307,6 +307,27 @@ class CustomersController extends BackendBaseController
             ->pluck('count', 'month')
             ->all();
 
+            $totalVisitors = Visitor::selectRaw('COUNT(DISTINCT user_id_cookie) as count')
+            ->when($store_id, function ($query) use ($store_id) {
+                $query->where('visitors.store_id', $store_id);
+            });
+            if ($request->isMethod('post')) {
+                $totalVisitors->whereYear('visitors.created_at', $year);
+            }
+            $totalVisitors = $totalVisitors->value('count'); // Use value() to directly get the count
+
+            $totalRegistered = User::selectRaw('COUNT(DISTINCT id) as count')
+                ->when($store_id, function ($query) use ($store_id) {
+                    $query->where('users.store_id', $store_id);
+                });
+
+            if ($request->isMethod('post')) {
+                $totalRegistered->whereYear('users.created_at', $year);
+            }
+
+            $totalRegistered = $totalRegistered->value('count'); // Use value() to directly get the count
+
+            
          }else{
     
             $customers = User::selectRaw('MONTH(users.created_at) as month, COUNT(*) as count')
@@ -356,6 +377,25 @@ class CustomersController extends BackendBaseController
             ->groupByRaw('MONTH(visitors.created_at)')
             ->pluck('count', 'month')
             ->all();
+
+            $totalVisitors = Visitor::selectRaw('COUNT(DISTINCT user_id_cookie) as count')
+            ->where('visitors.store_id', '=' , $login_user_id);
+        
+            if ($request->isMethod('post')) {
+                $totalVisitors->whereYear('visitors.created_at', $year);
+            }
+            
+            $totalVisitors = $totalVisitors->value('count'); // Use value() to directly get the count
+            
+
+            $totalRegistered = User::selectRaw('COUNT(DISTINCT id) as count')
+            ->where('visitors.store_id', '=' , $login_user_id);
+
+            if ($request->isMethod('post')) {
+                $totalRegistered->whereYear('users.created_at', $year);
+            }
+
+            $totalRegistered = $totalRegistered->value('count'); // Use value() to directly get the count
       
          }
 
@@ -418,8 +458,8 @@ class CustomersController extends BackendBaseController
       $chart->dataset('Lose Customers', 'bar', $loseData)
             ->backgroundColor('rgba(220, 53, 69, 0.7)');
 
-        
-     return view("{$module_path}.{$module_name}.stats", compact('stores','store_id','selected_year','selectedYear','module_title', 'module_name', 'module_path', 'module_action','module_icon', 'chart'));
+     return view("{$module_path}.{$module_name}.stats", compact('stores','store_id','selected_year','selectedYear','module_title',
+      'module_name', 'module_path', 'module_action','module_icon', 'chart','totalVisitors','totalRegistered'));
     }
 
     public function claimed(Request $request)
