@@ -376,7 +376,7 @@ class CustomersController extends BackendBaseController
 
       $totalVisiterData = array_fill(0, 12, 0);
       $totalRegisterUserData = array_fill(0, 12, 0);
-      $totalUnregisteredUserData = array_fill(0, 12, 0);
+    //  $totalUnregisteredUserData = array_fill(0, 12, 0);
       $winData = array_fill(0, 12, 0);
       $loseData = array_fill(0, 12, 0);
       
@@ -396,10 +396,10 @@ class CustomersController extends BackendBaseController
           $loseData[$month - 1] = $count;
       }
 
-      $totalUnregisteredUserData = [];
-        for ($i = 0; $i < 12; $i++) {
-            $totalUnregisteredUserData[$i] = ($totalVisiterData[$i] ?? 0) - ($totalRegisterUserData[$i] ?? 0);
-        }
+    //   $totalUnregisteredUserData = [];
+    //     for ($i = 0; $i < 12; $i++) {
+    //         $totalUnregisteredUserData[$i] = ($totalVisiterData[$i] ?? 0) - ($totalRegisterUserData[$i] ?? 0);
+    //     }
 
       // Create chart
       $chart = new Chart;
@@ -410,8 +410,8 @@ class CustomersController extends BackendBaseController
         $chart->dataset('Total registered Customers', 'bar', $totalRegisterUserData)
             ->backgroundColor('rgba(0, 123, 255, 0.7)');
 
-        $chart->dataset('Total Not registered Customers', 'bar', $totalUnregisteredUserData)
-            ->backgroundColor('rgba(255, 99, 132, 0.7)'); // Assuming you want a different color for unregistered customers
+        // $chart->dataset('Total Not registered Customers', 'bar', $totalUnregisteredUserData)
+        //     ->backgroundColor('rgba(255, 99, 132, 0.7)'); // Assuming you want a different color for unregistered customers
 
       $chart->dataset('Win Customers', 'bar', $winData)
             ->backgroundColor('rgba(40, 167, 69, 0.7)');
