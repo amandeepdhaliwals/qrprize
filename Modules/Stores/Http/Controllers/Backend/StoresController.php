@@ -363,7 +363,7 @@ class StoresController extends BackendBaseController
             $data = [
                 "password" => $password,
             ];
-            //$$module_name_singular->notify(new UserAccountCreated($data));
+            $$module_name_singular->notify(new UserAccountCreated($data));
             Flash::success(
                 icon("fas fa-envelope") . " Account Credentials Sent to User."
             )->important();

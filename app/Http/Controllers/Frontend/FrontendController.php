@@ -180,11 +180,11 @@ class FrontendController extends Controller
             ->first();
             $claim_request_claim = $claim ? $claim->request_claim : null;
 
-            if($coupon_category != 'service'){
+            if($coupon_category == 'service'){
                 $claim_request_claim = '1';   
             }
     
-           // $user->notify(new CouponWinNotification($couponDetails));
+            $user->notify(new CouponWinNotification($couponDetails));
         }
     
         return view('frontend.win', compact('cust_result_id',
