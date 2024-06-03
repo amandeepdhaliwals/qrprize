@@ -115,10 +115,14 @@ class CustomersController extends BackendBaseController
       
         if($login_role_id == 1 ){
             $query = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name',
-             'users.created_at', 'users.updated_at', 'customer_statistics.win_count','customer_statistics.lose_count') 
+             'users.created_at', 'users.updated_at', 'customer_statistics.win_count','customer_statistics.lose_count',
+             'customers.campaign_id','customers.advertisement_id','campaign.campaign_name',
+             'advertisement.advertisement_name',) 
             ->join('customers', 'users.id', '=', 'customers.user_id')
             ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
             ->join('customer_statistics', 'users.id', '=', 'customer_statistics.customer_id')
+            ->join('campaign', 'campaign.id', '=', 'customers.campaign_id')
+            ->join('advertisement', 'advertisement.id', '=', 'customers.advertisement_id')
             ->when($store_id, function ($query) use ($store_id) {
                 $query->where('customers.store_id', $store_id);
             })
@@ -140,9 +144,15 @@ class CustomersController extends BackendBaseController
             });  
             $query->get();
         }else{
-            $query = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name', 'users.created_at', 'users.updated_at')
+            $query = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name', 'users.created_at',
+             'users.updated_at','customer_statistics.win_count','customer_statistics.lose_count',
+             'customers.campaign_id','customers.advertisement_id','campaign.campaign_name',
+             'advertisement.advertisement_name') 
             ->join('customers', 'users.id', '=', 'customers.user_id')
             ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
+            ->join('customer_statistics', 'users.id', '=', 'customer_statistics.customer_id')
+            ->join('campaign', 'campaign.id', '=', 'customers.campaign_id')
+            ->join('advertisement', 'advertisement.id', '=', 'customers.advertisement_id')
             ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
             ->when($campaign_id, function ($query) use ($campaign_id) {
                 $query->where('customers.campaign_id', $campaign_id);
@@ -170,6 +180,10 @@ class CustomersController extends BackendBaseController
             ->editColumn('email', '{{$email}}')
             ->editColumn('mobile', '{{$mobile}}')
             ->editColumn('store_name', '{{$store_name}}')
+            ->editColumn('campaign', '{{$campaign_name}}')
+            ->editColumn('advertisement', '{{$advertisement_name}}')
+            ->editColumn('win_count', '{{$win_count}}')
+            ->editColumn('lose_count', '{{$lose_count}}')
             ->editColumn('created_at', function ($data) {
                 $module_name = $this->module_name;
 
@@ -192,7 +206,7 @@ class CustomersController extends BackendBaseController
 
                 return $data->updated_at->isoFormat('llll');
             })
-            ->rawColumns(['name','email','mobile','store_name','created_at'])
+            ->rawColumns(['name','email','mobile','store_name','campaign','advertisement','win_count','lose_count','created_at'])
            // ->orderColumns(['id'], '-:column $1')
             ->make(true);
     }

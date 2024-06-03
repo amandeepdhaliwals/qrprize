@@ -103,6 +103,10 @@
                             <th>Email</th>
                             <th>Mobile</th>
                             <th>Store Name</th>
+                            <th>Campaign</th>
+                            <th>Advertisement</th>
+                            <th>Win Count</th>
+                            <th>Lose Count</th>
                             <th>Updated At</th>
                             <!-- <th>Action</th>  -->
                         </tr>
@@ -183,6 +187,22 @@
                 {
                     data: 'store_name',
                     name: 'store_name'
+                },
+                {
+                    data: 'campaign',
+                    name: 'campaign'
+                },
+                {
+                    data: 'advertisement',
+                    name: 'advertisement'
+                },
+                {
+                    data: 'win_count',
+                    name: 'win_count'
+                },
+                {
+                    data: 'lose_count',
+                    name: 'lose_count'
                 },
                 {
                     data: 'updated_at',
