@@ -10,6 +10,7 @@ use Modules\Coupons\Entities\Claim; // Import the Claim model
 use Modules\Videos\Entities\Video; // Import the Video model
 use Modules\Gallery\Entities\Gallery; // Import the gallery(images) model
 use Modules\Otherprizes\Entities\Otherprize; // Import the other prize images model
+use Modules\Customers\Entities\Visitor;
 use Modules\Customers\Entities\CustomerWin;
 use Modules\Customers\Entities\CustomerResult;
 use Illuminate\Http\Response;
@@ -17,6 +18,9 @@ use App\Notifications\CouponWinNotification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Notifications\ClaimRequestNotification;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cookie;
 
 class FrontendController extends Controller
 {
@@ -51,7 +55,7 @@ class FrontendController extends Controller
         return view('frontend.terms');
     }
 
-    public function campaign($storeId,$campaignId,)
+    public function campaign(Request $request,$storeId,$campaignId,)
     {
         $campaign = Campaign::where('id',$campaignId)->where('store_id',$storeId)->first();
 
@@ -79,13 +83,53 @@ class FrontendController extends Controller
 
                 $coupons = Coupon::whereIn('id', $coupon_ids)->get(); 
                 $lock_time = $advertisement_detail->lock_time;
-                return view('frontend.campaign',compact('campaignId','advertisement_detail','advertisement_video','primary_image','secondary_images','other_images','coupons','lock_time'));
+                if ($request->cookie('user_id') === null) {
+                    // Generate a unique user ID
+                    $userId = Str::random(32);
+                    // Set the cookie to expire in 20 years
+                    $expiryDate = Carbon::now()->addYears(20);
+                    Cookie::queue(Cookie::make('user_id', $userId, $expiryDate->diffInMinutes(), null, null, false, true));
+                } else {
+                    // Retrieve the existing user ID from the cookie
+                    $userId = $request->cookie('user_id');
+                }
+                $visitor_id = $this->createVisitor($userId, $storeId, $campaignId, $advertisement_id);
+                return view('frontend.campaign',compact('campaignId','advertisement_detail','advertisement_video',
+                'primary_image','secondary_images','other_images','coupons','lock_time','visitor_id'));
             }
 
         }else{
             return abort(Response::HTTP_NOT_FOUND);
         }
     }
+
+    private function createVisitor($userId, $storeId, $campaignId, $advertisementId)
+    {
+        $visitor = Visitor::create([
+            'user_id_cookie' => $userId,
+            'store_id' => $storeId,
+            'campaign_id' => $campaignId,
+            'advertisement_id' => $advertisementId,
+            'view' => 0, 
+        ]);
+        
+        return $visitor->id;
+    }   
+    
+    public function updateVisitor(Request $request)
+    {
+        // Find the visitor by ID
+        $visitor = Visitor::find($request->visitorId);
+        
+        // If visitor found, update the view column
+        if ($visitor) {
+            $visitor->view = 1;
+            $visitor->save();
+            return response()->json(['success' => true, 'message' => 'Visitor view updated successfully.']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Visitor not found.']);
+        }
+    }   
 
     public function better_luck($storeId,$campaignId)
     {
@@ -129,13 +173,18 @@ class FrontendController extends Controller
             $advertisement_id = $res->advertisement_id;
             $storeId = $res->store_id;
             $campaignId = $res->campaign_id;
+            $coupon_category =  $coupon->category;
             $claim = Claim::where('customer_id', $res->customer_id)
             ->where('advertisement_id', $advertisement_id)
             ->where('coupon_id', $res->coupon_id)
             ->first();
             $claim_request_claim = $claim ? $claim->request_claim : null;
+
+            if($coupon_category != 'service'){
+                $claim_request_claim = '1';   
+            }
     
-            $user->notify(new CouponWinNotification($couponDetails));
+           // $user->notify(new CouponWinNotification($couponDetails));
         }
     
         return view('frontend.win', compact('cust_result_id',

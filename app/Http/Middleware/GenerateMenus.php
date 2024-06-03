@@ -94,7 +94,7 @@ class GenerateMenus
                             'class' => 'nav-group',
                         ])
                             ->data([
-                                'order' => 2,
+                                'order' => 100,
                                 'activematches' => [
                                     'admin/customers*',
                                 ],
@@ -110,23 +110,50 @@ class GenerateMenus
                             'class' => 'nav-item',
                         ])
                             ->data([
-                                'order' => 2,
+                                'order' => 100,
                                 'activematches' => 'admin/customers*',
                                 'permission' => ['view_customers'],
                             ])
                                 ->link->attr([
                                     'class' => 'nav-link',
                                 ]);
+
+                                $accessControl->add('<i class="nav-icon fa-solid fa-bar-chart"></i> Visitor Activity', [
+                                    'route' => 'backend.customers.visitor',
+                                    'class' => 'nav-item',
+                                ])
+                                    ->data([
+                                        'order' => 100,
+                                        'activematches' => 'admin/customers*',
+                                        'permission' => ['view_visitor'],
+                                    ])
+                                ->link->attr([
+                                    'class' => 'nav-link',
+                                ]);       
                     
-                        /// Submenu Videos
+                        /// Submenu Customer
                         $accessControl->add('<i class="nav-icon fa-solid fa-list"></i> List', [
                             'route' => 'backend.customers.index',
                             'class' => 'nav-item',
                         ])
                             ->data([
-                                'order' => 3,
+                                'order' => 100,
                                 'activematches' => 'admin/customers*',
                                 'permission' => ['view_customers'],
+                            ])
+                            ->link->attr([
+                                'class' => 'nav-link',
+                            ]); 
+
+                             /// Submenu Claimed
+                        $accessControl->add('<i class="nav-icon fa-solid fa-list"></i> Claimed', [
+                            'route' => 'backend.customers.claimed',
+                            'class' => 'nav-item',
+                        ])
+                            ->data([
+                                'order' => 100,
+                                'activematches' => 'admin/customers*',
+                                'permission' => ['view_claimed'],
                             ])
                             ->link->attr([
                                 'class' => 'nav-link',

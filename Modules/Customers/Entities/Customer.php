@@ -11,10 +11,16 @@ class Customer extends BaseModel
 {
     use HasFactory;
 
+    protected $table = 'customers';
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'user_id',
+        'store_id',
+        'campaign_id',
+        'advertisement_id'
+    ];
     
     protected static function newFactory(): CustomerFactory
     {

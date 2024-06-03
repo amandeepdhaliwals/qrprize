@@ -11,7 +11,51 @@
 @section('content')
 <div class="card">
     <div class="card-body">
+        <div class="row">
+            <div class="col-3">
+                <label for="store_filter" class="form-label">Filter by Store:</label>
+                <select id="store_filter" class="form-select">
+                    <option value="">All Stores</option>
+                    @foreach($stores as $store)
+                        <option value="{{ $store->id }}">{{ $store->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
+            <div class="col-3">
+                <label for="campaign_filter" class="form-label">Filter by Campaign:</label>
+                <select id="campaign_filter" class="form-select">
+                    <option value="">All Campaign</option>
+                    @foreach($campaigns as $campaign)
+                        <option value="{{ $campaign->id }}">{{ $campaign->campaign_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-3">
+                <label for="adv_filter" class="form-label">Filter by Advertisement:</label>
+                <select id="adv_filter" class="form-select">
+                    <option value="">All Advertisement</option>
+                    @foreach($advertisements as $advertisement)
+                        <option value="{{ $advertisement->id }}">{{ $advertisement->advertisement_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-3">
+                <label for="win_filter" class="form-label">Filter by Win:</label>
+                <select id="win_filter" class="form-select">
+                    <option value="">No Filter</option>
+                    <option value="1">Win</option>
+                    <option value="0">Lose</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="card">
+    <div class="card-body">
+    <div class="col"> 
         <x-backend.section-header>
             <i class="{{ $module_icon }}"></i> {{ __($module_title) }} <small class="text-muted">{{ __($module_action) }}</small>
 
@@ -96,86 +140,106 @@
 <script type="module" src="{{ asset('vendor/datatable/datatables.min.js') }}"></script>
 
 <script type="module">
-    $('#datatable').DataTable({
-        processing: true,
-        serverSide: true,
-        autoWidth: true,
-        responsive: true,
-        ajax: '{{ route("backend.$module_name.index_data") }}',
-        columns: [
-            { 
-            data: null,
-            name: 'id',
-            render: function (data, type, row, meta) {
-                    return meta.row + 1; // Row index starts from 0, so add 1 to start from 1
+    $(document).ready(function () {
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+        // DataTable initialization
+        var table = $('#datatable').DataTable({
+            processing: true,
+            serverSide: true,
+            autoWidth: true,
+            responsive: true,
+            ajax: {
+                url: '{{ route("backend.$module_name.index_data_cust") }}',
+                type: 'GET',
+                data: function (d) {
+                    d._token = csrfToken; // Include CSRF token
+                    d.store = $('#store_filter').val(); // Add selected store value to the request data
+                    d.campaign = $('#campaign_filter').val();
+                    d.adv = $('#adv_filter').val();
+                    d.win_lose = $('#win_filter').val();
                 }
             },
-            {
-                data: 'name',
-                name: 'name'
-            },
-            {
-                data: 'email',
-                name: 'email'
-            },
-            {
-                data: 'mobile',
-                name: 'mobile'
-            },
-            {
-                data: 'store_name',
-                name: 'store_name'
-            },
-            {
-                data: 'updated_at',
-                name: 'updated_at'
-            },
-            // {
-            //     data: 'action',
-            //     name: 'action',
-            //     orderable: false,
-            //     searchable: false
-            // }
-        ]
+            columns: [
+                { 
+                    data: null,
+                    name: 'id',
+                    render: function (data, type, row, meta) {
+                        return meta.row + 1; // Row index starts from 0, so add 1 to start from 1
+                    }
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'email',
+                    name: 'email'
+                },
+                {
+                    data: 'mobile',
+                    name: 'mobile'
+                },
+                {
+                    data: 'store_name',
+                    name: 'store_name'
+                },
+                {
+                    data: 'updated_at',
+                    name: 'updated_at'
+                },
+            ]
+        });
+
+        // Handle change event on store filter dropdown
+        $('#store_filter').on('change', function () {
+            table.ajax.reload(); // Reload DataTable when the store filter changes
+        });
+
+        $('#campaign_filter').on('change', function () {
+            table.ajax.reload(); // Reload DataTable when the store filter changes
+        });
+
+        $('#adv_filter').on('change', function () {
+            table.ajax.reload(); // Reload DataTable when the store filter changes
+        });
+
+        $('#win_filter').on('change', function () {
+            table.ajax.reload(); // Reload DataTable when the store filter changes
+        });
+        
+        // Export to Excel button click event
+        $('#exportBtn').click(function() {
+            // Get filtered data from all pages
+            var filteredData = [];
+            table.rows({ search: 'applied' }).every(function() {
+                filteredData.push(this.data());
+            });
+
+            // Send filtered data to server for export
+            $.ajax({
+                url: '{{ route("backend.$module_name.exportToExcel") }}',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken // Include CSRF token in the request headers
+                },
+                data: JSON.stringify({ filteredData: filteredData }),
+                xhrFields: {
+                    responseType: 'blob' // Set the response type to blob
+                },
+                success: function(response) {
+                    var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'customers.xlsx';
+                    link.click();
+                },
+                error: function(xhr, status, error) {
+                    alert(error)
+                }
+            });
+        });
     });
-
-    var csrfToken = $('meta[name="csrf-token"]').attr('content');
-    $('#exportBtn').click(function() {
-    // Get filtered data from DataTable
-    // var filteredData = $('#datatable').DataTable().rows({search:'applied'}).data().toArray();
-
-    var table = $('#datatable').DataTable();
-
-    // Get filtered data from all pages
-    var filteredData = [];
-    table.rows({ search: 'applied' }).every(function() {
-        filteredData.push(this.data());
-    });
-
-    // Send filtered data to server for export
-    $.ajax({
-        url: '{{ route("backend.$module_name.exportToExcel") }}',
-        type: 'POST',
-        contentType: 'application/json',
-        headers: {
-            'X-CSRF-TOKEN': csrfToken // Include CSRF token in the request headers
-        },
-        data: JSON.stringify({ filteredData: filteredData }),
-        xhrFields: {
-            responseType: 'blob' // Set the response type to blob
-        },
-        success: function(response) {
-            var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            var link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = 'customers.xlsx';
-            link.click();
-        },
-        error: function(xhr, status, error) {
-            alert(error)
-        }
-    });
-});
-
 </script>
 @endpush
