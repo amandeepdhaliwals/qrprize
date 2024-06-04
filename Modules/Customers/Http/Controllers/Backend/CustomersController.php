@@ -719,7 +719,7 @@ class CustomersController extends BackendBaseController
         $claim->shipping_status = $request->input('status');
         $claim->save();
     
-        $customer = Customer::find($claim->customer_id);
+        $customer = User::find($claim->customer_id);
         $statusText = [
             0 => 'Pending',
             1 => 'Packed',
