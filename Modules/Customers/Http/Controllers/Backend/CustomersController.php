@@ -317,19 +317,17 @@ class CustomersController extends BackendBaseController
             $totalVisitors = $totalVisitors->value('count'); // Use value() to directly get the count
 
 
-            $totalRegistered = User::selectRaw('COUNT(DISTINCT id) as count')
+            $totalRegistered = User::selectRaw('COUNT(DISTINCT users.id) as count')
+             ->join('customers', 'users.id', '=', 'customers.user_id')
                 ->when($store_id, function ($query) use ($store_id) {
-                    $query->where('users.store_id', $store_id);
+                    $query->where('customers.store_id', $store_id);
                 });
-
             if ($request->isMethod('post')) {
                 $totalRegistered->whereYear('users.created_at', $year);
             }
-
             $totalRegistered->whereHas('roles', function ($query) use ($rolesId) {
                 $query->whereIn('roles.id', $rolesId);
             });
-
             $totalRegistered = $totalRegistered->value('count'); // Use value() to directly get the count
 
             
@@ -391,8 +389,9 @@ class CustomersController extends BackendBaseController
             $totalVisitors = $totalVisitors->value('count'); // Use value() to directly get the count
             
 
-            $totalRegistered = User::selectRaw('COUNT(DISTINCT id) as count')
-            ->where('visitors.store_id', '=' , $login_user_id);
+            $totalRegistered = User::selectRaw('COUNT(DISTINCT users.id) as count')
+            ->join('customers', 'users.id', '=', 'customers.user_id')
+            ->where('customers.store_id', '=' , $login_user_id);
 
             if ($request->isMethod('post')) {
                 $totalRegistered->whereYear('users.created_at', $year);
