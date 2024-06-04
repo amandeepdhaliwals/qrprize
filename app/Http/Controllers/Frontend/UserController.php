@@ -737,7 +737,7 @@ class UserController extends Controller
 
         // Send the OTP via email or mobile
          $user = User::find($userId);
-       //  Notification::send($user, new OTPNotification($otpCodeEmail));
+         Notification::send($user, new OTPNotification($otpCodeEmail));
         return [
             'email_otp' => $otpCodeEmail,
             'mobile_otp' => $otpCodeMobile
@@ -814,7 +814,7 @@ class UserController extends Controller
                 
                 // Notify user about account creation
                 $data = ['password' => $password];
-               // $user->notify(new UserAccountCreated($data));
+                $user->notify(new UserAccountCreated($data));
                 
                 return ['status' => 'success']; // Both OTPs are valid and verified
             } else {
