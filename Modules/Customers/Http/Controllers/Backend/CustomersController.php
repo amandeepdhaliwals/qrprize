@@ -25,6 +25,8 @@ use Modules\Stores\Entities\Campaign;
 use Modules\Coupons\Entities\Claim; // Import the Claim model
 use Illuminate\Support\HtmlString;
 use Laracasts\Flash\Flash;
+use App\Notifications\ShippingStatusUpdated;
+
 
 
 class CustomersController extends BackendBaseController
