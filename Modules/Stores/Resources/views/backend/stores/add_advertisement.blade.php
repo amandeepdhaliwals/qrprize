@@ -901,6 +901,14 @@ $(document).ready(function() {
                   hasError = false;
                }
             }
+            else {
+               // If the coupon is not checked, but its associated inputs have values, show an error
+               if (numberOfCouponsInputs[i].value || winningRatioInputs[i].value) {
+                     hasError = true;
+                     showError('#adv_winning_error', 'Please select the winning prize first.', '#adv_winning');
+                     // You may show an error message or perform other actions as needed
+               }
+            }
          }
 
 

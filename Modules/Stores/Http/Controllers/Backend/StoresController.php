@@ -1066,8 +1066,8 @@ class StoresController extends BackendBaseController
         ]);
 
         $couponIdArray = $requestData['coupon_id'];
-        $noOfCouponArray = array_filter($requestData['no_of_coupon']); // Remove null values
-        $winningRatioArray = array_filter($requestData['winning_ratio']); // Remove null values
+        $noOfCouponArray = array_values(array_filter($requestData['no_of_coupon'])); // Remove null values
+        $winningRatioArray = array_values(array_filter($requestData['winning_ratio'])); // Remove null values
         $noOfCouponSum = array_sum($noOfCouponArray);
         
         // Check if the lengths of coupon ID and number of coupons arrays are equal
