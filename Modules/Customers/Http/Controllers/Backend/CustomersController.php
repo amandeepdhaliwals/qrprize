@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\Log;
 use Modules\Stores\Entities\Advertisement; // Import the advertisement model
 use Modules\Stores\Entities\Campaign;
 use Modules\Coupons\Entities\Claim; // Import the Claim model
+use Illuminate\Support\HtmlString;
+use Laracasts\Flash\Flash;
 
 
 class CustomersController extends BackendBaseController
@@ -484,8 +486,35 @@ class CustomersController extends BackendBaseController
         $module_name = $this->module_name;
         $module_path = $this->module_path;
         $module_icon = $this->module_icon;
-        $module_action = 'Visitor'; 
-        return view("{$module_path}.{$module_name}.visitor",compact('module_title', 'module_name', 'module_path', 'module_action','module_icon'));
+        $module_action = 'Visitors'; 
+
+        $role_id = auth()->user()->roles->pluck('id')->toArray();
+        $login_role_id = $role_id[0];
+        $login_user_id = Auth::id();
+
+        $role_id = auth()->user()->roles->pluck('id')->toArray();
+        $login_role_id = $role_id[0];
+        $login_user_id = Auth::id();
+
+        // Fetch visitor data based on the login role
+        if ($login_role_id == 1) {
+            $totalViews = Visitor::where('view', 1)->count();
+            $totalUnviews = Visitor::where('view', 0)->count();
+            $distinctUserCount = Visitor::distinct('user_id_cookie')->count('user_id_cookie');
+        } else {
+            $totalViews = Visitor::where('view', 1)
+                ->where('store_id', '=', $login_user_id)
+                ->count();
+            $totalUnviews = Visitor::where('view', 0)
+                ->where('store_id', '=', $login_user_id)
+                ->count();
+            $distinctUserCount = Visitor::where('store_id', '=', $login_user_id)
+                ->distinct('user_id_cookie')
+                ->count('user_id_cookie');
+        }
+
+        return view("{$module_path}.{$module_name}.visitor",compact('module_title', 'module_name', 'module_path', 
+        'module_action','module_icon','totalViews', 'totalUnviews', 'distinctUserCount'));
     }
 
     public function visitor_data(Request $request)
@@ -570,7 +599,9 @@ class CustomersController extends BackendBaseController
     
     public function claimed_data()
     {
+        $module_name = $this->module_name;
         $claims = Claim::select([
+            'claims.id',
             'claims.customer_id', 
             'users.name as customer_name', 
             'claims.advertisement_id', 
@@ -580,32 +611,131 @@ class CustomersController extends BackendBaseController
             'claims.coupon_id',
             'coupons.title',
             'claims.request_claim', 
-            'claims.email_sent',  
-            'claims.created_at', 
+            'claims.is_claimed',
+            'claims.email_sent', 
+            'claims.shipping_status',
             'claims.updated_at', 
         ])
         ->join('users', 'claims.customer_id', '=', 'users.id')
         ->join('coupons', 'claims.coupon_id', '=', 'coupons.id')
         ->join('advertisement', 'claims.advertisement_id', '=', 'advertisement.id')
         ->get();
-    
+
         return DataTables::of($claims)
+
+            ->addColumn("change_shipping_status", function ($data) use ($module_name) {
+                $claimId = $data->id;
+                $route = route("backend.{$module_name}.update_claim", [
+                    "claimId" => $claimId,
+                ]);
+                $content =
+                    '<div class="d-flex justify-content-center">
+                        <a href="' . $route . '" class="btn btn-primary">Update</a>
+                    </div>';
+                return new HtmlString($content);
+            })
             ->editColumn('request_claim', function ($data) {
                 return $data->request_claim ? 'Yes' : 'No';
             })
+            ->editColumn('shipping_status', function ($data) {
+                $status_text = [
+                    0 => 'Pending',
+                    1 => 'Packed',
+                    2 => 'In transit',
+                    3 => 'Shipped',
+                    4 => 'Completed'
+                ];
+            
+                return isset($status_text[$data->shipping_status]) ? $status_text[$data->shipping_status] : 'Unknown';
+            })
+            ->editColumn('is_claimed', function ($data) {
+                return $data->request_claim ? 'Completed' : 'Pending';
+            })
             ->editColumn('email_sent', function ($data) {
                 return $data->email_sent ? 'Sent to admin' : 'Not Sent';
-            })
-            ->editColumn('created_at', function ($data) {
-                $diff = Carbon::now()->diffInHours($data->created_at);
-                return $diff < 25 ? $data->created_at->diffForHumans() : $data->created_at->isoFormat('llll');
             })
             ->editColumn('updated_at', function ($data) {
                 $diff = Carbon::now()->diffInHours($data->updated_at);
                 return $diff < 25 ? $data->updated_at->diffForHumans() : $data->updated_at->isoFormat('llll');
             })
-            ->rawColumns(['customer_name','request_claim', 'created_at', 'updated_at'])
+            ->rawColumns(['customer_name','request_claim','is_claimed','change_shipping_status','created_at', 'updated_at'])
             ->make(true);
     }
+
+    public function update_claim(Request $request)
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_action = 'Update Shipping Status - Claim'; 
+
+        $claim = Claim::select([
+            'claims.id',
+            'claims.customer_id', 
+            'users.name as customer_name', 
+            'claims.advertisement_id', 
+            'advertisement.advertisement_name', 
+            'claims.name', 
+            'claims.address', 
+            'claims.coupon_id',
+            'coupons.title',
+            'claims.request_claim', 
+            'claims.is_claimed',
+            'claims.email_sent', 
+            'claims.shipping_status',
+            'claims.updated_at', 
+        ])
+        ->join('users', 'claims.customer_id', '=', 'users.id')
+        ->join('coupons', 'claims.coupon_id', '=', 'coupons.id')
+        ->join('advertisement', 'claims.advertisement_id', '=', 'advertisement.id')
+        ->where('claims.id', $request->claimId)
+        ->first(); // Using first() to retrieve a single claim
+        
+        if (!$claim) {
+            return redirect()->route("backend.{$module_name}.claimed")->with('error', 'Claim not found.');
+        }
+    
+        $shipping_status = $claim->shipping_status;
+    
+        return view("{$module_path}.{$module_name}.update_claim", compact('module_title', 'module_name', 'module_path', 
+        'module_action', 'module_icon', 'shipping_status','claim'));
+
+    }
+
+    public function update_shipping_status(Request $request)
+    {
+        $request->validate([
+            'status' => 'required|in:0,1,2,3,4', // Ensure the status is one of the valid values
+        ]);
+    
+        $claim = Claim::find($request->claim_id);
+    
+        if (!$claim) {
+            return redirect()->route("backend.{$this->module_name}.claimed")->with('error', 'Claim not found.');
+        }
+    
+        // Update the shipping status
+        $claim->shipping_status = $request->input('status');
+        $claim->save();
+    
+        $customer = $claim->customer_id;
+        $statusText = [
+            0 => 'Pending',
+            1 => 'Packed',
+            2 => 'In transit',
+            3 => 'Shipped',
+            4 => 'Completed',
+        ];
+    
+        // Get the shipping status text
+        $shippingStatusText = $statusText[$request->input('status')];
+        $customer->notify(new ShippingStatusUpdated($shippingStatusText));
+
+        Flash::success("<i class='fas fa-check'></i> Claim Updated Successfully")->important();
+
+        return redirect()->route("backend.{$this->module_name}.claimed")->with('success', 'Shipping status updated successfully.');
+    }
+    
 }
 

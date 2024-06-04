@@ -36,6 +36,8 @@ Route::group(['namespace' => '\Modules\Customers\Http\Controllers\Backend','as' 
     Route::get("{$module_name}/stats", ['as' => "{$module_name}.stats", 'uses' => "{$controller_name}@stats"]);
     Route::get("{$module_name}/claimed", ['as' => "{$module_name}.claimed", 'uses' => "{$controller_name}@claimed"]);
     Route::get("{$module_name}/claimed_data", ['as' => "{$module_name}.claimed_data", 'uses' => "{$controller_name}@claimed_data"]);
+    Route::get("{$module_name}/update_claim/{claimId}", ['as' => "{$module_name}.update_claim", 'uses' => "{$controller_name}@update_claim"]);
+    Route::post("{$module_name}/update_shipping_status", ['as' => "{$module_name}.update_shipping_status", 'uses' => "{$controller_name}@update_shipping_status"]);
     Route::post("{$module_name}/exportToExcel", ['as' => "{$module_name}.exportToExcel", 'uses' => "{$controller_name}@exportToExcel"]);
     Route::get("{$module_name}/index", ['as' => "{$module_name}.index", 'uses' => "{$controller_name}@index"]);
     Route::get("{$module_name}/index_list", ['as' => "{$module_name}.index_list", 'uses' => "{$controller_name}@index_list"]);

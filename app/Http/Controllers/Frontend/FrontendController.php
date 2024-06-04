@@ -206,18 +206,18 @@ class FrontendController extends Controller
             return abort(Response::HTTP_NOT_FOUND);
         }
 
-
         $claim = Claim::where('customer_id', $request->customer_id)
         ->where('advertisement_id', $request->advertisement_id)
         ->where('coupon_id', $request->coupon_id)
         ->first();
 
         // Check if the coupon is already claimed
-        if ($claim && $claim->is_claimed) {
-            return abort(Response::HTTP_NOT_FOUND);
-            // return redirect()->back()->with('error', 'Coupon has already been claimed.');
+        if ($claim) {
+            $claim->request_claim = 1;
+            $claim->email_sent = 1;
+            $claim->save();
         }
-
+    
         $adminUsers = User::whereHas('roles', function($query) {
             $query->where('name', 'super admin');
         })->get();
@@ -226,17 +226,6 @@ class FrontendController extends Controller
             $adminUser = $adminUsers->first();
             $adminUser->notify(new ClaimRequestNotification($request->name, $request->address, $coupon->code));
         }
-        // Create a new claim record
-        Claim::create([
-            'customer_id' => $request->customer_id, 
-            'advertisement_id' => $request->advertisement_id,
-            'name' => $request->name,
-            'address' => $request->address,
-            'coupon_id' => $request->coupon_id,
-            'is_claimed' => 0,
-            'request_claim' => 1,
-            'email_sent' => 1,
-        ]);
 
         // Redirect to the desired URL
         return redirect()->back()->with('success', 'Coupon claimed successfully!');

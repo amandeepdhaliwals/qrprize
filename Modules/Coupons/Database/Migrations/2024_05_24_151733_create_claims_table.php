@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreign('coupon_id')->references('id')->on('coupons')->onDelete('cascade');
             $table->boolean('is_claimed')->default(false);
             $table->boolean('request_claim')->default(false);
+            $table->boolean('shipping_status')->default(false);
             $table->boolean('email_sent')->default(false);
             $table->integer('created_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();

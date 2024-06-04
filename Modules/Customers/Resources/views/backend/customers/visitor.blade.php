@@ -22,8 +22,33 @@
     color: #888;
 }
 
+.card 
+{
+margin-top: 20px;
+border-radius: 10px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.body-stat {
+font-family: Arial, sans-serif;
+}
+.stat {
+font-size: 1.2rem;
+margin: 10px 0;
+}
+
 </style>
 @section('content')
+<div class="container">
+        <div class="card card-stat">
+            <div class="card-body body-stat">
+                <h4 class="card-title">Total</h4>
+                <p class="stat">Total Visitors: <strong>{{$distinctUserCount}}</strong></p>
+                <p class="stat">Total Views: <strong>{{$totalViews}}</strong></p>
+                <p class="stat">Total Unviews: <strong>{{$totalUnviews}}</strong></p>
+            </div>
+        </div>
+    </div>
+
 <div class="card">
     <div class="card-body">
 

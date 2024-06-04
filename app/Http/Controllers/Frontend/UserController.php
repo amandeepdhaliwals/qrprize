@@ -31,6 +31,7 @@ use Modules\Customers\Entities\CustomerWin;
 use Modules\Stores\Entities\Campaign; 
 use Illuminate\Support\Facades\DB;
 use App\Notifications\UserAccountCreated;
+use Modules\Coupons\Entities\Claim; // Import the Claim model
 
 
 class UserController extends Controller
@@ -898,6 +899,17 @@ class UserController extends Controller
                 'customer_id' => $user_id,
                 'coupon_id' => $coupon_id,
                 'win_time' => now()
+            ]);
+
+            Claim::create([
+                'customer_id' => $customerResult->id, 
+                'advertisement_id' => $advertisement_id,
+                'name' => '-',
+                'address' => '-',
+                'coupon_id' => $coupon_id,
+                'is_claimed' => 0,
+                'request_claim' => 0,
+                'email_sent' => 0,
             ]);
        
         } else {
