@@ -215,6 +215,8 @@ class FrontendController extends Controller
         if ($claim) {
             $claim->request_claim = 1;
             $claim->email_sent = 1;
+            $claim->name = $request->name;
+            $claim->address = $request->address;
             $claim->save();
         }
     

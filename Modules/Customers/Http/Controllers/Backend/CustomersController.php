@@ -648,9 +648,9 @@ class CustomersController extends BackendBaseController
             
                 return isset($status_text[$data->shipping_status]) ? $status_text[$data->shipping_status] : 'Unknown';
             })
-            ->editColumn('is_claimed', function ($data) {
-                return $data->request_claim ? 'Completed' : 'Pending';
-            })
+            // ->editColumn('is_claimed', function ($data) {
+            //     return $data->is_claimed ? 'Completed' : 'Pending';
+            // })
             ->editColumn('email_sent', function ($data) {
                 return $data->email_sent ? 'Sent to admin' : 'Not Sent';
             })
@@ -658,7 +658,7 @@ class CustomersController extends BackendBaseController
                 $diff = Carbon::now()->diffInHours($data->updated_at);
                 return $diff < 25 ? $data->updated_at->diffForHumans() : $data->updated_at->isoFormat('llll');
             })
-            ->rawColumns(['customer_name','request_claim','is_claimed','change_shipping_status','created_at', 'updated_at'])
+            ->rawColumns(['customer_name','request_claim','change_shipping_status','created_at', 'updated_at'])
             ->make(true);
     }
 

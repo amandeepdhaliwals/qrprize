@@ -35,7 +35,7 @@
                             <th>Name</th>
                             <th>Address</th>
                             <th>Request for Claim</th>
-                            <th>Is Claim</th>
+                            <!-- <th>Is Claim</th> -->
                             <th>Email Sent</th>
                             <th>Shipping Status</th>
                             <th>Change Shipping Status</th>
@@ -95,7 +95,7 @@
             { data: 'name', name: 'name' },
             { data: 'address', name: 'address'},
             { data: 'request_claim', name: 'request_claim' },
-            { data: 'is_claimed', name: 'is_claimed' },
+            // { data: 'is_claimed', name: 'is_claimed' },
             { data: 'email_sent', name: 'email_sent' },
             { data: 'shipping_status', name: 'shipping_status' },
             { data: 'change_shipping_status', name: 'change_shipping_status', orderable: false, searchable: false },
