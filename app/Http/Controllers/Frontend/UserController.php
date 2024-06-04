@@ -902,7 +902,7 @@ class UserController extends Controller
             ]);
 
             Claim::create([
-                'customer_id' => $customerResult->id, 
+                'customer_id' => $user_id, 
                 'advertisement_id' => $advertisement_id,
                 'name' => '-',
                 'address' => '-',
