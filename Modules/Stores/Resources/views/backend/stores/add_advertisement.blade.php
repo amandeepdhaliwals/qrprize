@@ -785,21 +785,43 @@ $(document).ready(function() {
         e.preventDefault();
         var clickedButtonValue = this.value;
 
+        var hasError = false;
         // Function to show error messages to the respective field
         function showError(errorField, errorMessage) {
             $(errorField).text(errorMessage);
+            hasError = true;
         }
         function removeError(errorField) {
             $(errorField).text('');
         }
 
-        var validations = [
-            { field: 'advertisement_name', error: 'Please enter advertisement name.', container: '#adv_name', errorField: '#adv_name_error' },
-            { field: 'video_id:checked', error: 'Please select advertisement video.', container: '#adv_video', errorField: '#adv_video_error' },
-            { field: 'heading', error: 'Please enter heading.', container: '#adv_heading', errorField: '#adv_heading_error' },
-          //  { field: 'primary_image_id:checked', error: 'Please select primary image.', container: '#adv_primary', errorField: '#adv_primary_error' },
-            { field: 'heading_other_prize', error: 'Please enter other prize heading.', container: '#adv_other', errorField: '#adv_other_heading_error' }
-        ];
+         // Validate advertisement_name
+         if ($('input[name="advertisement_name"]').val() === '') {
+            showError('#adv_name_error', 'Please enter advertisement name.', '#adv_name');
+         } else {
+            removeError('#adv_name_error', '#adv_name');
+         }
+
+         // Validate video_id
+         if ($('input[name="video_id"]:checked').length === 0) {
+            showError('#adv_video_error', 'Please select advertisement video.', '#adv_video');
+         } else {
+            removeError('#adv_video_error', '#adv_video');
+         }
+
+         // Validate heading
+         if ($('input[name="heading"]').val() === '') {
+            showError('#adv_heading_error', 'Please enter heading.', '#adv_heading');
+         } else {
+            removeError('#adv_heading_error', '#adv_heading');
+         }
+
+         // Validate heading_other_prize
+         if ($('input[name="heading_other_prize"]').val() === '') {
+            showError('#adv_other_heading_error', 'Please enter other prize heading.', '#adv_other');
+         } else {
+            removeError('#adv_other_heading_error', '#adv_other');
+         }
 
         var primary_image_id_checkedValues = $('input[name="primary_image_id[]"]:checked').map(function() {
             return $(this).val();
@@ -825,68 +847,35 @@ $(document).ready(function() {
             return $(this).val();
         }).get();
 
-      //   var lock_time_check = $('select[name="lock_time"]').val();
-
-        var hasError = false;
-
-        for (let i = 0; i < validations.length; i++) {
-            let field = validations[i].field.includes(':checked') ? `input[name="${validations[i].field.split(':')[0]}"]:checked` : `input[name="${validations[i].field}"]`;
-
-            if ($(field).length === 0 || $(field).val() == '') {
-                showError(validations[i].errorField, validations[i].error, validations[i].container);
-                hasError = true;
-            }
-            else{
-               removeError(validations[i].errorField);
-               hasError = false;
-            }
-        }
-
-
         if (primary_image_id_checkedValues.length === 0) {
-            showError('#adv_primary_error', 'Please select at least one primary image.', '#imageGallerySecondary');
-            hasError = true;
+            showError('#adv_primary_error', 'Please select at least one primary image.');
         }
         else{
-            removeError('#secondary_error');
-            hasError = false;
+            removeError('#adv_primary_error');
         }
 
       //   if (secondary_image_id_checkedValues.length === 0) {
       //       showError('#secondary_error', 'Please select at least one secondary image.', '#imageGallerySecondary');
-      //       hasError = true;
+      
       //   }
       //   else{
       //       removeError('#secondary_error');
-      //       hasError = false;
+      // 
       //   }
 
         if (other_coupon_image_ids_checkedValues.length === 0) {
             showError('#adv_other_coupon_error', 'Please select at least one other coupon image.', '#adv_other_coupon');
-            hasError = true;
         }
         else{
             removeError('#adv_other_coupon_error');
-            hasError = false;
         }
 
         if (coupon_id_checkedValues.length === 0) {
             showError('#adv_winning_error', 'Please select at least one winning prize.', '#adv_winning');
-            hasError = true;
         }
         else{
             removeError('#adv_winning_error');
-            hasError = false;
         }
-
-      //   if (lock_time_check == '') {
-      //       showError('#adv_lock_error', 'Please select at least one winning prize.', '#adv_lock');
-      //       hasError = true;
-      //   }
-      //   else{
-      //       removeError('#adv_lock_error');
-      //       hasError = false;
-      //   }
 
         var couponCheckboxes = $('input[name="coupon_id[]"]');
         var numberOfCouponsInputs = $('input[name="no_of_coupon[]"]');
@@ -896,35 +885,31 @@ $(document).ready(function() {
             if (couponCheckboxes[i].checked) {
                if (!numberOfCouponsInputs[i].value) {
                      // Show error message or perform validation here
-                     hasError = true;
                      showError('#adv_winning_error', 'Please enter no of coupons.', '#adv_winning');
                      // For example, you can show an error message or perform other validation logic
                }
                else{
                   removeError('#adv_winning_error');
-                  hasError = false;
+         
                }
                if (!winningRatioInputs[i].value) {
                      // Show error message or perform validation for missing winning ratio
-                     hasError = true;
                      showError('#adv_winning_error_ratio', 'Please enter ratio.', '#adv_winning');
                      // For example, you can show an error message or perform other validation logic
                }
                else{
                   removeError('#adv_winning_error_ratio');
-                  hasError = false;
+         
                }
             }
             else {
                // If the coupon is not checked, but its associated inputs have values, show an error
                if (numberOfCouponsInputs[i].value || winningRatioInputs[i].value) {
-                     hasError = true;
                      showError('#adv_winning_error', 'Please select the winning prize first.', '#adv_winning');
                      // You may show an error message or perform other actions as needed
                }
             }
          }
-
 
      
         if (hasError) {
