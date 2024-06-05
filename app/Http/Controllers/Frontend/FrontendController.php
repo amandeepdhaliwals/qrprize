@@ -70,7 +70,8 @@ class FrontendController extends Controller
             if($advertisement_id){
                 $advertisement_detail = Advertisement::where('id',$advertisement_id)->first();
                 $advertisement_video = Video::where('id',$advertisement_detail->adv_video_id)->where("deleted_at", null)->first();
-                $primary_image = Gallery::where('id',$advertisement_detail->primary_image_id)->where("deleted_at", null)->first();
+                $primary_image_ids = explode(',', $advertisement_detail->primary_image_id);
+                $primary_images = Gallery::whereIn("id", $primary_image_ids)->where("status", 1)->where("deleted_at", null)->get();
                 $secondary_image_ids = explode(',', $advertisement_detail->secondary_images_id);
                 $secondary_images = Gallery::whereIn("id", $secondary_image_ids)->where("status", 1)->whereNull("deleted_at")->get();
                 $other_image_ids = explode(',', $advertisement_detail->other_coupon_images_id);
@@ -95,7 +96,7 @@ class FrontendController extends Controller
                 }
                 $visitor_id = $this->createVisitor($userId, $storeId, $campaignId, $advertisement_id);
                 return view('frontend.campaign',compact('campaignId','advertisement_detail','advertisement_video',
-                'primary_image','secondary_images','other_images','coupons','lock_time','visitor_id'));
+                'primary_images','secondary_images','other_images','coupons','lock_time','visitor_id'));
             }
 
         }else{

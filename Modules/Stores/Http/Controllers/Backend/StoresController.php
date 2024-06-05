@@ -1095,7 +1095,15 @@ class StoresController extends BackendBaseController
         }
         
         $advertisement_name = $requestData['advertisement_name_hid'].$requestData['advertisement_name'];
-        $secondaryImageIdsString = implode(',', $requestData['secondary_image_id']);
+
+        $primaryImageIdsString = implode(',', $requestData['primary_image_id']);
+
+        if(isset($requestData['secondary_image_id']) && !empty($requestData['secondary_image_id'])) {
+            $secondaryImageIdsString = implode(',', $requestData['secondary_image_id']);
+        } else {
+            $secondaryImageIdsString = '';
+        }
+        
         $otherCouponImageIdsString = implode(',', $requestData['other_coupon_image_ids']);
 
     
@@ -1104,7 +1112,7 @@ class StoresController extends BackendBaseController
             "store_id" => $requestData['user_id'],
             "adv_video_id" => $requestData['video_id'],
             "heading" => $requestData['heading'],
-            "primary_image_id" => $requestData['primary_image_id'],
+            "primary_image_id" => $primaryImageIdsString,
             "secondary_images_id" => $secondaryImageIdsString,
             "other_coupon_prize_heading" => $requestData['heading_other_prize'],
             "other_coupon_images_id" => $otherCouponImageIdsString,
@@ -1280,11 +1288,12 @@ class StoresController extends BackendBaseController
             ->where("deleted_at", null)
             ->first();
 
-        $primary_image = Gallery::where("status", 1)
-        ->where("id", $preview_advertisements->primary_image_id)
-        ->where("deleted_at", null)
-        ->first();
+        $primary_image_ids = explode(',', $preview_advertisements->primary_image_id);
 
+        $primary_images = Gallery::whereIn("id", $primary_image_ids)
+        ->where("status", 1)
+        ->where("deleted_at", null)
+        ->get();
 
         $secondary_image_ids = explode(',', $preview_advertisements->secondary_images_id);
 
@@ -1326,7 +1335,7 @@ class StoresController extends BackendBaseController
                 "module_action",
                 "store",
                 "adv_videos",
-                "primary_image",
+                "primary_images",
                 // "advertisement_count_for_name",
                 "other_images",
                 "preview_advertisements",

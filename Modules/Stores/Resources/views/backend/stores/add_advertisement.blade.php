@@ -266,7 +266,7 @@
                      <div class="columns medium-12 small-centered">
                         <!-- <h4 class="float-left"> -->
                         <lable class="required-label">Select Primary Image</lable>
-                        <div class="note">Select any one image from list.</div>
+                        <div class="note">Select multiple images from list for carousel.</div>
                      </div>
                   </div>
                   <div id="imageGallery" class="video-gallery">
@@ -296,7 +296,7 @@
                               
                               </a>
                               <div style="display:flex; align-items: baseline;">
-                              <input style="margin-right:6px" type="radio" id="html{{ $key }}" name="primary_image_id" value="{{ $adv_image->id }}"><br/>
+                              <input style="margin-right:6px" type="checkbox" id="html{{ $key }}" name="primary_image_id[]" value="{{ $adv_image->id }}"><br/>
                               <span class="name"><strong>{{$adv_image->title}}</strong></span>
                               </div>
                            </div>
@@ -318,7 +318,7 @@
                <div class="col-lg-12" id="adv_secondary" >
                   <div class="row">
                      <div class="columns medium-12 small-centered">
-                        <lable class="required-label">Select Secondary Image</lable>
+                        <lable class="">Select Secondary Image</lable>
                         <div class="note">Select multiple images from list for carousel.</div>
                      </div>
                   </div>
@@ -797,9 +797,13 @@ $(document).ready(function() {
             { field: 'advertisement_name', error: 'Please enter advertisement name.', container: '#adv_name', errorField: '#adv_name_error' },
             { field: 'video_id:checked', error: 'Please select advertisement video.', container: '#adv_video', errorField: '#adv_video_error' },
             { field: 'heading', error: 'Please enter heading.', container: '#adv_heading', errorField: '#adv_heading_error' },
-            { field: 'primary_image_id:checked', error: 'Please select primary image.', container: '#adv_primary', errorField: '#adv_primary_error' },
+          //  { field: 'primary_image_id:checked', error: 'Please select primary image.', container: '#adv_primary', errorField: '#adv_primary_error' },
             { field: 'heading_other_prize', error: 'Please enter other prize heading.', container: '#adv_other', errorField: '#adv_other_heading_error' }
         ];
+
+        var primary_image_id_checkedValues = $('input[name="primary_image_id[]"]:checked').map(function() {
+            return $(this).val();
+        }).get();
 
         var secondary_image_id_checkedValues = $('input[name="secondary_image_id[]"]:checked').map(function() {
             return $(this).val();
@@ -838,14 +842,24 @@ $(document).ready(function() {
             }
         }
 
-        if (secondary_image_id_checkedValues.length === 0) {
-            showError('#secondary_error', 'Please select at least one secondary image.', '#imageGallerySecondary');
+
+        if (primary_image_id_checkedValues.length === 0) {
+            showError('#adv_primary_error', 'Please select at least one primary image.', '#imageGallerySecondary');
             hasError = true;
         }
         else{
             removeError('#secondary_error');
             hasError = false;
         }
+
+      //   if (secondary_image_id_checkedValues.length === 0) {
+      //       showError('#secondary_error', 'Please select at least one secondary image.', '#imageGallerySecondary');
+      //       hasError = true;
+      //   }
+      //   else{
+      //       removeError('#secondary_error');
+      //       hasError = false;
+      //   }
 
         if (other_coupon_image_ids_checkedValues.length === 0) {
             showError('#adv_other_coupon_error', 'Please select at least one other coupon image.', '#adv_other_coupon');
@@ -923,7 +937,8 @@ $(document).ready(function() {
             advertisement_name_hid: $('input[name="advertisement_name_hid"]').val(),
             video_id: $('input[name="video_id"]:checked').val(),
             heading: $('input[name="heading"]').val(),
-            primary_image_id: $('input[name="primary_image_id"]:checked').val(),
+           // primary_image_id: $('input[name="primary_image_id"]:checked').val(),
+            primary_image_id: primary_image_id_checkedValues,
             secondary_image_id: secondary_image_id_checkedValues,
             heading_other_prize: $('input[name="heading_other_prize"]').val(),
             other_coupon_image_ids: other_coupon_image_ids_checkedValues,

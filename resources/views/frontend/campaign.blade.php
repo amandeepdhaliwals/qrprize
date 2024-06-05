@@ -90,45 +90,52 @@
 			<!-- End Call To Action Section -->
 
 
-			<section id="second-section" class="second-section">
-				<div class="container" data-aos="zoom-out">
-					<div class="section-header">
-						<h4>{{$advertisement_detail->heading}}</h4>
+			<section id="crousel2">
+				<div class="container">
+				<div class="section-header">
+					<h4>{{$advertisement_detail->heading}}</h4>
 					</div>
-
-					<div class="row gx-lg-0 gy-4">
-
-						<div class="col-lg-12 ">
-							<div class="vacation-banner">
-								<div class="itinerary-tag">
-									<div class="itinerary-box">
-										<ul>
-											<?php
-           $free_services_str = $primary_image->free_services;
-           $primary_free_services = explode(",", $free_services_str);
-           if (in_array("Flight", $primary_free_services)) { ?>
-											<li><img src="{{ asset('assets/img/airplane.svg') }}"></li>
-											<?php }
-           if (in_array("Visa", $primary_free_services)) { ?>
-											<li><img src="{{ asset('assets/img/bed.svg') }}"></li>
-											<?php }
-           if (in_array("Documentation", $primary_free_services)) { ?>
-											<li><img src="{{ asset('assets/img/doc.svg') }}"></li>
-											<?php }
-           ?>
-
-										</ul>
-									</div>
-								</div>
-								<div class="bottom-shadow"></div>
-								<img class="vacation-img" src="{{ url('/storage').'/'.$primary_image->image }}">
-								<h5>{{$primary_image->title}}</h5>
+				<div id="carouselExampleCaptions2" class="carousel slide">
+				<div class="carousel-indicators">
+					@foreach($primary_images as $key => $primary_image)
+						<button type="button" data-bs-target="#carouselExampleCaptions2" data-bs-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $key + 1 }}"></button>
+					@endforeach
+				</div>
+				<div class="carousel-inner">
+					@foreach($primary_images as $key => $primary_image)
+						<div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+							<div class="itinerary-tag">
+							<div class="itinerary-box">
+								<ul>
+								<?php $free_services_str = $primary_image->free_services;
+								$primary_free_services = explode(",", $free_services_str);
+								if(in_array('Flight',$primary_free_services)){
+								?>
+								<li><img src="{{ asset('assets/img/airplane.svg') }}"></li>
+								<?php } 
+								if(in_array('Visa',$primary_free_services)){
+								?>
+								<li><img src="{{ asset('assets/img/bed.svg') }}"></li>
+								<?php } 
+								if(in_array('Documentation',$primary_free_services)){
+								?>
+								<li><img src="{{ asset('assets/img/doc.svg') }}"></li>
+								<?php } ?>
+								</ul>
+							</div>
+							</div> 
+							<img src="{{ Storage::url($primary_image->image) }}" class="d-block w-100" alt="...">
+							<div class="carousel-caption d-md-block">
+						
+								<!-- Add your dynamic content here if needed -->
+								<h5>{{ $primary_image->title }}</h5>
 							</div>
 						</div>
-					</div>
+					@endforeach
 				</div>
+			</div>
+			</div>
 			</section>
-
 
 			<section id="crousel">
 				<div class="container">

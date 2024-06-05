@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('store_id'); 
             $table->integer('adv_video_id'); 
             $table->string('heading')->nullable();
-            $table->integer('primary_image_id');
+            $table->text('primary_image_id')->nullable();
             $table->text('secondary_images_id')->nullable();
             $table->string('other_coupon_prize_heading')->nullable();
             $table->text('other_coupon_images_id')->nullable();
