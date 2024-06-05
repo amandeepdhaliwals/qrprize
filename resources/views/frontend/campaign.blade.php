@@ -13,7 +13,7 @@
 
 		<!-- Favicons -->
 		<!--   <link href="" rel="icon">
-  <link href="" rel="apple-touch-icon" -->
+		<link href="" rel="apple-touch-icon" -->
 
 		<!-- Google Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,23 +44,24 @@
 		</style>
 	</head>
 	<style>
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
-            height: 0;
-            overflow: hidden;
-            max-width: 100%;
-            background: #000;
-        }
+		.video-container {
+			position: relative;
+			padding-bottom: 56.25%;
+			/* 16:9 aspect ratio */
+			height: 0;
+			overflow: hidden;
+			max-width: 100%;
+			background: #000;
+		}
 
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+		.video-container iframe {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
 
 	<body>
 
@@ -69,7 +70,7 @@
 
 			<section id="call-to-action" class="call-to-action">
 				<div class="banner-img">
-				<!-- <div class="container text-center" data-aos="zoom-out"> -->
+					<!-- <div class="container text-center" data-aos="zoom-out"> -->
 					<div class="video-container" data-aos="zoom-out">
 
 						@if($advertisement_video->media_type == "Video" || $advertisement_video->media_type == "video")
@@ -81,7 +82,7 @@
 						<div id="player"></div>
 						<!-- <iframe id="youtube-player" width="100%" height="100%" src="{{ $advertisement_video->media }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
 						@elseif($advertisement_video->media_type == "Vimeo" || $advertisement_video->media_type == "vimeo")
-						<iframe id="vimeo-player"  src="{{ $advertisement_video->media }}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+						<iframe id="vimeo-player" src="{{ $advertisement_video->media }}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
 						@endif
 					</div>
 				</div>
@@ -89,52 +90,51 @@
 
 			<!-- End Call To Action Section -->
 
-
 			<section id="crousel2">
 				<div class="container">
-				<div class="section-header">
-					<h4>{{$advertisement_detail->heading}}</h4>
+					<div class="section-header">
+						<h4>{{$advertisement_detail->heading}}</h4>
 					</div>
-				<div id="carouselExampleCaptions2" class="carousel slide">
-				<div class="carousel-indicators">
-					@foreach($primary_images as $key => $primary_image)
-						<button type="button" data-bs-target="#carouselExampleCaptions2" data-bs-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $key + 1 }}"></button>
-					@endforeach
-				</div>
-				<div class="carousel-inner">
-					@foreach($primary_images as $key => $primary_image)
-						<div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-							<div class="itinerary-tag">
-							<div class="itinerary-box">
-								<ul>
-								<?php $free_services_str = $primary_image->free_services;
-								$primary_free_services = explode(",", $free_services_str);
-								if(in_array('Flight',$primary_free_services)){
-								?>
-								<li><img src="{{ asset('assets/img/airplane.svg') }}"></li>
-								<?php } 
-								if(in_array('Visa',$primary_free_services)){
-								?>
-								<li><img src="{{ asset('assets/img/bed.svg') }}"></li>
-								<?php } 
-								if(in_array('Documentation',$primary_free_services)){
-								?>
-								<li><img src="{{ asset('assets/img/doc.svg') }}"></li>
-								<?php } ?>
-								</ul>
-							</div>
-							</div> 
-							<img src="{{ Storage::url($primary_image->image) }}" class="d-block w-100" alt="...">
-							<div class="carousel-caption d-md-block">
-						
-								<!-- Add your dynamic content here if needed -->
-								<h5>{{ $primary_image->title }}</h5>
-							</div>
+					<div id="carouselExampleCaptions2" class="carousel slide">
+						<div class="carousel-indicators">
+							@foreach($primary_images as $key => $primary_image)
+							<button type="button" data-bs-target="#carouselExampleCaptions2" data-bs-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $key + 1 }}"></button>
+							@endforeach
 						</div>
-					@endforeach
+						<div class="carousel-inner">
+							@foreach($primary_images as $key => $primary_image)
+							<div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+								<div class="itinerary-tag">
+									<div class="itinerary-box">
+										<ul>
+											<?php
+												$free_services_str = $primary_image->free_services;
+												$primary_free_services = explode(",", $free_services_str);
+												if (in_array("Flight", $primary_free_services)) { ?>
+																					<li><img src="{{ asset('assets/img/airplane.svg') }}"></li>
+																					<?php }
+												if (in_array("Visa", $primary_free_services)) { ?>
+																					<li><img src="{{ asset('assets/img/bed.svg') }}"></li>
+																					<?php }
+												if (in_array("Documentation", $primary_free_services)) { ?>
+											    <li><img src="{{ asset('assets/img/doc.svg') }}"></li>
+											<?php
+											 }
+        									 ?>
+										</ul>
+									</div>
+								</div>
+								<img src="{{ Storage::url($primary_image->image) }}" class="d-block w-100" alt="...">
+								<div class="carousel-caption d-md-block">
+
+									<!-- Add your dynamic content here if needed -->
+									<h5>{{ $primary_image->title }}</h5>
+								</div>
+							</div>
+							@endforeach
+						</div>
+					</div>
 				</div>
-			</div>
-			</div>
 			</section>
 
 			<section id="crousel">
@@ -152,9 +152,9 @@
 									<div class="itinerary-box">
 										<ul>
 											<?php
-           $free_services_str = $secondary_image->free_services;
-           $secondary_free_services = explode(",", $free_services_str);
-           ?>
+											$free_services_str = $secondary_image->free_services;
+											$secondary_free_services = explode(",", $free_services_str);
+											?>
 											@if(in_array('Flight',$secondary_free_services)) <li><img src="{{ asset('assets/img/airplane.svg') }}"></li>@endif
 											@if(in_array('Visa',$secondary_free_services)) <li><img src="{{ asset('assets/img/bed.svg') }}"></li>@endif
 											@if(in_array('Documentation',$secondary_free_services)) <li><img src="{{ asset('assets/img/doc.svg') }}"></li>@endif
@@ -218,35 +218,31 @@
 					</div>
 				</div>
 				<!-- <div id="txt"></div> -->
-       
+
 			</section><!-- End spin wheel Section -->
 
-    
 			<section class="spinner">
-
 				<div class="container">
-        <div class="row countdown-row" id="div-id-countdown-row">
-          <div class="col-12">
-            <div id="betterluckcountdown" class="betterluckcountdown"></div>
-          </div>
-          <div class="col-12">
-            <p id="p-better-luck"></p>
-            </div>
-          </div>
+					<div class="row countdown-row" id="div-id-countdown-row">
+						<div class="col-12">
+							<div id="betterluckcountdown" class="betterluckcountdown"></div>
+						</div>
+						<div class="col-12">
+							<p id="p-better-luck"></p>
+						</div>
+					</div>
 					<div class="row">
 						<div class="col-12 text-center">
 							<button id="spin-button" class='butn butn__new mt-4'><span>SPIN!</span></button>
-              <a href="" id="spin-button-a" class='butn butn__new mt-4'><span>SPIN!</span></a>
+							<a href="" id="spin-button-a" class='butn butn__new mt-4'><span>SPIN!</span></a>
 						</div>
 						<div class="col-12 mt-2">
 							<p id="rvw-text" class="review-text">Please view the video above to spin the wheel.</p>
 							<!-- <div id="watched-time" class="container text-center" style="margin-top: 20px;">Watched Time: 0 seconds</div> -->
+						</div>
 					</div>
-				</div>
-        <div id="scroll-down-div"></div>
+					<div id="scroll-down-div"></div>
 			</section>
-
-
 		</main><!-- End #main -->
 
 		<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -304,7 +300,7 @@
 						<div class="text-center loginModal-header">
 							<img src="{{ asset('assets/Impact/assets/img/login-lock.svg') }}">
 							<h4>Enter OTP received on your
-								email & phone number to verify!</h4>
+								email to verify!</h4>
 						</div>
 						<div class="">
 							<div class="login-input">
@@ -314,10 +310,6 @@
 								<input type="hidden" name="user_id_otp">
 								<input type="text" placeholder="Email OTP" name="email_otp">
 								<div id="email_otp_error" style="color:red"></div>
-							</div>
-							<div class="login-input">
-								<input type="text" placeholder="Phone Number OTP" name="phone_number_otp">
-								<div id="phone_number_otp_error" style="color:red"></div>
 							</div>
 						</div>
 						<div class="otp-resend">
@@ -329,7 +321,7 @@
 						<a href="#" id="otp_verification" class='butn butn__new mt-4 unlock-results-btn'><span>Unlock Result</span></a>
 						<div id="incorrect_error" style="color:red"></div>
 						<div id="otp_email"></div>
-						<div id="otp_mobile"></div>
+
 
 					</div>
 				</div>
@@ -359,12 +351,12 @@
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <script>
-      $(document).ready(function(){
+		<script>
+			$(document).ready(function() {
 
-      $('#div-id-countdown-row').css('display','none');
-		
-     });
+				$('#div-id-countdown-row').css('display', 'none');
+
+			});
 		</script>
 
 		<script type="text/javascript">
@@ -375,22 +367,25 @@
 
 			$(document).ready(function() {
 
-        $('#spin-button').click(function(){
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+				$('#spin-button').click(function() {
+					window.scrollTo({
+						top: 0,
+						behavior: 'smooth'
+					});
+				});
 				/*WHEEL SPIN FUNCTION*/
 				$('#spin').click(function() {
-          $('input[name="first_name"]').val('');
-          $('input[name="last_name"]').val('');
-          $('input[name="email"]').val('');
-          $('input[name="phone_number"]').val('');
-            
+					$('input[name="first_name"]').val('');
+					$('input[name="last_name"]').val('');
+					$('input[name="email"]').val('');
+					$('input[name="phone_number"]').val('');
+
 					//add 1 every click
 					clicks++;
 
 					/*multiply the degree by number of clicks
-          generate random number between 1 - 360, 
-          then add to the new degree*/
+					generate random number between 1 - 360, 
+					then add to the new degree*/
 					var newDegree = degree * clicks;
 					var extraDegree = Math.floor(Math.random() * (360 - 1 + 1)) + 1;
 					totalDegree = newDegree + extraDegree;
@@ -490,10 +485,10 @@
 					video.addEventListener("ended", function() {
 						console.log("Video ended.");
 						var visitorId = {{$visitor_id}};
-           				updateView(visitorId);
+						updateView(visitorId);
 						enableSpinner();
 						$('#spin-button').hide();
-            			$('#spin-button-a').hide();
+						$('#spin-button-a').hide();
 						$('#rvw-text').hide();
 
 						var watchedTime = Math.floor(video.currentTime);
@@ -517,26 +512,26 @@
 					player.on('ended', function() {
 						console.log('The video has ended');
 						var visitorId = {{$visitor_id}};
-           				updateView(visitorId);
+						updateView(visitorId);
 						enableSpinner();
 						$('#spin-button').hide();
-            			$('#spin-button-a').hide();
+						$('#spin-button-a').hide();
 						$('#rvw-text').hide();
 						var watchedTime = Math.floor(video.currentTime);
 						var timetext = "Watched time: " + watchedTime + " seconds";
 					});
 
 					function handleScroll() {
-					var position = vimeo.getBoundingClientRect();
-					// Pause the video if it's in the viewport
-					if (position.top <= -150 && position.bottom <= window.innerHeight) {
-						player.pause();
+						var position = vimeo.getBoundingClientRect();
+						// Pause the video if it's in the viewport
+						if (position.top <= -150 && position.bottom <= window.innerHeight) {
+							player.pause();
+						}
 					}
-				}
 
-				// Listen for scroll event
-				window.addEventListener("scroll", handleScroll);
-				} 
+					// Listen for scroll event
+					window.addEventListener("scroll", handleScroll);
+				}
 
 			});
 		</script>
@@ -581,7 +576,8 @@
 						setTimeout(function() {
 							$('#email_error').empty();
 						}, 3000);
-					} else if ($('input[name="phone_number"]').val() == '') {
+					}
+					else if ($('input[name="phone_number"]').val() == '') {
 						$('#phone_number_error').text('Please enter phone number.');
 						// $('html, body').animate({
 						//    scrollTop: $('#adv_video').offset().top - 150 // Adjust the value as needed
@@ -589,8 +585,8 @@
 						setTimeout(function() {
 							$('#phone_number_error').empty();
 						}, 3000);
-
-					} else {
+					 } 
+					else {
 						var customData = {
 							store_id: $('input[name="store_id"]').val(),
 							campaign_id: $('input[name="campaign_id"]').val(),
@@ -610,45 +606,43 @@
 							contentType: "application/json",
 							success: function(response) {
 								// Handle success response
-                             console.log(response);
+								// console.log(response);
 								if (response.response_type == 'success') {
 
-                  if(response.status == 'otp_send_customerVerify' || 
-                      response.status == 'otp_send' ){
-                      $('#loginModal').modal('hide');
-                      $('#otpModal').modal('show');
-                      startTimer(); //otp timer
-                      disableResendButton();
-                      document.querySelector('input[name="store_id_otp"]').value = response.storeId;
-                      document.querySelector('input[name="campaign_id_otp"]').value = response.campaign_id;
-                      document.querySelector('input[name="advertisement_id_otp"]').value = response.adverisement_id;
-                      document.querySelector('input[name="user_id_otp"]').value = response.user_id;
+									if (response.status == 'otp_send_customerVerify' ||
+										response.status == 'otp_send') {
+										$('#loginModal').modal('hide');
+										$('#otpModal').modal('show');
+										startTimer(); //otp timer
+										disableResendButton();
+										document.querySelector('input[name="store_id_otp"]').value = response.storeId;
+										document.querySelector('input[name="campaign_id_otp"]').value = response.campaign_id;
+										document.querySelector('input[name="advertisement_id_otp"]').value = response.adverisement_id;
+										document.querySelector('input[name="user_id_otp"]').value = response.user_id;
 
-                      document.getElementById("otp_email").textContent = 'Dummy OTP For Email: ' + response.email_otp;
-                      document.getElementById("otp_mobile").textContent = 'Dummy OTP For Mobile: ' + response.mobile_otp;
-                  }
-               
-                  if (response.status == 'customer_result'){
-                    if (response.result) {
-                        $('#otpModal').modal('hide');
+										document.getElementById("otp_email").textContent = 'Dummy OTP For Email: ' + response.email_otp;
+									}
 
-                        var APP_URL = {!! json_encode(url('/')) !!}
-                        var url = APP_URL + '/win/' + response.storeId + '/campaign/' + response.campaign_id;
-                        window.location.href = url;
-                      } else {
-                        $('#otpModal').modal('hide');
-                        var APP_URL = {!! json_encode(url('/')) !!}
-                        var url = APP_URL + '/better_luck/' + response.storeId + '/campaign/' + response.campaign_id;
-                        window.location.href = url;
-                      }
-                  }
-                }
-                else{
-                  if(response.status == 'locked') {
-                    $('#loginModal').modal('hide');
-                    countdownLocked(response.lockDateTime);
-							  	}
-                }	
+									if (response.status == 'customer_result') {
+										if (response.result) {
+											$('#otpModal').modal('hide');
+
+											var APP_URL = {!! json_encode(url('/')) !!}
+											var url = APP_URL + '/win/' + response.storeId + '/campaign/' + response.campaign_id;
+											window.location.href = url;
+										} else {
+											$('#otpModal').modal('hide');
+											var APP_URL = {!! json_encode(url('/')) !!}
+											var url = APP_URL + '/better_luck/' + response.storeId + '/campaign/' + response.campaign_id;
+											window.location.href = url;
+										}
+									}
+								} else {
+									if (response.status == 'locked') {
+										$('#loginModal').modal('hide');
+										countdownLocked(response.lockDateTime);
+									}
+								}
 							},
 							error: function(xhr, status, error) {
 								// Handle error
@@ -673,12 +667,12 @@
 											$('#email_error').empty();
 										}, 2000);
 									}
-									if (firstErrorKey == 'mobile') {
-										$('#phone_number_error').text(errors[firstErrorKey][0]);
-										setTimeout(function() {
-											$('#phone_number_error').empty();
-										}, 2000);
-									}
+									// if (firstErrorKey == 'mobile') {
+									// 	$('#phone_number_error').text(errors[firstErrorKey][0]);
+									// 	setTimeout(function() {
+									// 		$('#phone_number_error').empty();
+									// 	}, 2000);
+									// }
 
 									//  displayErrors(errors);
 								} else {
@@ -708,44 +702,45 @@
 					}, 1000);
 				}
 
-        function countdownLocked(lockDateTime)
-        {
-           $('#div-id-countdown-row').css('display','block');
-          	// Set the date we're counting down to
-            var countDownDate = new Date(lockDateTime).getTime();
-            // Update the count down every 1 second
-            var x = setInterval(function() {
+				function countdownLocked(lockDateTime) {
+					$('#div-id-countdown-row').css('display', 'block');
+					// Set the date we're counting down to
+					var countDownDate = new Date(lockDateTime).getTime();
+					// Update the count down every 1 second
+					var x = setInterval(function() {
 
-            // Get today's date and time
-            var now = new Date().getTime();
-            console.log(countDownDate,now);
+						// Get today's date and time
+						var now = new Date().getTime();
+						console.log(countDownDate, now);
 
-            // Find the distance between now and the count down date
-            var distance = countDownDate - now;
+						// Find the distance between now and the count down date
+						var distance = countDownDate - now;
 
-            // Time calculations for days, hours, minutes and seconds
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+						// Time calculations for days, hours, minutes and seconds
+						var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+						var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+						var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // Output the result in an element with id="demo"
-            document.getElementById("betterluckcountdown").innerHTML = hours + "h : " +
-              minutes + "m : " + seconds + "s";
+						// Output the result in an element with id="demo"
+						document.getElementById("betterluckcountdown").innerHTML = hours + "h : " +
+							minutes + "m : " + seconds + "s";
 
-            document.getElementById("p-better-luck").innerHTML = "Worry not, you can try again after " + hours + " hours " +  minutes + " minutes ";
-              
+						document.getElementById("p-better-luck").innerHTML = "Worry not, you can try again after " + hours + " hours " + minutes + " minutes ";
 
-            // If the count down is over, write some text 
-            if (distance < 0) {
-              clearInterval(x);
-              //document.getElementById("betterluckcountdown").innerHTML = "Unlocked";
-              $('#betterluckcountdown').hide();
-            }
-          }, 1000);
 
-            var targetDiv = document.getElementById('scroll-down-div');
-            targetDiv.scrollIntoView({ behavior: 'smooth' });
-        }
+						// If the count down is over, write some text 
+						if (distance < 0) {
+							clearInterval(x);
+							//document.getElementById("betterluckcountdown").innerHTML = "Unlocked";
+							$('#betterluckcountdown').hide();
+						}
+					}, 1000);
+
+					var targetDiv = document.getElementById('scroll-down-div');
+					targetDiv.scrollIntoView({
+						behavior: 'smooth'
+					});
+				}
 
 				$('#resend-button').click(function(e) {
 
@@ -773,10 +768,10 @@
 							startTimer();
 							disableResendButton();
 							document.getElementById("otp_email").textContent = 'Dummy OTP For Email: ' + response.email_otp;
-							document.getElementById("otp_mobile").textContent = 'Dummy OTP For Mobile: ' + response.mobile_otp;
-              if(response.response_type == 'failed'){
-                $('#incorrect_error').text(response.message);
-              }
+							// document.getElementById("otp_mobile").textContent = 'Dummy OTP For Mobile: ' + response.mobile_otp;
+							if (response.response_type == 'failed') {
+								$('#incorrect_error').text(response.message);
+							}
 						},
 						error: function(xhr, status, error) {
 							console.error(error);
@@ -801,20 +796,22 @@
 							$('#email_otp_error').empty();
 						}, 3000);
 
-					} else if ($('input[name="phone_number_otp"]').val() == '') {
-						$('#phone_number_otp_error').text('Please enter phone number OTP.');
-						setTimeout(function() {
-							$('#phone_number_otp_error').empty();
-						}, 3000);
+					}
+					// else if ($('input[name="phone_number_otp"]').val() == '') {
+					// 	$('#phone_number_otp_error').text('Please enter phone number OTP.');
+					// 	setTimeout(function() {
+					// 		$('#phone_number_otp_error').empty();
+					// 	}, 3000);
 
-					} else {
+					// } 
+					else {
 						var customData = {
 							store_id: $('input[name="store_id_otp"]').val(),
 							campaign_id: $('input[name="campaign_id_otp"]').val(),
 							advertisement_id: $('input[name="advertisement_id_otp"]').val(),
 							user_id: $('input[name="user_id_otp"]').val(),
 							email_otp: $('input[name="email_otp"]').val(),
-							mobile_otp: $('input[name="phone_number_otp"]').val(),
+							//mobile_otp: $('input[name="phone_number_otp"]').val(),
 							_token: '{{csrf_token()}}'
 						};
 
@@ -829,12 +826,12 @@
 								if (response.response_type == 'success') {
 									if (response.result == true) {
 										$('#otpModal').modal('hide');
-                                        var APP_URL = {!! json_encode(url('/')) !!}
+										var APP_URL = {!! json_encode(url('/')) !!}
 										var url = APP_URL + '/win/' + response.cust_result_id;
 										window.location.href = url;
 									} else {
 										$('#otpModal').modal('hide');
-                    					var APP_URL = {!! json_encode(url('/')) !!}
+										var APP_URL = {!! json_encode(url('/')) !!}
 										var url = APP_URL + '/better_luck/' + response.storeId + '/campaign/' + response.campaign_id;
 										window.location.href = url;
 									}
@@ -852,103 +849,104 @@
 			});
 		</script>
 		<script>
-		var advertisementVideo = {
-			media_type: "<?php echo addslashes($advertisement_video->media_type); ?>"
-		};
-  	if(advertisementVideo.media_type == "Youtube" || advertisementVideo.media_type == "youtube"){ 
-		function getYouTubeVideoId(url) {
-				const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-				const matches = url.match(regex);
-				return matches ? matches[1] : null;
-		}
-
-      	var videoUrl = "{{ $advertisement_video->media }}"; // Static video URL for testing
-      	var videoId = getYouTubeVideoId(videoUrl);
-      	console.log("Extracted Video ID:", videoId);
-      if(videoId){
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-			var player;
-			function onYouTubeIframeAPIReady() {
-			player = new YT.Player('player', {
-				height: '100%',
-				width: '100%',
-				videoId: videoId,
-				events: {
-				'onReady': onPlayerReady,
-				'onStateChange': onPlayerStateChange
-				}
-			});
-			}
-
-			function onPlayerReady(event) {
-			console.log('ready')
-			event.target.playVideo();
-			}
-
-			function onPlayerStateChange(event) {
-					console.log('Player state changed:', event.data); // Log the state change
-					if (event.data == YT.PlayerState.PLAYING) {
-						console.log('Video is playing');
-					} else if (event.data == YT.PlayerState.ENDED) {
-						console.log('Video has ended');
-						var visitorId = {{$visitor_id}};
-						updateView(visitorId);
-						document.getElementById("spinner-overlay").style.display = "none";
-						$('#spin-button').hide();
-            			$('#spin-button-a').hide();
-						$('#rvw-text').hide();
-					}
-			}
-       
-			function pauseVideo() {
-			if (player) {
-				player.pauseVideo();
-			}
-			}
-
-			function NotPlayerInViewport() {
-				const rect = document.getElementById('player').getBoundingClientRect();
-				console.log(rect.top);
-				return (
-					rect.top <= -150 && rect.bottom <= window.innerHeight
-				);
+			var advertisementVideo = {
+				media_type: "<?php echo addslashes($advertisement_video->media_type); ?>"
+			};
+			if (advertisementVideo.media_type == "Youtube" || advertisementVideo.media_type == "youtube") {
+				function getYouTubeVideoId(url) {
+					const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+					const matches = url.match(regex);
+					return matches ? matches[1] : null;
 				}
 
-				window.addEventListener('scroll', function() {
-				if (NotPlayerInViewport()) {
-					pauseVideo();
-				}
-				});
-			}
-		}
+				var videoUrl = "{{ $advertisement_video->media }}"; // Static video URL for testing
+				var videoId = getYouTubeVideoId(videoUrl);
+				console.log("Extracted Video ID:", videoId);
+				if (videoId) {
+					var tag = document.createElement('script');
+					tag.src = "https://www.youtube.com/iframe_api";
+					var firstScriptTag = document.getElementsByTagName('script')[0];
+					firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-		function updateView(visitorId) {
-					// Make an AJAX request to update the view
-					var customData = {
-						visitorId: visitorId,
-						_token: '{{csrf_token()}}'
-						};
-					var jsonData = JSON.stringify(customData);
-					   $.ajax({
-							type: 'POST',
-							url: '{{ route("frontend.updateVisitor") }}', // URL to submit form data
-							data: jsonData,
-							contentType: "application/json",
-							success: function(response) {
-								// Handle success response            
-								console.log("View updated successfully.");
-							},
-							error: function(xhr, status, error) {
-								// Handle error
-								console.error(error);
+					var player;
+
+					function onYouTubeIframeAPIReady() {
+						player = new YT.Player('player', {
+							height: '100%',
+							width: '100%',
+							videoId: videoId,
+							events: {
+								'onReady': onPlayerReady,
+								'onStateChange': onPlayerStateChange
 							}
 						});
+					}
+
+					function onPlayerReady(event) {
+						console.log('ready')
+						event.target.playVideo();
+					}
+
+					function onPlayerStateChange(event) {
+						console.log('Player state changed:', event.data); // Log the state change
+						if (event.data == YT.PlayerState.PLAYING) {
+							console.log('Video is playing');
+						} else if (event.data == YT.PlayerState.ENDED) {
+							console.log('Video has ended');
+							var visitorId = {{$visitor_id}};
+							updateView(visitorId);
+							document.getElementById("spinner-overlay").style.display = "none";
+							$('#spin-button').hide();
+							$('#spin-button-a').hide();
+							$('#rvw-text').hide();
+						}
+					}
+
+					function pauseVideo() {
+						if (player) {
+							player.pauseVideo();
+						}
+					}
+
+					function NotPlayerInViewport() {
+						const rect = document.getElementById('player').getBoundingClientRect();
+						console.log(rect.top);
+						return (
+							rect.top <= -150 && rect.bottom <= window.innerHeight
+						);
+					}
+
+					window.addEventListener('scroll', function() {
+						if (NotPlayerInViewport()) {
+							pauseVideo();
+						}
+					});
 				}
-  </script>
+			}
+
+			function updateView(visitorId) {
+				// Make an AJAX request to update the view
+				var customData = {
+					visitorId: visitorId,
+					_token: '{{csrf_token()}}'
+				};
+				var jsonData = JSON.stringify(customData);
+				$.ajax({
+					type: 'POST',
+					url: '{{ route("frontend.updateVisitor") }}', // URL to submit form data
+					data: jsonData,
+					contentType: "application/json",
+					success: function(response) {
+						// Handle success response            
+						console.log("View updated successfully.");
+					},
+					error: function(xhr, status, error) {
+						// Handle error
+						console.error(error);
+					}
+				});
+			}
+		</script>
 	</body>
 
 </html>

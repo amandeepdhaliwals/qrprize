@@ -503,21 +503,16 @@ class UserController extends Controller
 
         $module_action = 'Details';
 
-         // Check if a user already exists with the same email and mobile
+         // Check if a user already exists with the same email
         $existingUser = User::where('email', $request->email)
-        ->where('mobile', $request->mobile)
         ->first();
 
         if ($existingUser) { 
             $otpVerificationEmail = OtpVerification::where('user_id', $existingUser->id)
             ->where('type', 'email')
             ->first();
-            $otpVerificationMobile = OtpVerification::where('user_id', $existingUser->id)
-                        ->where('type', 'mobile')
-                        ->first();
                       
-            if (($otpVerificationEmail && $otpVerificationEmail->is_verified == 0) ||
-              ($otpVerificationMobile && $otpVerificationMobile->is_verified == 0)) 
+            if ($otpVerificationEmail && $otpVerificationEmail->is_verified == 0) 
             {    
               
                 $otpCodes =   $this->generateAndSendOtp($existingUser->id);
@@ -529,7 +524,6 @@ class UserController extends Controller
                     'response_type' => 'success',
                     'status' => 'otp_send_customerVerify',
                     'email_otp' => $otpCodes['email_otp'], /// will remove
-                    'mobile_otp' => $otpCodes['mobile_otp'],  /// will remove
                 ]);
             }
             else{  //// customer already verified
@@ -660,7 +654,6 @@ class UserController extends Controller
             'response_type' => 'success',
             'status' => 'otp_send',
             'email_otp' =>  $otpCodes['email_otp'],  /// will remove
-            'mobile_otp' => $otpCodes['mobile_otp'], /// will remove
         ]);
      }
     }
@@ -703,7 +696,6 @@ class UserController extends Controller
             'adverisement_id' => $request->advertisement_id,
             'response_type' => 'success',
             'email_otp' => $otpCodes['email_otp'], /// will remove
-            'mobile_otp' => $otpCodes['mobile_otp'],  /// will remove
         ]);
     }
 
@@ -726,22 +718,11 @@ class UserController extends Controller
             'expires_at' => Carbon::now()->addMinutes(5)
         ]);
 
-        // Generate new OTP code for mobile
-        $otpCodeMobile = rand(100000, 999999);
-        OtpVerification::create([
-            'user_id' => $userId,
-            'otp_code' => $otpCodeMobile,
-            'type' => 'mobile',
-            'is_verified' => 0,
-            'expires_at' => Carbon::now()->addMinutes(5)
-        ]);
-
         // Send the OTP via email or mobile
          $user = User::find($userId);
          Notification::send($user, new OTPNotification($otpCodeEmail));
         return [
             'email_otp' => $otpCodeEmail,
-            'mobile_otp' => $otpCodeMobile
         ];
     }
 
@@ -756,7 +737,7 @@ class UserController extends Controller
     
         $module_action = 'Details';
     
-        $verificationResult = $this->verifyOtp($request->user_id, $request->email_otp, $request->mobile_otp);
+        $verificationResult = $this->verifyOtp($request->user_id, $request->email_otp);
     
         if ($verificationResult['status'] == 'success') {
             $resultHandleCustomer =  $this->handleCustomerWinning($request->user_id, $request->advertisement_id, $request->campaign_id, $request->store_id);
@@ -779,29 +760,19 @@ class UserController extends Controller
         ]);
     }
     
-    public function verifyOtp($userId, $otpCodeEmail, $otpCodeMobile) {
+    public function verifyOtp($userId, $otpCodeEmail) {
         // Fetch the OTP record for email
         $otp_email = OtpVerification::where('user_id', $userId)
                     ->where('otp_code', $otpCodeEmail)
                     ->where('type', 'email')
                     ->first();
     
-        // Fetch the OTP record for mobile
-        $otp_mobile = OtpVerification::where('user_id', $userId)
-                    ->where('otp_code', $otpCodeMobile)
-                    ->where('type', 'mobile')
-                    ->first();
     
         // Check if email OTP is valid and not expired
         if ($otp_email && $otp_email->expires_at > Carbon::now() && !$otp_email->is_verified) {
-            // Check if mobile OTP is valid and not expired
-            if ($otp_mobile && $otp_mobile->expires_at > Carbon::now() && !$otp_mobile->is_verified) {
-                // Mark both OTPs as verified
+        
                 $otp_email->is_verified = 1;
                 $otp_email->save();
-    
-                $otp_mobile->is_verified = 1;
-                $otp_mobile->save();
     
                 //// create password for user
                 $password = Str::random(8);
@@ -818,10 +789,6 @@ class UserController extends Controller
                 $user->notify(new UserAccountCreated($data));
                 
                 return ['status' => 'success']; // Both OTPs are valid and verified
-            } else {
-                // Mobile OTP is invalid or expired
-                return ['status' => 'error', 'message' => 'Mobile OTP is invalid or expired'];
-            }
         } else {
             // Email OTP is invalid or expired
             return ['status' => 'error', 'message' => 'Email OTP is invalid or expired'];
