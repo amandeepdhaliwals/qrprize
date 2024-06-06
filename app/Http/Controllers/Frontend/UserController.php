@@ -503,8 +503,13 @@ class UserController extends Controller
 
         $module_action = 'Details';
 
+        $rolesId = [5];
+
          // Check if a user already exists with the same email
         $existingUser = User::where('email', $request->email)
+        ->whereHas('roles', function ($query) use ($rolesId) {
+            $query->where('id', $rolesId);
+        })
         ->first();
 
         if ($existingUser) { 

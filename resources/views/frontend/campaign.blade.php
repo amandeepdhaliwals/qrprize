@@ -561,27 +561,19 @@
 
 					} else if ($('input[name="last_name"]').val() == '') {
 						$('#last_name_error').text('Please enter last name.');
-						// $('html, body').animate({
-						//    scrollTop: $('#adv_video').offset().top - 150 // Adjust the value as needed
-						// }, 1000);
 						setTimeout(function() {
 							$('#last_name_error').empty();
 						}, 3000);
 
 					} else if ($('input[name="email"]').val() == '') {
 						$('#email_error').text('Please enter email.');
-						// $('html, body').animate({
-						//    scrollTop: $('#adv_video').offset().top - 150 // Adjust the value as needed
-						// }, 1000);
 						setTimeout(function() {
 							$('#email_error').empty();
 						}, 3000);
 					}
 					else if ($('input[name="phone_number"]').val() == '') {
 						$('#phone_number_error').text('Please enter phone number.');
-						// $('html, body').animate({
-						//    scrollTop: $('#adv_video').offset().top - 150 // Adjust the value as needed
-						// }, 1000);
+	
 						setTimeout(function() {
 							$('#phone_number_error').empty();
 						}, 3000);
@@ -667,12 +659,12 @@
 											$('#email_error').empty();
 										}, 2000);
 									}
-									// if (firstErrorKey == 'mobile') {
-									// 	$('#phone_number_error').text(errors[firstErrorKey][0]);
-									// 	setTimeout(function() {
-									// 		$('#phone_number_error').empty();
-									// 	}, 2000);
-									// }
+									if (firstErrorKey == 'mobile') {
+										$('#phone_number_error').text(errors[firstErrorKey][0]);
+										setTimeout(function() {
+											$('#phone_number_error').empty();
+										}, 2000);
+									}
 
 									//  displayErrors(errors);
 								} else {
