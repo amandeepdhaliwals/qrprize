@@ -33,7 +33,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Frontend', 'as' => 'frontend.
     Route::get('privacy', 'FrontendController@privacy')->name('privacy');
     Route::get('terms', 'FrontendController@terms')->name('terms');
 
-    Route::get('store/{store_id}/campaign/{campaign_id}', 'FrontendController@campaign')->name('campaign');
+    Route::get('campaign/{combined_id}', 'FrontendController@campaign')->name('campaign');
 
     Route::post('user/create_user', 'UserController@create_user')->name('create_user');
     Route::post('user/otp_verify', 'UserController@otp_verify')->name('otp_verify');

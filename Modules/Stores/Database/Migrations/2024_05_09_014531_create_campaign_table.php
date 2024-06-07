@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('campaign_name');
             $table->integer('store_id'); 
             $table->text('advertisement_ids')->nullable();
-            $table->string('qr_code_url')->nullable();
+            $table->text('qr_code_url')->nullable();
             $table->integer('lock_time');
             $table->longText('qr_code_image')->nullable();
             $table->integer('created_by')->unsigned()->nullable();

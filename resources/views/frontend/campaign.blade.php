@@ -260,9 +260,6 @@
 						</div>
 						<div class="">
 							<div class="login-input">
-								<input type="hidden" name="store_id" value="{{$advertisement_detail->store_id}}">
-								<input type="hidden" name="campaign_id" value="{{$campaignId}}">
-								<input type="hidden" name="advertisement_id" value="{{$advertisement_detail->id}}">
 								<input type="text" placeholder="First Name" name="first_name">
 								<div id="first_name_error" style="color:red"></div>
 							</div>
@@ -278,6 +275,8 @@
 								<input type="number" placeholder="Phone Number" name="phone_number">
 								<div id="phone_number_error" style="color:red"></div>
 							</div>
+							<div id="user_data_error" style="color:red"></div>
+							<input type="hidden" name="token_user_data" value="{{$encryptedValue}}">
 						</div>
 
 						<a href="#" id="create_user" class='butn butn__new mt-4 unlock-results-btn'><span>Unlock Result</span></a>
@@ -321,8 +320,6 @@
 						<a href="#" id="otp_verification" class='butn butn__new mt-4 unlock-results-btn'><span>Unlock Result</span></a>
 						<div id="incorrect_error" style="color:red"></div>
 						<div id="otp_email"></div>
-
-
 					</div>
 				</div>
 			</div>
@@ -580,9 +577,7 @@
 					 } 
 					else {
 						var customData = {
-							store_id: $('input[name="store_id"]').val(),
-							campaign_id: $('input[name="campaign_id"]').val(),
-							advertisement_id: $('input[name="advertisement_id"]').val(),
+							token_user_data: $('input[name="token_user_data"]').val(),
 							first_name: $('input[name="first_name"]').val(),
 							last_name: $('input[name="last_name"]').val(),
 							email: $('input[name="email"]').val(),
@@ -629,10 +624,15 @@
 											window.location.href = url;
 										}
 									}
-								} else {
+								} 
+								else{
 									if (response.status == 'locked') {
 										$('#loginModal').modal('hide');
 										countdownLocked(response.lockDateTime);
+									}
+									if(response.status == 'user_token')
+									{
+										$('#user_data_error').text(response.message);
 									}
 								}
 							},

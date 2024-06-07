@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
-
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -36,6 +35,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Response; 
 use PDF;
+use Illuminate\Support\Facades\Crypt;
 
 class StoresController extends BackendBaseController
 {
@@ -855,23 +855,37 @@ class StoresController extends BackendBaseController
             "lock_time" => "required",
         ]);
 
-        $campaignId = $module_model::latest()->value("id") + 1;
         $storeId = $request->store_id;
-        $url = url("/store/" . $storeId . "/campaign/" . $campaignId);
-        $qrCode = QrCode::format("png")
-            ->size(200)
-            ->generate($url);
-        $qr_code_image = base64_encode($qrCode);
 
         $campaign_name = $request['campaign_name_hid'].$request['campaign_name'];
         // Create a new campaign record
         $$module_name_singular = $module_model::create([
             "campaign_name" => $campaign_name,
             "store_id" => $storeId,
-            "qr_code_url" => $url,
-            "qr_code_image" => $qr_code_image,
+            "qr_code_url" => '',
+            "qr_code_image" => '',
             "lock_time" => $request['lock_time'],
             "advertisement_ids" => $request->advertisement_ids,
+        ]);
+
+        //$encodedStoreId = Crypt::encryptString($storeId);
+        $salt = Str::random(8);
+       // $encodedCampaignId = Crypt::encryptString($$module_name_singular->id);
+
+        //$combined_id = "{$encodedStoreId}_{$salt}_{$encodedCampaignId}";
+   
+        $combined_id =  Crypt::encryptString($storeId . '_' . $salt . '_' . $$module_name_singular->id);
+
+        $url = url("/campaign/".$combined_id);
+
+        $qrCode = QrCode::format("png")
+            ->size(200)
+            ->generate($url);
+        $qr_code_image = base64_encode($qrCode);
+
+        $$module_name_singular->update([
+            'qr_code_url' => $url,
+            'qr_code_image' => $qr_code_image
         ]);
 
         $store = Store::where('user_id', $storeId)->first();

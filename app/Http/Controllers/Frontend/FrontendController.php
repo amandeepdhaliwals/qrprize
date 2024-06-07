@@ -21,6 +21,10 @@ use App\Notifications\ClaimRequestNotification;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+   
 
 class FrontendController extends Controller
 {
@@ -55,54 +59,70 @@ class FrontendController extends Controller
         return view('frontend.terms');
     }
 
-    public function campaign(Request $request,$storeId,$campaignId,)
+    public function campaign(Request $request, $campaign)
     {
-        $campaign = Campaign::where('id',$campaignId)->where('store_id',$storeId)->first();
+        try {
+            $decrypt_campaign_data = Crypt::decryptString($campaign);
+ 
+            list($storeId, $salt, $campaignId) = explode('_', $decrypt_campaign_data);
 
-        if($campaign){
-            //$advertisement_id = $campaign->advertisement_ids[0];
-            $advertisementIds = $campaign->advertisement_ids;
+            // Find the campaign by its ID and store ID
+            $campaign_data = Campaign::where('id', $campaignId)
+                                ->where('store_id', $storeId)
+                                ->firstOrFail();
+
+            // Retrieve advertisement IDs and calculate the current advertisement index
+            $advertisementIds = $campaign_data->advertisement_ids;
             $hour = now()->hour;
-            // Calculate the advertisement index
             $advertisementIndex = ($hour - 1) % count($advertisementIds);
             $advertisement_id = $advertisementIds[$advertisementIndex];
-
-            if($advertisement_id){
-                $advertisement_detail = Advertisement::where('id',$advertisement_id)->first();
-                $advertisement_video = Video::where('id',$advertisement_detail->adv_video_id)->where("deleted_at", null)->first();
-                $primary_image_ids = explode(',', $advertisement_detail->primary_image_id);
-                $primary_images = Gallery::whereIn("id", $primary_image_ids)->where("status", 1)->where("deleted_at", null)->get();
-                $secondary_image_ids = explode(',', $advertisement_detail->secondary_images_id);
-                $secondary_images = Gallery::whereIn("id", $secondary_image_ids)->where("status", 1)->whereNull("deleted_at")->get();
-                $other_image_ids = explode(',', $advertisement_detail->other_coupon_images_id);
-                $other_images = Otherprize::whereIn("id", $other_image_ids)->where("status", 1)->whereNull("deleted_at")->get();  
-
-                 // Decode the JSON data into an associative array
-                $coupon_data = json_decode($advertisement_detail->coupons_id, true);
-                // Extract the keys (coupon IDs)
-                $coupon_ids = array_keys($coupon_data);
-
-                $coupons = Coupon::whereIn('id', $coupon_ids)->get(); 
-                $lock_time = $advertisement_detail->lock_time;
-                if ($request->cookie('user_id') === null) {
-                    // Generate a unique user ID
-                    $userId = Str::random(32);
-                    // Set the cookie to expire in 20 years
-                    $expiryDate = Carbon::now()->addYears(20);
-                    Cookie::queue(Cookie::make('user_id', $userId, $expiryDate->diffInMinutes(), null, null, false, true));
-                } else {
-                    // Retrieve the existing user ID from the cookie
-                    $userId = $request->cookie('user_id');
-                }
-                $visitor_id = $this->createVisitor($userId, $storeId, $campaignId, $advertisement_id);
-                return view('frontend.campaign',compact('campaignId','advertisement_detail','advertisement_video',
-                'primary_images','secondary_images','other_images','coupons','lock_time','visitor_id'));
+    
+            // Handle the case where the advertisement ID is not found
+            if (!$advertisement_id) {
+                return abort(Response::HTTP_NOT_FOUND);
             }
+    
+            // Retrieve advertisement details and related data
+            $advertisement_detail = Advertisement::findOrFail($advertisement_id);
+            $advertisement_video = Video::findOrFail($advertisement_detail->adv_video_id);
+            $primary_image_ids = explode(',', $advertisement_detail->primary_image_id);
+            $primary_images = Gallery::whereIn("id", $primary_image_ids)->where("status", 1)->whereNull("deleted_at")->get();
+            $secondary_image_ids = explode(',', $advertisement_detail->secondary_images_id);
+            $secondary_images = Gallery::whereIn("id", $secondary_image_ids)->where("status", 1)->whereNull("deleted_at")->get();
+            $other_image_ids = explode(',', $advertisement_detail->other_coupon_images_id);
+            $other_images = Otherprize::whereIn("id", $other_image_ids)->where("status", 1)->whereNull("deleted_at")->get();
+    
+            $coupon_data = json_decode($advertisement_detail->coupons_id, true);
+            $coupon_ids = array_keys($coupon_data);
+            $coupons = Coupon::whereIn('id', $coupon_ids)->get(); 
+    
+            $lock_time = $advertisement_detail->lock_time;
+    
+            // Generate or retrieve the user ID from the cookie
+            if ($request->cookie('user_id') === null) {
+                $userId = Str::random(32);
+                $expiryDate = Carbon::now()->addYears(20);
+                Cookie::queue(Cookie::make('user_id', $userId, $expiryDate->diffInMinutes(), null, null, false, true));
+            } else {
+                $userId = $request->cookie('user_id');
+            }
+    
+            // Create or retrieve the visitor ID
+            $visitor_id = $this->createVisitor($userId, $storeId, $campaignId, $advertisement_id);
 
-        }else{
+            // Encrypt the concatenated values
+            $encryptedValue = Crypt::encryptString($advertisement_detail->store_id . '_' . $campaignId . '_' . $advertisement_detail->id);
+
+            // Return the view with the necessary data
+            return view('frontend.campaign', compact('campaignId', 'advertisement_detail', 'advertisement_video', 'primary_images', 'secondary_images', 'other_images', 'coupons', 'lock_time', 'visitor_id','encryptedValue'));
+        } catch (DecryptException $e) {
+            // Handle decryption error
+            return abort(Response::HTTP_BAD_REQUEST);
+        } catch (ModelNotFoundException $e) {
+            // Handle campaign not found
             return abort(Response::HTTP_NOT_FOUND);
         }
-    }
+    } 
 
     private function createVisitor($userId, $storeId, $campaignId, $advertisementId)
     {

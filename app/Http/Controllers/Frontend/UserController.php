@@ -32,6 +32,8 @@ use Modules\Stores\Entities\Campaign;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\UserAccountCreated;
 use Modules\Coupons\Entities\Claim; // Import the Claim model
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 
 class UserController extends Controller
@@ -481,6 +483,7 @@ class UserController extends Controller
 
     public function create_user(Request $request)
     {
+        ///the rate limiter ensures that only up to 50 requests are accepted from a single IP address within a 1-minute timeframe
         $key = 'otp-request-' . $request->ip();
         $maxAttempts = 50;
         $decaySeconds = 60;
@@ -511,6 +514,40 @@ class UserController extends Controller
             $query->where('id', $rolesId);
         })
         ->first();
+
+        try {
+        $token_user_data = Crypt::decryptString($request->token_user_data);
+
+        list($request->store_id, $request->campaign_id, $request->advertisement_id) = explode('_', $token_user_data);
+
+        } catch (DecryptException $e) {
+            //return response()->json(['error' => 'Invalid token'], 400);
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'Invalid token'
+            ]);
+        } catch (\Throwable $e) {
+           // return response()->json(['error' => 'An error occurred'], 500);
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'An error occurred'
+            ]);
+        }
+
+        $campaignsExist = Campaign::where('id', $request->campaign_id)
+        ->where('store_id', $request->store_id)
+        ->whereJsonContains('advertisement_ids', $request->advertisement_id)
+        ->exists();
+    
+        if(!$campaignsExist){
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'Something went wrong'
+            ]);  
+        } 
 
         if ($existingUser) { 
             $otpVerificationEmail = OtpVerification::where('user_id', $existingUser->id)
