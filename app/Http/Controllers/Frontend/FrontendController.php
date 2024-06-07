@@ -171,6 +171,7 @@ class FrontendController extends Controller
         if (!$res) {
             return abort(Response::HTTP_NOT_FOUND);
         } else {
+ 
             $coupon = Coupon::where('id', $res->coupon_id)->first();
             if (!$coupon) {
                 return abort(Response::HTTP_NOT_FOUND);
@@ -194,6 +195,7 @@ class FrontendController extends Controller
             $advertisement_id = $res->advertisement_id;
             $storeId = $res->store_id;
             $campaignId = $res->campaign_id;
+            $campaign = Campaign::select('qr_code_url')->where('id',$campaignId)->where('store_id',$storeId)->first();
             $coupon_category =  $coupon->category;
             $claim = Claim::where('customer_id', $res->customer_id)
             ->where('advertisement_id', $advertisement_id)
@@ -207,8 +209,8 @@ class FrontendController extends Controller
     
             $user->notify(new CouponWinNotification($couponDetails));
         }
-    
-        return view('frontend.win', compact('cust_result_id',
+
+        return view('frontend.win', compact('cust_result_id','campaign',
          'customer_id','coupon','claim','claim_request_claim','advertisement_id','storeId','campaignId'));
     }
 

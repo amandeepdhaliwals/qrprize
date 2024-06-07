@@ -61,7 +61,7 @@
           <div class="col-12">
           <p>Worry not, you can try again after {{$campaign->lock_time}} hours.</p>
 
-          <a href="{{config('app.url')}}/store/{{$storeId}}/campaign/{{$campaignId}}" class='butn butn__new mt-4'><span>Back To Homepage</span></a>
+          <a href="{{$campaign->qr_code_url}}" class='butn butn__new mt-4'><span>Back To Homepage</span></a>
         </div>
           </div>
         </div>

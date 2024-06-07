@@ -121,7 +121,7 @@
             setInterval(countdownFunc, 1000);
 
             setTimeout(function () {
-              window.location.href = "{{ config('app.url') }}/store/{{ $storeId }}/campaign/{{ $campaignId }}"; // Redirect after 10 seconds
+              window.location.href = "{{$campaign->qr_code_url }}"; // Redirect after 10 seconds
             }, 10000);
         </script>
         @endif
