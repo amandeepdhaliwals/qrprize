@@ -868,12 +868,9 @@ class StoresController extends BackendBaseController
             "advertisement_ids" => $request->advertisement_ids,
         ]);
 
-        //$encodedStoreId = Crypt::encryptString($storeId);
-        $salt = Str::random(8);
-       // $encodedCampaignId = Crypt::encryptString($$module_name_singular->id);
 
-        //$combined_id = "{$encodedStoreId}_{$salt}_{$encodedCampaignId}";
-   
+        $salt = Str::random(8);
+    
         $combined_id =  Crypt::encryptString($storeId . '_' . $salt . '_' . $$module_name_singular->id);
 
         $url = url("/campaign/".$combined_id);

@@ -558,14 +558,11 @@ class UserController extends Controller
             {    
               
                 $otpCodes =   $this->generateAndSendOtp($existingUser->id);
+                $encryptedExistingUserId = Crypt::encryptString($existingUser->id);
                 return response()->json([
-                    'user_id' => $existingUser->id,
-                    'storeId' => $request->store_id,
-                    'campaign_id' => $request->campaign_id,
-                    'adverisement_id' => $request->advertisement_id,
+                    'user_id' => $encryptedExistingUserId,
                     'response_type' => 'success',
                     'status' => 'otp_send_customerVerify',
-                    'email_otp' => $otpCodes['email_otp'], /// will remove
                 ]);
             }
             else{  //// customer already verified
@@ -606,15 +603,22 @@ class UserController extends Controller
                 if ($latestCustomerResult) {
                     //// check customer is win or lose and add entry
                     $resultHandleCustomer =  $this->handleCustomerWinning($existingUser->id, $request->advertisement_id, $request->campaign_id, $request->store_id);
+
+                     // Generate the appropriate URL based on the result
+                     $salt = Str::random(8);
+ 
+                     if ($resultHandleCustomer['result']) {
+                        $combined_id_win =  Crypt::encryptString($resultHandleCustomer['cust_result_id'] . '_' . $salt);
+                         $url = "/win/".$combined_id_win;
+                     } else {
+                        $combined_id_lose =  Crypt::encryptString($request->store_id . '_' . $salt . '_' . $request->campaign_id);
+                         $url = "/better_luck/".$combined_id_lose;
+                     }
+
                     return response()->json([
-                        'user_id' => $existingUser->id,
-                        'storeId' => $request->store_id,
-                        'campaign_id' => $request->campaign_id,
-                        'adverisement_id' => $request->advertisement_id,
                         'response_type' => $resultHandleCustomer['response_type'],
                         'status' => $resultHandleCustomer['status'],
-                        'result' => $resultHandleCustomer['result'],
-                        'cust_result_id' => $resultHandleCustomer['cust_result_id'],
+                        'redirect_url' => $url,
                     ]);
 
                 }
@@ -687,21 +691,37 @@ class UserController extends Controller
 
         ///Generate and Send Otp
         $otpCodes =  $this->generateAndSendOtp($$module_name_singular->id);
-
+        $encryptedExistingUserId = Crypt::encryptString($$module_name_singular->id);
         return response()->json([
-            'user_id' => $$module_name_singular->id,
-            'storeId' => $request->store_id,
-            'campaign_id' => $request->campaign_id,
-            'adverisement_id' => $request->advertisement_id,
+            'user_id' => $encryptedExistingUserId,
             'response_type' => 'success',
             'status' => 'otp_send',
-            'email_otp' =>  $otpCodes['email_otp'],  /// will remove
         ]);
      }
     }
 
     public function resend_otp(Request $request)
     {
+        try {
+            $userIdEncrypt = $request->user_id;
+            $request->user_id = Crypt::decryptString($userIdEncrypt);
+    
+            } catch (DecryptException $e) {
+                //return response()->json(['error' => 'Invalid token'], 400);
+                return response()->json([
+                    'status' => 'user_token',
+                    'response_type' => 'failed',
+                    'message' => 'Invalid token'
+                ]);
+            } catch (\Throwable $e) {
+               // return response()->json(['error' => 'An error occurred'], 500);
+                return response()->json([
+                    'status' => 'user_token',
+                    'response_type' => 'failed',
+                    'message' => 'An error occurred'
+                ]);
+        }
+
         $key = 'otp-request-user-' . $request->user_id;
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
@@ -732,12 +752,8 @@ class UserController extends Controller
         $otpCodes = $this->generateAndSendOtp($user->id);
    
         return response()->json([
-            'user_id' => $user->id,
-            'storeId' => $request->store_id,
-            'campaign_id' => $request->campaign_id,
-            'adverisement_id' => $request->advertisement_id,
+            'user_id' => $userIdEncrypt,
             'response_type' => 'success',
-            'email_otp' => $otpCodes['email_otp'], /// will remove
         ]);
     }
 
@@ -779,19 +795,62 @@ class UserController extends Controller
     
         $module_action = 'Details';
     
+        try {
+            $token_user_data = Crypt::decryptString($request->token_user_data);
+            $userIdEncrypt = $request->user_id;
+            $request->user_id = Crypt::decryptString($userIdEncrypt);
+
+            list($request->store_id, $request->campaign_id, $request->advertisement_id) = explode('_', $token_user_data);
+    
+            } catch (DecryptException $e) {
+                //return response()->json(['error' => 'Invalid token'], 400);
+                return response()->json([
+                    'status' => 'user_token',
+                    'response_type' => 'failed',
+                    'message' => 'Invalid token'
+                ]);
+            } catch (\Throwable $e) {
+               // return response()->json(['error' => 'An error occurred'], 500);
+                return response()->json([
+                    'status' => 'user_token',
+                    'response_type' => 'failed',
+                    'message' => 'An error occurred'
+                ]);
+            }
+          
+          $campaignsExist = Campaign::where('id', $request->campaign_id)
+            ->where('store_id', $request->store_id)
+            ->whereJsonContains('advertisement_ids', $request->advertisement_id)
+            ->exists();
+        
+            if(!$campaignsExist){
+                return response()->json([
+                    'status' => 'user_token',
+                    'response_type' => 'failed',
+                    'message' => 'Something went wrong'
+                ]);  
+            }   
+
         $verificationResult = $this->verifyOtp($request->user_id, $request->email_otp);
     
         if ($verificationResult['status'] == 'success') {
             $resultHandleCustomer =  $this->handleCustomerWinning($request->user_id, $request->advertisement_id, $request->campaign_id, $request->store_id);
+
+             // Generate the appropriate URL based on the result
+             $salt = Str::random(8);
+                 
+             if ($resultHandleCustomer['result']) {
+                $combined_id_win =  Crypt::encryptString($resultHandleCustomer['cust_result_id'] . '_' . $salt);
+                 $url = "/win/".$combined_id_win;
+             } else {
+                $combined_id_lose =  Crypt::encryptString($request->store_id . '_' . $salt . '_' . $request->campaign_id);
+                 $url = "/better_luck/".$combined_id_lose;
+             }
+
             return response()->json([
-                'user_id' => $request->user_id,
-                'storeId' => $request->store_id,
-                'campaign_id' => $request->campaign_id,
-                'adverisement_id' => $request->advertisement_id,
                 'response_type' => $resultHandleCustomer['response_type'],
                 'status' => $resultHandleCustomer['status'],
-                'result' => $resultHandleCustomer['result'],
-                'cust_result_id' => $resultHandleCustomer['cust_result_id'],
+                'redirect_url' => $url,
             ]);
          
         }

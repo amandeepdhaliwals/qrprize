@@ -303,10 +303,7 @@
 						</div>
 						<div class="">
 							<div class="login-input">
-								<input type="hidden" name="store_id_otp">
-								<input type="hidden" name="campaign_id_otp">
-								<input type="hidden" name="advertisement_id_otp">
-								<input type="hidden" name="user_id_otp">
+								 <input type="hidden" name="user_id_otp">
 								<input type="text" placeholder="Email OTP" name="email_otp">
 								<div id="email_otp_error" style="color:red"></div>
 							</div>
@@ -319,7 +316,6 @@
 						</div>
 						<a href="#" id="otp_verification" class='butn butn__new mt-4 unlock-results-btn'><span>Unlock Result</span></a>
 						<div id="incorrect_error" style="color:red"></div>
-						<div id="otp_email"></div>
 					</div>
 				</div>
 			</div>
@@ -549,9 +545,6 @@
 					e.preventDefault();
 					if ($('input[name="first_name"]').val() == '') {
 						$('#first_name_error').text('Please enter first name.');
-						// $('html, body').animate({
-						//    scrollTop: $('#first_name').offset().top - 150 // Adjust the value as needed
-						// }, 1000);
 						setTimeout(function() {
 							$('#first_name_error').empty();
 						}, 3000);
@@ -593,7 +586,6 @@
 							contentType: "application/json",
 							success: function(response) {
 								// Handle success response
-								// console.log(response);
 								if (response.response_type == 'success') {
 
 									if (response.status == 'otp_send_customerVerify' ||
@@ -602,27 +594,14 @@
 										$('#otpModal').modal('show');
 										startTimer(); //otp timer
 										disableResendButton();
-										document.querySelector('input[name="store_id_otp"]').value = response.storeId;
-										document.querySelector('input[name="campaign_id_otp"]').value = response.campaign_id;
-										document.querySelector('input[name="advertisement_id_otp"]').value = response.adverisement_id;
 										document.querySelector('input[name="user_id_otp"]').value = response.user_id;
 
-										document.getElementById("otp_email").textContent = 'Dummy OTP For Email: ' + response.email_otp;
 									}
 
 									if (response.status == 'customer_result') {
-										if (response.result) {
-											$('#otpModal').modal('hide');
-
-											var APP_URL = {!! json_encode(url('/')) !!}
-											var url = APP_URL + '/win/' + response.storeId + '/campaign/' + response.campaign_id;
-											window.location.href = url;
-										} else {
-											$('#otpModal').modal('hide');
-											var APP_URL = {!! json_encode(url('/')) !!}
-											var url = APP_URL + '/better_luck/' + response.storeId + '/campaign/' + response.campaign_id;
-											window.location.href = url;
-										}
+										$('#otpModal').modal('hide');
+										window.location.href = response.redirect_url;
+	
 									}
 								} 
 								else{
@@ -738,15 +717,10 @@
 
 					e.preventDefault(); // Prevent default form submission behavior
 
-					var user_id = $('#user_id_otp').val(); // Assuming there's an input field with ID 'user_id'
+					var user_id = $('#user_id_otp').val(); 
 					var _token = '{{ csrf_token() }}';
-
-
 					var customData = {
 						user_id: $('input[name="user_id_otp"]').val(),
-						store_id: $('input[name="store_id"]').val(),
-						campaign_id: $('input[name="campaign_id"]').val(),
-						advertisement_id: $('input[name="advertisement_id"]').val(),
 						_token: '{{csrf_token()}}'
 					};
 					var jsonData = JSON.stringify(customData);
@@ -759,8 +733,6 @@
 						success: function(response) {
 							startTimer();
 							disableResendButton();
-							document.getElementById("otp_email").textContent = 'Dummy OTP For Email: ' + response.email_otp;
-							// document.getElementById("otp_mobile").textContent = 'Dummy OTP For Mobile: ' + response.mobile_otp;
 							if (response.response_type == 'failed') {
 								$('#incorrect_error').text(response.message);
 							}
@@ -789,21 +761,11 @@
 						}, 3000);
 
 					}
-					// else if ($('input[name="phone_number_otp"]').val() == '') {
-					// 	$('#phone_number_otp_error').text('Please enter phone number OTP.');
-					// 	setTimeout(function() {
-					// 		$('#phone_number_otp_error').empty();
-					// 	}, 3000);
-
-					// } 
 					else {
 						var customData = {
-							store_id: $('input[name="store_id_otp"]').val(),
-							campaign_id: $('input[name="campaign_id_otp"]').val(),
-							advertisement_id: $('input[name="advertisement_id_otp"]').val(),
+							token_user_data: $('input[name="token_user_data"]').val(),
 							user_id: $('input[name="user_id_otp"]').val(),
 							email_otp: $('input[name="email_otp"]').val(),
-							//mobile_otp: $('input[name="phone_number_otp"]').val(),
 							_token: '{{csrf_token()}}'
 						};
 
@@ -816,17 +778,8 @@
 							success: function(response) {
 								// Handle success response            
 								if (response.response_type == 'success') {
-									if (response.result == true) {
-										$('#otpModal').modal('hide');
-										var APP_URL = {!! json_encode(url('/')) !!}
-										var url = APP_URL + '/win/' + response.cust_result_id;
-										window.location.href = url;
-									} else {
-										$('#otpModal').modal('hide');
-										var APP_URL = {!! json_encode(url('/')) !!}
-										var url = APP_URL + '/better_luck/' + response.storeId + '/campaign/' + response.campaign_id;
-										window.location.href = url;
-									}
+									$('#otpModal').modal('hide');
+									window.location.href = response.redirect_url;
 								} else {
 									$('#incorrect_error').text(response.message);
 								}

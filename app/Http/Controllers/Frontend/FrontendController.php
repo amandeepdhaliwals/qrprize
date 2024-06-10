@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-   
 
 class FrontendController extends Controller
 {
@@ -152,8 +151,30 @@ class FrontendController extends Controller
         }
     }   
 
-    public function better_luck($storeId,$campaignId)
+    public function better_luck($combined_id_lose)
     {
+        try 
+        {
+        $decrypt_data = Crypt::decryptString($combined_id_lose);
+
+        list($storeId, $salt, $campaignId) = explode('_', $decrypt_data);
+
+        } catch (DecryptException $e) {
+            //return response()->json(['error' => 'Invalid token'], 400);
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'Invalid token'
+            ]);
+        } catch (\Throwable $e) {
+            // return response()->json(['error' => 'An error occurred'], 500);
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'An error occurred'
+            ]);
+        }
+
         $campaign = Campaign::where('id',$campaignId)->where('store_id',$storeId)->first();
         if(!$campaign){
         return abort(Response::HTTP_NOT_FOUND);
@@ -161,8 +182,32 @@ class FrontendController extends Controller
         return view('frontend.betterluck',compact('storeId','campaign','campaignId'));
     }
 
-    public function win($cust_result_id)
+    public function win($combined_id_win)
     {
+        try 
+        {
+        $decrypt_data = Crypt::decryptString($combined_id_win);
+
+        list($cust_result_id, $salt) = explode('_', $decrypt_data);
+
+        } catch (DecryptException $e) {
+            //return response()->json(['error' => 'Invalid token'], 400);
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'Invalid token'
+            ]);
+        } catch (\Throwable $e) {
+            // return response()->json(['error' => 'An error occurred'], 500);
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'An error occurred'
+            ]);
+        }
+
+
+
         $res = CustomerWin::select('customer_wins.*', 'customer_results.*')
         ->join('customer_results', 'customer_wins.customer_results_id', '=', 'customer_results.id')
         ->where('customer_wins.customer_results_id', $cust_result_id)
@@ -197,10 +242,12 @@ class FrontendController extends Controller
             $campaignId = $res->campaign_id;
             $campaign = Campaign::select('qr_code_url')->where('id',$campaignId)->where('store_id',$storeId)->first();
             $coupon_category =  $coupon->category;
+
             $claim = Claim::where('customer_id', $res->customer_id)
             ->where('advertisement_id', $advertisement_id)
             ->where('coupon_id', $res->coupon_id)
             ->first();
+
             $claim_request_claim = $claim ? $claim->request_claim : null;
 
             if($coupon_category == 'service'){
