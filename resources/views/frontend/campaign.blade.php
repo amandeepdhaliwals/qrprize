@@ -233,7 +233,7 @@
 					</div>
 					<div class="row">
 						<div class="col-12 text-center">
-							<button id="spin-button" class='butn butn__new mt-4'><span>SPIN!</span></button>
+							<!-- <button id="spin-button" class='butn butn__new mt-4'><span>SPIN!</span></button> -->
 							<a href="" id="spin-button-a" class='butn butn__new mt-4'><span>SPIN!</span></a>
 						</div>
 						<div class="col-12 mt-2">
