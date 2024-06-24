@@ -576,65 +576,51 @@ class UserController extends Controller
                 ->where('campaign_id', $request->campaign_id)
                 ->latest('created_at') 
                 ->first();
-
-                $lockTimeAdded = Carbon::createFromFormat('Y-m-d H:i:s', $latestCustomerResult->created_at);
-
-                // Add 12 hours to the datetime
-                $lockTimeAdded->addHours($campaign->lock_time);
-
-                // Format the new datetime as needed
-                $lockTimeAdded = $lockTimeAdded->format('Y-m-d H:i:s');
-                $currentDateTime = Carbon::now();
-
-                if($lockTimeAdded > $currentDateTime)
-                {
-                    $carbonDate = Carbon::createFromFormat('Y-m-d H:i:s', $lockTimeAdded);
-                    // Format the date to 'Jan 5, 2030 15:37:25'
-                    $formattedDate = $carbonDate->format('M j, Y H:i:s');
-
-                    return response()->json([
-                        'response_type' => 'failed',
-                        'message' => 'Customer is locked for some period',
-                        'status' => 'locked',
-                        'lockDateTime' => $formattedDate
-                    ]);
-                }
-                
+  
                 if ($latestCustomerResult) {
-                    //// check customer is win or lose and add entry
-                    $resultHandleCustomer =  $this->handleCustomerWinning($existingUser->id, $request->advertisement_id, $request->campaign_id, $request->store_id);
+                    $lockTimeAdded = Carbon::createFromFormat('Y-m-d H:i:s', $latestCustomerResult->created_at);
 
-                     // Generate the appropriate URL based on the result
-                     $salt = Str::random(8);
- 
-                     if ($resultHandleCustomer['result']) {
-                        $combined_id_win =  Crypt::encryptString($resultHandleCustomer['cust_result_id'] . '_' . $salt);
-                         $url = "/win/".$combined_id_win;
-                     } else {
-                        $combined_id_lose =  Crypt::encryptString($request->store_id . '_' . $salt . '_' . $request->campaign_id);
-                         $url = "/better_luck/".$combined_id_lose;
-                     }
+                    // Add 12 hours to the datetime
+                    $lockTimeAdded->addHours($campaign->lock_time);
 
-                    return response()->json([
-                        'response_type' => $resultHandleCustomer['response_type'],
-                        'status' => $resultHandleCustomer['status'],
-                        'redirect_url' => $url,
-                    ]);
+                    // Format the new datetime as needed
+                    $lockTimeAdded = $lockTimeAdded->format('Y-m-d H:i:s');
+                    $currentDateTime = Carbon::now();
 
+                    if($lockTimeAdded > $currentDateTime)
+                    {
+                        $carbonDate = Carbon::createFromFormat('Y-m-d H:i:s', $lockTimeAdded);
+                        // Format the date to 'Jan 5, 2030 15:37:25'
+                        $formattedDate = $carbonDate->format('M j, Y H:i:s');
+
+                        return response()->json([
+                            'response_type' => 'failed',
+                            'message' => 'Customer is locked for some period',
+                            'status' => 'locked',
+                            'lockDateTime' => $formattedDate
+                        ]);
+                    }
                 }
-                //  else {
-                //     $otpCodes =  $this->generateAndSendOtp($existingUser->id);
-                //     return response()->json([
-                //         'user_id' => $existingUser->id,
-                //         'storeId' => $request->store_id,
-                //         'campaign_id' => $request->campaign_id,
-                //         'adverisement_id' => $request->advertisement_id,
-                //         'response_type' => 'success',
-                //         'status' => 'otp_send',
-                //         'email_otp' =>  $otpCodes['email_otp'],  /// will remove
-                //         'mobile_otp' => $otpCodes['mobile_otp'], /// will remove
-                //     ]);
-                // }
+
+                 //// check customer is win or lose and add entry
+                 $resultHandleCustomer =  $this->handleCustomerWinning($existingUser->id, $request->advertisement_id, $request->campaign_id, $request->store_id);
+
+                  // Generate the appropriate URL based on the result
+                  $salt = Str::random(8);
+
+                  if ($resultHandleCustomer['result']) {
+                     $combined_id_win =  Crypt::encryptString($resultHandleCustomer['cust_result_id'] . '_' . $salt);
+                      $url = "/win/".$combined_id_win;
+                  } else {
+                     $combined_id_lose =  Crypt::encryptString($request->store_id . '_' . $salt . '_' . $request->campaign_id);
+                      $url = "/better_luck/".$combined_id_lose;
+                  }
+
+                 return response()->json([
+                     'response_type' => $resultHandleCustomer['response_type'],
+                     'status' => $resultHandleCustomer['status'],
+                     'redirect_url' => $url,
+                 ]);
 
             }                      
         }

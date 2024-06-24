@@ -26,6 +26,7 @@ use Modules\Coupons\Entities\Claim; // Import the Claim model
 use Illuminate\Support\HtmlString;
 use Laracasts\Flash\Flash;
 use App\Notifications\ShippingStatusUpdated;
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -106,91 +107,155 @@ class CustomersController extends BackendBaseController
         $title = $page_heading.' '.label_case($module_action);
 
         $rolesId = [5];
-     
-        $role_id=auth()->user()->roles->pluck('id')->toArray();
+        $role_id = auth()->user()->roles->pluck('id')->toArray();
         $login_role_id = $role_id[0];
         $login_user_id = Auth::id();
 
-
-        $store_id = $request->input('store'); // Get selected store value from request
+        $store_id = $request->input('store');
         $campaign_id = $request->input('campaign');
-        $advertisement_id = $request->input('adv'); 
-        $win_lose = $request->input('win_lose');       
-      
-        if($login_role_id == 1 ){
-            $query = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name',
-             'users.created_at', 'users.updated_at', 'customer_statistics.win_count','customer_statistics.lose_count',
-             'customers.campaign_id','customers.advertisement_id','campaign.campaign_name',
-             'advertisement.advertisement_name',) 
-            ->join('customers', 'users.id', '=', 'customers.user_id')
-            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
-            ->join('customer_statistics', 'users.id', '=', 'customer_statistics.customer_id')
-            ->join('campaign', 'campaign.id', '=', 'customers.campaign_id')
-            ->join('advertisement', 'advertisement.id', '=', 'customers.advertisement_id')
-            ->when($store_id, function ($query) use ($store_id) {
-                $query->where('customers.store_id', $store_id);
-            })
-            ->when($campaign_id, function ($query) use ($campaign_id) {
-                $query->where('customers.campaign_id', $campaign_id);
-            })
-            ->when($advertisement_id, function ($query) use ($advertisement_id) {
-                $query->where('customers.advertisement_id', $advertisement_id);
-            });
-  
-            if ($win_lose === '1') {
-                $query->where('customer_statistics.win_count', '>', 0);
-            } elseif ($win_lose === '0') {
-                $query->where('customer_statistics.win_count', '=', 0)
-                    ->where('customer_statistics.lose_count', '>', 0);
-            }
-            $query->whereHas('roles', function ($query) use ($rolesId) {
-                $query->whereIn('id', $rolesId);
-            });  
-            $query->get();
-        }else{
-            $query = User::select('users.id', 'users.name', 'users.email', 'users.mobile', 'store_users.name as store_name', 'users.created_at',
-             'users.updated_at','customer_statistics.win_count','customer_statistics.lose_count',
-             'customers.campaign_id','customers.advertisement_id','campaign.campaign_name',
-             'advertisement.advertisement_name') 
-            ->join('customers', 'users.id', '=', 'customers.user_id')
-            ->join('users as store_users', 'customers.store_id', '=', 'store_users.id') 
-            ->join('customer_statistics', 'users.id', '=', 'customer_statistics.customer_id')
-            ->join('campaign', 'campaign.id', '=', 'customers.campaign_id')
-            ->join('advertisement', 'advertisement.id', '=', 'customers.advertisement_id')
-            ->where('customers.store_id', '=' , $login_user_id) // Replace $storeId with the desired store_id value
-            ->when($campaign_id, function ($query) use ($campaign_id) {
-                $query->where('customers.campaign_id', $campaign_id);
-            })
-            ->when($advertisement_id, function ($query) use ($advertisement_id) {
-                $query->where('customers.advertisement_id', $advertisement_id);
-            });
-            if ($win_lose === '1') {
-                $query->where('customer_statistics.win_count', '>', 0);
-            } elseif ($win_lose === '0') {
-                $query->where('customer_statistics.win_count', '=', 0)
-                    ->where('customer_statistics.lose_count', '>', 0);
-            }
-            $query->whereHas('roles', function ($query) use ($rolesId) {
-                $query->whereIn('id', $rolesId);
-            });
-            $query->get();
+        $advertisement_id = $request->input('adv');
+        $win_lose = $request->input('win_lose');
+        if ($login_role_id == 1) {
+            $query = User::select('users.id', 'users.name', 'users.email', 'users.mobile',
+                'users.created_at', 'users.updated_at', 'customer_statistics.win_count', 'customer_statistics.lose_count')
+                // 'customers.campaign_id', 'customers.advertisement_id', 'campaign.campaign_name',
+                // 'advertisement.advertisement_name','store_users.name as store_name',)
+                // ->join('campaign', 'campaign.id', '=', 'customers.campaign_id')
+                // ->join('advertisement', 'advertisement.id', '=', 'customers.advertisement_id')
+                //->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
+                ->join('customers', 'users.id', '=', 'customers.user_id')
+                ->join('customer_statistics', 'users.id', '=', 'customer_statistics.customer_id')
+                // ->when($store_id, function ($query) use ($store_id) {
+                //     $query->where('customers.store_id', $store_id);
+                // })
+                // ->when($campaign_id, function ($query) use ($campaign_id) {
+                //     $query->where('customers.campaign_id', $campaign_id);
+                // })
+                // ->when($advertisement_id, function ($query) use ($advertisement_id) {
+                //     $query->where('customers.advertisement_id', $advertisement_id);
+                // })
+                ->when($win_lose === '1', function ($query) {
+                    $query->where('customer_statistics.win_count', '>', 0);
+                })
+                ->when($win_lose === '0', function ($query) {
+                    $query->where('customer_statistics.win_count', '=', 0)
+                        ->where('customer_statistics.lose_count', '>', 0);
+                })
+                ->whereHas('roles', function ($query) use ($rolesId) {
+                    $query->whereIn('id', $rolesId);
+                });
+        } else {
+            $query = User::select('users.id', 'users.name', 'users.email', 'users.mobile',
+                'users.created_at', 'users.updated_at', 'customer_statistics.win_count', 'customer_statistics.lose_count')
+                // 'customers.campaign_id', 'customers.advertisement_id', 'campaign.campaign_name',
+                // 'advertisement.advertisement_name','store_users.name as store_name',)
+                // ->join('campaign', 'campaign.id', '=', 'customers.campaign_id')
+                // ->join('advertisement', 'advertisement.id', '=', 'customers.advertisement_id')
+                //->join('users as store_users', 'customers.store_id', '=', 'store_users.id')
+                ->join('customers', 'users.id', '=', 'customers.user_id')
+                ->join('customer_statistics', 'users.id', '=', 'customer_statistics.customer_id')
+                ->where('customers.store_id', '=', $login_user_id)
+                // ->when($campaign_id, function ($query) use ($campaign_id) {
+                //     $query->where('customers.campaign_id', $campaign_id);
+                // })
+                // ->when($advertisement_id, function ($query) use ($advertisement_id) {
+                //     $query->where('customers.advertisement_id', $advertisement_id);
+                // })
+                ->when($win_lose === '1', function ($query) {
+                    $query->where('customer_statistics.win_count', '>', 0);
+                })
+                ->when($win_lose === '0', function ($query) {
+                    $query->where('customer_statistics.win_count', '=', 0)
+                        ->where('customer_statistics.lose_count', '>', 0);
+                })
+                ->whereHas('roles', function ($query) use ($rolesId) {
+                    $query->whereIn('id', $rolesId);
+                });
         }
 
-        $data = $query;
+        $users = $query->get();
 
+        foreach ($users as $user) {
+            // Fetch campaigns based on customer_results table
+            $user->campaigns = DB::table('campaign')
+                ->join('customer_results', 'campaign.id', '=', 'customer_results.campaign_id')
+                ->where('customer_results.customer_id', $user->id)
+                ->when($campaign_id, function ($query) use ($campaign_id) {
+                    $query->where('customer_results.campaign_id', $campaign_id);
+                })
+                ->when($advertisement_id, function ($query, $advertisement_id) {
+                    // Filter by advertisement_id if provided
+                    $query->where('customer_results.advertisement_id', $advertisement_id);
+                })
+                ->when($store_id, function ($query) use ($store_id) {
+                    $query->where('customer_results.store_id', $store_id);
+                })
+                ->distinct()
+                ->pluck('campaign.campaign_name');
+    
+            // Fetch advertisements based on customer_results table
+            $user->advertisements = DB::table('advertisement')
+                ->join('customer_results', 'advertisement.id', '=', 'customer_results.advertisement_id')
+                ->where('customer_results.customer_id', $user->id)
+                ->when($campaign_id, function ($query) use ($campaign_id) {
+                    $query->where('customer_results.campaign_id', $campaign_id);
+                })
+                ->when($advertisement_id, function ($query, $advertisement_id) {
+                    // Filter by advertisement_id if provided
+                    $query->where('customer_results.advertisement_id', $advertisement_id);
+                })
+                ->when($store_id, function ($query) use ($store_id) {
+                    $query->where('customer_results.store_id', $store_id);
+                })
+                ->distinct()
+                ->pluck('advertisement.advertisement_name');
 
-        return Datatables::of($query)
+              // Fetch advertisements based on customer_results table
+              if ($login_role_id == 1) {
+                $user->stores = DB::table('users')
+                    ->join('customer_results', 'users.id', '=', 'customer_results.store_id')
+                    ->where('customer_results.customer_id', $user->id) // Assuming customer_id relates to the user ID
+                    ->when($campaign_id, function ($query) use ($campaign_id) {
+                        $query->where('customer_results.campaign_id', $campaign_id);
+                    })
+                    ->when($advertisement_id, function ($query, $advertisement_id) {
+                        // Filter by advertisement_id if provided
+                        $query->where('customer_results.advertisement_id', $advertisement_id);
+                    })
+                    ->when($store_id, function ($query) use ($store_id) {
+                        $query->where('customer_results.store_id', $store_id);
+                    })
+                    ->distinct()
+                    ->pluck('users.name');
+            }
+        }
+
+        // Remove users without campaigns and advertisements but with stores
+        $users = $users->reject(function ($user) {
+            return !$user->campaigns->count() && !$user->advertisements->count() && !$user->stores->count();
+        });
+        
+        return DataTables::of($users)
             ->editColumn('name', '<strong>{{$name}}</strong>')
             ->editColumn('email', '{{$email}}')
             ->editColumn('mobile', '{{$mobile}}')
-            ->editColumn('store_name', '{{$store_name}}')
-            ->editColumn('campaign', '{{$campaign_name}}')
-            ->editColumn('advertisement', '{{$advertisement_name}}')
+            ->editColumn('store_name', function ($data) {
+                $storesList = implode(', ', $data->stores->toArray());
+                return '<div data-list="' . $storesList . '">' . $storesList . '</div>';
+            })
+
+            ->editColumn('campaign', function ($data) {
+                $campaignList = implode(', ', $data->campaigns->toArray());
+                return '<div data-list="' . $campaignList . '">' . $campaignList . '</div>';
+            })
+            
+            ->editColumn('advertisement', function ($data) {
+                $advertisementsList = implode(', ', $data->advertisements->toArray());
+                return '<div data-list="' . $advertisementsList . '">' . $advertisementsList . '</div>';
+            })
             ->editColumn('win_count', '{{$win_count}}')
             ->editColumn('lose_count', '{{$lose_count}}')
             ->editColumn('created_at', function ($data) {
-                $module_name = $this->module_name;
-
                 $diff = Carbon::now()->diffInHours($data->created_at);
 
                 if ($diff < 25) {
@@ -200,8 +265,6 @@ class CustomersController extends BackendBaseController
                 return $data->created_at->isoFormat('llll');
             })
             ->editColumn('updated_at', function ($data) {
-                $module_name = $this->module_name;
-
                 $diff = Carbon::now()->diffInHours($data->updated_at);
 
                 if ($diff < 25) {
@@ -210,10 +273,10 @@ class CustomersController extends BackendBaseController
 
                 return $data->updated_at->isoFormat('llll');
             })
-            ->rawColumns(['name','email','mobile','store_name','campaign','advertisement','win_count','lose_count','created_at'])
-           // ->orderColumns(['id'], '-:column $1')
+            ->rawColumns(['name', 'email', 'mobile', 'store_name', 'campaign', 'advertisement', 'win_count', 'lose_count', 'created_at'])
             ->make(true);
     }
+
 
     public function exportToExcel(Request $request)
     {

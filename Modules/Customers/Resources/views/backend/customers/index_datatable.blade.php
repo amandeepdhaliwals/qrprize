@@ -7,6 +7,18 @@
     <x-backend-breadcrumb-item type="active" icon='{{ $module_icon }}'>{{ __($module_title) }}</x-backend-breadcrumb-item>
 </x-backend-breadcrumbs>
 @endsection
+<style>
+.hiddenData {
+    display: none;
+}
+
+.more, .less {
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+}
+
+</style>
 
 @section('content')
 <div class="card">
@@ -210,6 +222,38 @@
                 },
             ]
         });
+
+
+        table.on('draw', function() {
+        $('td div[data-list]').each(function() {
+        var dataList = $(this).attr('data-list').split(', ');
+        if (dataList.length > 1) {
+            var shownData = dataList.slice(0, 1).map(item => '<li>' + item + '</li>').join('');
+            var hiddenData = dataList.slice(1).map(item => '<li>' + item + '</li>').join('');
+            $(this).html(
+                '<ul>' + shownData + '</ul>' +
+                '<span class="more">more...</span>' +
+                '<ul class="hiddenData">' + hiddenData + '</ul>'
+            );
+        } else {
+            var allData = dataList.map(item => '<li>' + item + '</li>').join('');
+            $(this).html('<ul>' + allData + '</ul>');
+        }
+        });
+
+        // Event to show hidden data on click
+        $(document).on('click', '.more', function() {
+            var hiddenData = $(this).next('.hiddenData');
+            if (hiddenData.is(':visible')) {
+                hiddenData.hide();
+                $(this).text('more...');
+            } else {
+                hiddenData.show();
+                $(this).text('less...');
+            }
+        });
+        });
+
 
         // Handle change event on store filter dropdown
         $('#store_filter').on('change', function () {
