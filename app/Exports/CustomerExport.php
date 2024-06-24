@@ -25,6 +25,7 @@ class CustomerExport implements FromCollection, WithHeadings
             // Convert HTML entities to plain text
             $name = strip_tags($item['name']);
             $email = strip_tags($item['email']);
+            $storeName = strip_tags($item['store_name']);
             // Other fields...
 
             // Return the transformed object
@@ -32,7 +33,7 @@ class CustomerExport implements FromCollection, WithHeadings
                 'Name' => $name,
                 'Email' => $email,
                 'Mobile' => $item['mobile'],
-                'Store Name' => $item['store_name'],
+                'Store Name' => $storeName,
                 'Created At' => $item['created_at'],
                 'Updated At' => $item['updated_at']
             ];
