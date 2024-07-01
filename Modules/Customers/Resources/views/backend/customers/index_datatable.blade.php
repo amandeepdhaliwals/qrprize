@@ -174,6 +174,8 @@
                     d.campaign = $('#campaign_filter').val();
                     d.adv = $('#adv_filter').val();
                     d.win_lose = $('#win_filter').val();
+                    //table.ajax.reload(null, false);
+                    //table.ajax.reload();
                 }
             },
             columns: [
