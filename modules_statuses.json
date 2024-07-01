@@ -1,8 +1,4 @@
 {
-    "Article": true,
-    "Tag": true,
-    "Comment": true,
-    "Category": true,
     "Coupons": true,
     "Videos": true,
     "Stores": true,
