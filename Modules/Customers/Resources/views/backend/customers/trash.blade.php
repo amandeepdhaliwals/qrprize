@@ -4,7 +4,8 @@
 
 @section('breadcrumbs')
 <x-backend-breadcrumbs>
-    <x-backend-breadcrumb-item type="active" icon='{{ $module_icon }}'>{{ __($module_title) }}</x-backend-breadcrumb-item>
+    <x-backend-breadcrumb-item type="active"
+        icon='{{ $module_icon }}'>{{ __($module_title) }}</x-backend-breadcrumb-item>
 </x-backend-breadcrumbs>
 @endsection
 
@@ -13,14 +14,16 @@
     <div class="card-body">
 
         <x-backend.section-header>
-            <i class="{{ $module_icon }}"></i> {{ __($module_title) }} <small class="text-muted">{{ __($module_action) }}</small>
+            <i class="{{ $module_icon }}"></i> {{ __($module_title) }} <small
+                class="text-muted">{{ __($module_action) }}</small>
 
             <x-slot name="subtitle">
-                @lang(":module_name Management Dashboard", ['module_name'=>Str::title($module_name)])
+                @lang(":module_name Management Dashboard", ['module_name' => Str::title($module_name)])
             </x-slot>
             <x-slot name="toolbar">
                 <x-backend.buttons.return-back />
-                <a href='{{ route("backend.$module_name.index") }}' class="btn btn-secondary" data-toggle="tooltip" title="{{ ucwords($module_name) }} List"><i class="fas fa-list"></i> List</a>
+                <a href='{{ route("backend.$module_name.index") }}' class="btn btn-secondary" data-toggle="tooltip"
+                    title="{{ ucwords($module_name) }} List"><i class="fas fa-list"></i> List</a>
             </x-slot>
         </x-backend.section-header>
 
@@ -38,9 +41,6 @@
                             <th>
                                 Updated At
                             </th>
-                            <!-- <th>
-                                Created By
-                            </th> -->
                             <th class="text-end">
                                 Action
                             </th>
@@ -49,25 +49,28 @@
 
                     <tbody>
                         @foreach($$module_name as $module_name_singular)
-                        <tr>
-                            <td>
-                                {{ $module_name_singular->id }}
-                            </td>
-                            <td>
-                                <strong>
-                                    {{ $module_name_singular->title }}
-                                </strong>
-                            </td>
-                            <td>
-                                {{ $module_name_singular->updated_at->isoFormat('llll') }}
-                            </td>
-                            <!-- <td>
-                                {{ $module_name_singular->created_by }}
-                            </td> -->
-                            <td class="text-end">
-                                <a href="{{route("backend.$module_name.restore", $module_name_singular)}}" class="btn btn-warning btn-sm" data-method="PATCH" data-token="{{csrf_token()}}" data-toggle="tooltip" title="{{__('labels.backend.restore')}}"><i class='fas fa-undo'></i> {{__('labels.backend.restore')}}</a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>
+                                    {{ $module_name_singular->id }}
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ $module_name_singular->title }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    {{ $module_name_singular->updated_at->isoFormat('llll') }}
+                                </td>
+                                <!-- <td>
+                                    {{ $module_name_singular->created_by }}
+                                </td> -->
+                                <td class="text-end">
+                                    <a href="{{route("backend.$module_name.restore", $module_name_singular)}}"
+                                        class="btn btn-warning btn-sm" data-method="PATCH" data-token="{{csrf_token()}}"
+                                        data-toggle="tooltip" title="{{__('labels.backend.restore')}}"><i
+                                            class='fas fa-undo'></i> {{__('labels.backend.restore')}}</a>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
