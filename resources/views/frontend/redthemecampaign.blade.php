@@ -608,12 +608,12 @@
 						}
 					}
 
-					function pauseVideo() {
-						if (player) {
-							player.pauseVideo();
-                            disableSpinner();
-						}
-					}
+					// function pauseVideo() {
+					// 	if (player) {
+					// 		player.pauseVideo();
+                    //         disableSpinner();
+					// 	}
+					// }
 
 					function NotPlayerInViewport() {
 						const rect = document.getElementById('player').getBoundingClientRect();

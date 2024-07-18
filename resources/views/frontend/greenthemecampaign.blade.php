@@ -485,10 +485,10 @@
 						// console.log("Video started playing.");
 					});
 
-                    video.addEventListener("pause", function() {
-                        // console.log("Video paused.");
-                        disableSpinner();
-                    });
+            video.addEventListener("pause", function() {
+                // console.log("Video paused.");
+                disableSpinner();
+            });
 
 					video.addEventListener("ended", function() {
 						// console.log("Video ended.");
@@ -518,8 +518,8 @@
 						console.log('The video started playing');
 					});
 
-                    player.on('pause', function() {
-                        disableSpinner();
+            player.on('pause', function() {
+                disableSpinner();
 					});
 
 					// Listen for the 'ended' event
@@ -591,16 +591,16 @@
 						} else if (event.data == YT.PlayerState.ENDED) {
 							var visitorId = {{$visitor_id}};
 							updateView(visitorId);
-                            enableSpinner();
+                enableSpinner();
 						}
 					}
 
-					function pauseVideo() {
-						if (player) {
-							player.pauseVideo();
-                            disableSpinner();
-						}
-					}
+					// function pauseVideo() {
+					// 	if (player) {
+					// 		player.pauseVideo();
+          //                   disableSpinner();
+					// 	}
+					// }
 
 					function NotPlayerInViewport() {
 						const rect = document.getElementById('player').getBoundingClientRect();
