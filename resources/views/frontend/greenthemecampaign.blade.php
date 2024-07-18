@@ -486,7 +486,7 @@
 
                     video.addEventListener("pause", function() {
                         // console.log("Video paused.");
-                        disableSpinner();
+                        //disableSpinner();
                     });
 
 					video.addEventListener("ended", function() {
@@ -518,7 +518,7 @@
 					});
 
                     player.on('pause', function() {
-                        disableSpinner();
+                      //  disableSpinner();
 					});
 
 					// Listen for the 'ended' event
@@ -597,7 +597,7 @@
 					function pauseVideo() {
 						if (player) {
 							player.pauseVideo();
-                            disableSpinner();
+                //disableSpinner();
 						}
 					}
 
