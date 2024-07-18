@@ -430,30 +430,30 @@
         <script src="{{ asset('assets/greentheme/js/main.js') }}"></script>
 
         <script>
+            function enableSpinner() {
+                  var image = document.getElementById("spinning-image");
+                  var button = document.querySelector(".spin-button");
+                  image.classList.remove("fade-out");
+                  button.removeAttribute("disabled");
+                  button.innerHTML = "&#x27A4;"; // Change the button icon if needed
+                  button.addEventListener("click", function() {
+                      console.log("Spin button clicked.");
+                      spinImage(); 
+                      // Call your spinImage() function or perform spin logic here
+                  });
+              }
+
+              function disableSpinner() {
+                  var image = document.getElementById("spinning-image");
+                  var button = document.querySelector(".spin-button");
+                  image.classList.add("fade-out");
+                  button.setAttribute("disabled", "true");
+                  button.innerHTML = "&#x1F512;"; // Change the button icon if needed
+              }
             //////// VIDEO - UPLOAD, VIMEO, YOUTUBE
 			document.addEventListener("DOMContentLoaded", function() {
-                function enableSpinner() {
-                    var image = document.getElementById("spinning-image");
-                    var button = document.querySelector(".spin-button");
-                    image.classList.remove("fade-out");
-                    button.removeAttribute("disabled");
-                    button.innerHTML = "&#x27A4;"; // Change the button icon if needed
-                    button.addEventListener("click", function() {
-                        console.log("Spin button clicked.");
-                        spinImage(); 
-                        // Call your spinImage() function or perform spin logic here
-                    });
-                }
-
-                function disableSpinner() {
-                    var image = document.getElementById("spinning-image");
-                    var button = document.querySelector(".spin-button");
-                    image.classList.add("fade-out");
-                    button.setAttribute("disabled", "true");
-                    button.innerHTML = "&#x1F512;"; // Change the button icon if needed
-                }
-
-                /// Uploaded Video
+            
+        /// Uploaded Video
 				// Get the video element
 				var video = document.getElementById("video-player");
 
@@ -595,12 +595,12 @@
 						}
 					}
 
-					// function pauseVideo() {
-					// 	if (player) {
-					// 		player.pauseVideo();
-          //                   disableSpinner();
-					// 	}
-					// }
+					function pauseVideo() {
+						if (player) {
+							player.pauseVideo();
+                            disableSpinner();
+						}
+					}
 
 					function NotPlayerInViewport() {
 						const rect = document.getElementById('player').getBoundingClientRect();
