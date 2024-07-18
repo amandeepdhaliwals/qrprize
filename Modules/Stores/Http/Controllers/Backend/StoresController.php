@@ -33,7 +33,7 @@ use Illuminate\Support\HtmlString;
 use App\Events\Backend\UserUpdated;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Response; 
+use Illuminate\Support\Facades\Response;
 use PDF;
 use Illuminate\Support\Facades\Crypt;
 
@@ -111,7 +111,7 @@ class StoresController extends BackendBaseController
             ->toArray();
 
         // Fetch users with the specified roles and join with userprofiles and store_qrcodes tables
-        $$module_name = User::select("users.*", "store_qrcodes.step_completed","store_qrcodes.store_name")
+        $$module_name = User::select("users.*", "store_qrcodes.step_completed", "store_qrcodes.store_name")
             ->join(
                 "model_has_roles",
                 "users.id",
@@ -191,7 +191,7 @@ class StoresController extends BackendBaseController
                 }
 
                 // Step 3 badge
-
+    
                 if ($data->step_completed >= 3) {
                     $step3Badge = '<span class="badge bg-success">Advertisement Added</span>';
                 } else {
@@ -281,7 +281,7 @@ class StoresController extends BackendBaseController
 
         $confirmed = 1; /// on adding store - email is always confirmed
         if ($confirmed === 1) {
-        //if ($request->confirmed === 1) {
+            //if ($request->confirmed === 1) {
             $data_array = Arr::add(
                 $data_array,
                 "email_verified_at",
@@ -296,9 +296,9 @@ class StoresController extends BackendBaseController
         $$module_name_singular->assignRole("store");
 
         // Check if any of the specified fields are present in the request
-        $fields = ['address', 'bio', 'url_website', 'url_facebook', 'url_instagram', 'url_twitter', 'url_linkedin', 'avatar','mobile'];
+        $fields = ['address', 'bio', 'url_website', 'url_facebook', 'url_instagram', 'url_twitter', 'url_linkedin', 'avatar', 'mobile'];
         $allEmpty = true;
-        
+
         foreach ($fields as $field) {
             if (!empty($request->{$field})) {
                 // If any field is not empty, set $allEmpty to false
@@ -307,7 +307,7 @@ class StoresController extends BackendBaseController
             }
         }
         $stepCompleted = $allEmpty ? 1 : 2;
-        
+
         // Insert entry into store_qrcodes
         Store::create([
             "user_id" => $$module_name_singular->id,
@@ -346,7 +346,7 @@ class StoresController extends BackendBaseController
             $userprofile->url_instagram = $request->url_instagram;
             $userprofile->url_twitter = $request->url_twitter;
             $userprofile->url_linkedin = $request->url_linkedin;
-             // Handle Avatar upload
+            // Handle Avatar upload
             if ($request->hasFile("avatar")) {
                 $userprofile->avatar = $$module_name_singular->avatar;
             }
@@ -355,8 +355,8 @@ class StoresController extends BackendBaseController
 
         Flash::success(
             "<i class='fas fa-check'></i> New '" .
-                Str::singular($module_title) .
-                "' Created"
+            Str::singular($module_title) .
+            "' Created"
         )->important();
 
         if ($request->email_credentials == 1) {
@@ -371,15 +371,15 @@ class StoresController extends BackendBaseController
 
         Log::info(
             label_case($module_title . " " . $module_action) .
-                " | '" .
-                $$module_name_singular->name .
-                "(ID:" .
-                $$module_name_singular->id .
-                ") ' by User:" .
-                auth()->user()->name .
-                "(ID:" .
-                auth()->user()->id .
-                ")"
+            " | '" .
+            $$module_name_singular->name .
+            "(ID:" .
+            $$module_name_singular->id .
+            ") ' by User:" .
+            auth()->user()->name .
+            "(ID:" .
+            auth()->user()->id .
+            ")"
         );
 
         return redirect("admin/{$module_name}");
@@ -459,11 +459,11 @@ class StoresController extends BackendBaseController
 
         Log::info(
             label_case($module_title . " " . $module_action) .
-                " | User:" .
-                auth()->user()->name .
-                "(ID:" .
-                auth()->user()->id .
-                ")"
+            " | User:" .
+            auth()->user()->name .
+            "(ID:" .
+            auth()->user()->id .
+            ")"
         );
 
         return view(
@@ -562,11 +562,11 @@ class StoresController extends BackendBaseController
 
         Log::info(
             label_case($module_title . " " . $module_action) .
-                " | User:" .
-                auth()->user()->name .
-                "(ID:" .
-                auth()->user()->id .
-                ")"
+            " | User:" .
+            auth()->user()->name .
+            "(ID:" .
+            auth()->user()->id .
+            ")"
         );
 
         return redirect()->route(
@@ -602,11 +602,11 @@ class StoresController extends BackendBaseController
 
             Log::notice(
                 label_case($module_title . " " . $module_action) .
-                    " Failed | User:" .
-                    auth()->user()->name .
-                    "(ID:" .
-                    auth()->user()->id .
-                    ")"
+                " Failed | User:" .
+                auth()->user()->name .
+                "(ID:" .
+                auth()->user()->id .
+                ")"
             );
 
             return redirect()->back();
@@ -620,18 +620,18 @@ class StoresController extends BackendBaseController
 
         flash(
             '<i class="fas fa-check"></i> ' .
-                $$module_name_singular->name .
-                " User Successfully Deleted!"
+            $$module_name_singular->name .
+            " User Successfully Deleted!"
         )->success();
 
         Log::info(
             label_case($module_action) .
-                " '{$module_name}': '" .
-                $$module_name_singular->name .
-                ", ID:" .
-                $$module_name_singular->id .
-                " ' by User:" .
-                auth()->user()->name
+            " '{$module_name}': '" .
+            $$module_name_singular->name .
+            ", ID:" .
+            $$module_name_singular->id .
+            " ' by User:" .
+            auth()->user()->name
         );
 
         return redirect("admin/{$module_name}");
@@ -662,10 +662,10 @@ class StoresController extends BackendBaseController
 
         Log::info(
             label_case($module_action) .
-                " " .
-                label_case($module_name) .
-                " by User:" .
-                auth()->user()->name
+            " " .
+            label_case($module_name) .
+            " by User:" .
+            auth()->user()->name
         );
 
         return view(
@@ -712,18 +712,18 @@ class StoresController extends BackendBaseController
 
         flash(
             '<i class="fas fa-check"></i> ' .
-                $$module_name_singular->name .
-                " Successfully Restoreded!"
+            $$module_name_singular->name .
+            " Successfully Restoreded!"
         )->success();
 
         Log::info(
             label_case($module_action) .
-                " '{$module_name}': '" .
-                $$module_name_singular->name .
-                ", ID:" .
-                $$module_name_singular->id .
-                " ' by User:" .
-                auth()->user()->name
+            " '{$module_name}': '" .
+            $$module_name_singular->name .
+            ", ID:" .
+            $$module_name_singular->id .
+            " ' by User:" .
+            auth()->user()->name
         );
 
         return redirect("admin/{$module_name}");
@@ -750,13 +750,13 @@ class StoresController extends BackendBaseController
         $store = Store::where("user_id", $storeId)->first();
 
         $advertisements = Advertisement::where("status", 1)
-            ->where("store_id",$storeId)
+            ->where("store_id", $storeId)
             ->where("deleted_at", null) // Assuming 'isdeleted' is a boolean column
             ->get();
 
-        $campaign_count= Campaign::where("store_id", $storeId)
-        ->count(); 
-        $campaign_count_for_name =  $campaign_count + 1;     
+        $campaign_count = Campaign::where("store_id", $storeId)
+            ->count();
+        $campaign_count_for_name = $campaign_count + 1;
 
         logUserAccess($module_title . " " . $module_action);
 
@@ -856,12 +856,15 @@ class StoresController extends BackendBaseController
         ]);
 
         $storeId = $request->store_id;
+        $selectedTheme = $request->selectedTheme;
+        $theme = ($selectedTheme == 'green') ? 0 : (($selectedTheme == 'red') ? 1 : null);
 
-        $campaign_name = $request['campaign_name_hid'].$request['campaign_name'];
+        $campaign_name = $request['campaign_name_hid'] . $request['campaign_name'];
         // Create a new campaign record
         $$module_name_singular = $module_model::create([
             "campaign_name" => $campaign_name,
             "store_id" => $storeId,
+            "theme" => $theme,
             "qr_code_url" => '',
             "qr_code_image" => '',
             "lock_time" => $request['lock_time'],
@@ -870,10 +873,10 @@ class StoresController extends BackendBaseController
 
 
         $salt = Str::random(8);
-    
-        $combined_id =  Crypt::encryptString($storeId . '_' . $salt . '_' . $$module_name_singular->id);
 
-        $url = url("/campaign/".$combined_id);
+        $combined_id = Crypt::encryptString($storeId . '_' . $salt . '_' . $$module_name_singular->id);
+
+        $url = url("/campaign/" . $combined_id);
 
         $qrCode = QrCode::format("png")
             ->size(200)
@@ -961,14 +964,14 @@ class StoresController extends BackendBaseController
         $module_icon = $this->module_icon;
         $module_model = "Modules\Stores\Entities\Campaign";
         $module_name_singular = Str::singular($module_name);
-    
+
         $module_action = "List";
-    
+
         $page_heading = label_case($module_title);
         $title = $page_heading . " " . label_case($module_action);
-    
+
         $campaigns = $module_model::select("campaign.*")->where('store_id', $storeId)->get();
-    
+
         return Datatables::of($campaigns)
             ->addColumn("download", function ($data) use ($module_name) {
                 $storeId = $data->store_id;
@@ -988,9 +991,9 @@ class StoresController extends BackendBaseController
             ->rawColumns(["qr_code_image", "edit_campaign"])
             ->make(true);
     }
-    
 
-           /**
+
+    /**
      * Show form to add advertisment for a store.
      *
      * @param  int  $storeId
@@ -1009,7 +1012,7 @@ class StoresController extends BackendBaseController
 
         // Find the store by ID
         $store = Store::where("user_id", $storeId)->first();
-       
+
         // // Find the user details by ID
         // $userDetails = User::where("id", $storeId)->first();
 
@@ -1020,18 +1023,18 @@ class StoresController extends BackendBaseController
         $adv_videos = Video::where("status", 1)
             ->where("deleted_at", null)
             ->get();
-        
+
         $adv_images = Gallery::where("status", 1)
             ->where("deleted_at", null)
             ->get();
 
         $other_images = Otherprize::where("status", 1)
-        ->where("deleted_at", null)
-        ->get();    
+            ->where("deleted_at", null)
+            ->get();
 
-        $advertisement_count= Advertisement::where("store_id", $storeId)
-        ->count(); 
-        $advertisement_count_for_name =  $advertisement_count + 1;  
+        $advertisement_count = Advertisement::where("store_id", $storeId)
+            ->count();
+        $advertisement_count_for_name = $advertisement_count + 1;
 
         logUserAccess($module_title . " " . $module_action);
 
@@ -1055,7 +1058,7 @@ class StoresController extends BackendBaseController
         );
     }
 
-       /**
+    /**
      * Store a new advertisement in the database.
      *
      * @param  \Illuminate\Http\Request  $request  The request object containing the campaign data.
@@ -1070,7 +1073,7 @@ class StoresController extends BackendBaseController
         $module_icon = $this->module_icon;
         $module_action = "Store";
 
-       // Validate the incoming request data
+        // Validate the incoming request data
         $requestData->validate([
             "advertisement_name" => "required",
             "coupon_id" => "required",
@@ -1078,46 +1081,61 @@ class StoresController extends BackendBaseController
 
         $couponIdArray = $requestData['coupon_id'];
         $noOfCouponArray = array_values(array_filter($requestData['no_of_coupon'])); // Remove null values
-        $winningRatioArray = array_values(array_filter($requestData['winning_ratio'])); // Remove null values
-        $noOfCouponSum = array_sum($noOfCouponArray);
+        //$winningRatioArray = array_values(array_filter($requestData['winning_ratio'])); // Remove null values
+
+        $dailyQuotaProbability =  isset($requestData['daily_quota_probability']) ? $requestData['daily_quota_probability'] : [];
+        $winProbabilityArray = isset($requestData['win_probability']) ? $requestData['win_probability'] : [];
+        $newUserProbabilityArray = isset($requestData['new_user_probability']) ? $requestData['new_user_probability'] : [];
+        $oldUserProbabilityArray = isset($requestData['old_user_probability']) ? $requestData['old_user_probability'] : [];
         
+        $noOfCouponSum = array_sum($noOfCouponArray);
+
         // Check if the lengths of coupon ID and number of coupons arrays are equal
         if (count($couponIdArray) !== count($noOfCouponArray)) {
             // Return an error response
             return response()->json(['error' => 'Mismatch in coupon ID and number of coupons.'], 400);
         }
-        
+
         $combinedDataCoupon = [];
-        
+
         // Combine coupon_id with no_of_coupon and winning_ratio
         foreach ($couponIdArray as $index => $couponId) {
             $combinedDataCoupon[$couponId] = [
                 'count' => $noOfCouponArray[$index],
-                'winning_ratio' => $winningRatioArray[$index]
+                // 'winning_ratio' => $winningRatioArray[$index]
+                'win_probability' => isset($winProbabilityArray[$index]) ? $winProbabilityArray[$index] : null,
+                'new_user_probability' => isset($newUserProbabilityArray[$index]) ? $newUserProbabilityArray[$index] : null,
+                'old_user_probability' => isset($oldUserProbabilityArray[$index]) ? $oldUserProbabilityArray[$index] : null,
+                'daily_quota_probability' => isset($dailyQuotaProbability[$index]) ? $dailyQuotaProbability[$index] : null,
+        
             ];
         }
-        
+
         // Convert combined data to JSON format
         $jsonDataCoupon = json_encode($combinedDataCoupon);
-        
-        if (empty($couponIdArray) || empty($noOfCouponArray) || empty($winningRatioArray)) {
+
+        // if (empty($couponIdArray) || empty($noOfCouponArray) || empty($winningRatioArray)) {
+        //     // Return an error response
+        //     return response()->json(['error' => 'Coupon ID or number of coupons or winning ratio is missing.'], 400);
+        // }
+        if (empty($couponIdArray) || empty($noOfCouponArray)) {
             // Return an error response
-            return response()->json(['error' => 'Coupon ID or number of coupons or winning ratio is missing.'], 400);
+            return response()->json(['error' => 'Coupon ID or number of coupons.'], 400);
         }
-        
-        $advertisement_name = $requestData['advertisement_name_hid'].$requestData['advertisement_name'];
+
+        $advertisement_name = $requestData['advertisement_name_hid'] . $requestData['advertisement_name'];
 
         $primaryImageIdsString = implode(',', $requestData['primary_image_id']);
 
-        if(isset($requestData['secondary_image_id']) && !empty($requestData['secondary_image_id'])) {
+        if (isset($requestData['secondary_image_id']) && !empty($requestData['secondary_image_id'])) {
             $secondaryImageIdsString = implode(',', $requestData['secondary_image_id']);
         } else {
             $secondaryImageIdsString = '';
         }
-        
+
         $otherCouponImageIdsString = implode(',', $requestData['other_coupon_image_ids']);
 
-    
+
         $data = [
             "advertisement_name" => $advertisement_name,
             "store_id" => $requestData['user_id'],
@@ -1133,29 +1151,27 @@ class StoresController extends BackendBaseController
             "status" => 1
         ];
 
-        
-        $request_type='';
-       
-        if($requestData['action'] == "preview_winning" || $requestData['action'] == "preview_lose")
-        {
+
+        $request_type = '';
+
+        if ($requestData['action'] == "preview_winning" || $requestData['action'] == "preview_lose") {
             $module_name = 'Modules\Stores\Entities\Previewadvertisement';
             $data["winning_type"] = $requestData['action'] == "preview_winning" ? 'winning' : 'lose';
-            $store_id =  $requestData['user_id'];
-            $request_type='1';
+            $store_id = $requestData['user_id'];
+            $request_type = '1';
 
-            
+
             $tableName = (new $module_name)->getTable();
             // Delete records based on criteria
             \DB::table($tableName)
                 ->where('store_id', $store_id)
                 ->where('winning_type', $data["winning_type"])
-                ->delete(); 
-        }
-        else{
+                ->delete();
+        } else {
             $module_name = 'Modules\Stores\Entities\Advertisement';
-            $request_type='2';
+            $request_type = '2';
         }
- 
+
         $request_action = $requestData['action'] == "preview_winning" ? '1' : '2';
 
         $module_name_singular = Str::singular($module_name);
@@ -1164,13 +1180,13 @@ class StoresController extends BackendBaseController
         $store = Store::where("user_id", $requestData['user_id'])->first();
         // Check if the model instance exists
 
-        if($request_type == '2'){  //// create advertisement
+        if ($request_type == '2') {  //// create advertisement
             $module_name_pr_adv = 'Modules\Stores\Entities\Previewadvertisement';
             $tableName = (new $module_name_pr_adv)->getTable();
             // Truncate the table
             \DB::table($tableName)->truncate();
 
-            if ($store && $store->step_completed < 3) {
+            if ($store && $store->step_completed < 3) { 
                 // Update the attributes
                 $store->step_completed = 3;
                 $store->save();
@@ -1186,12 +1202,12 @@ class StoresController extends BackendBaseController
                     'total_coupons' => $newTotalCouponCount,
                     'no_of_assigned_coupons' => $newAssignesCouponCount
                 ]);
-                
+
             }
-            
+
             flash(icon() . "New '" . Str::singular($module_title) . "' Added")
-            ->success()
-            ->important();
+                ->success()
+                ->important();
 
             // Log the successful creation of the campaign
             Log::info(
@@ -1201,19 +1217,18 @@ class StoresController extends BackendBaseController
             return response()->json([
                 'response_type' => 'store'
             ]);
-        }
-        else {
+        } else {
             return response()->json([
                 'storeId' => $store_id,
                 'request_action' => $request_action,
                 'response_type' => 'preview'
             ]);
-        }        
-       
+        }
+
     }
 
 
-     /**
+    /**
      * Retrieves the data for the index page of the module.
      *
      * @param  int  $storeId
@@ -1227,22 +1242,22 @@ class StoresController extends BackendBaseController
         $module_icon = $this->module_icon;
         $module_model = "Modules\Stores\Entities\Advertisement";
         $module_name_singular = Str::singular($module_name);
-    
+
         $module_action = "List";
-    
+
         $page_heading = label_case($module_title);
         $title = $page_heading . " " . label_case($module_action);
-    
-        $advertisements = $module_model::select("advertisement.*","videos.media","videos.media_type")
-        ->join('videos', 'advertisement.adv_video_id', '=', 'videos.id')
-        ->where('advertisement.store_id', $storeId)
-        ->get();
-     
+
+        $advertisements = $module_model::select("advertisement.*", "videos.media", "videos.media_type")
+            ->join('videos', 'advertisement.adv_video_id', '=', 'videos.id')
+            ->where('advertisement.store_id', $storeId)
+            ->get();
+
         return Datatables::of($advertisements)
             ->addColumn("edit_advertisement", function ($data) use ($module_name) {
                 $storeId = $data->store_id;
                 $advertisementId = $data->id;
-                $media_type =  $data->media_type;
+                $media_type = $data->media_type;
                 $media = $data->media;
 
                 $route = route("backend.{$module_name}.edit-campaign", [
@@ -1265,7 +1280,7 @@ class StoresController extends BackendBaseController
             @elseif($media_type == "Vimeo" || $media_type == "vimeo") 
                 <iframe src="{{ $media }}" width="150" height="140" frameborder="0" allowfullscreen></iframe>
             @else <span> No Media </span> @endif')
-            ->rawColumns(["edit_advertisement","media"])
+            ->rawColumns(["edit_advertisement", "media"])
             ->make(true);
     }
 
@@ -1276,7 +1291,7 @@ class StoresController extends BackendBaseController
      * @param  int  $storeId
      * @return \Illuminate\Contracts\View\View
      */
-    public function previewAdvertisement($storeId,$request_action)
+    public function previewAdvertisement($storeId, $request_action)
     {
         $module_title = "Preview Advertisement";
         $module_name = $this->module_name;
@@ -1287,24 +1302,24 @@ class StoresController extends BackendBaseController
 
         $module_action = "Show";
 
-        $winning_type = $request_action == '1' ? 'winning' : 'lose'; 
+        $winning_type = $request_action == '1' ? 'winning' : 'lose';
         $preview_advertisements = Previewadvertisement::where("store_id", $storeId)
-        ->where("winning_type",$winning_type)
-        ->first();
+            ->where("winning_type", $winning_type)
+            ->first();
         // Find the store by ID
         $store = Store::where("user_id", $storeId)->first();
 
         $adv_videos = Video::where("status", 1)
-            ->where("id",$preview_advertisements->adv_video_id)
+            ->where("id", $preview_advertisements->adv_video_id)
             ->where("deleted_at", null)
             ->first();
 
         $primary_image_ids = explode(',', $preview_advertisements->primary_image_id);
 
         $primary_images = Gallery::whereIn("id", $primary_image_ids)
-        ->where("status", 1)
-        ->where("deleted_at", null)
-        ->get();
+            ->where("status", 1)
+            ->where("deleted_at", null)
+            ->get();
 
         $secondary_image_ids = explode(',', $preview_advertisements->secondary_images_id);
 
@@ -1318,17 +1333,17 @@ class StoresController extends BackendBaseController
         $other_images = Otherprize::whereIn("id", $other_image_ids)
             ->where("status", 1)
             ->whereNull("deleted_at")
-            ->get();    
+            ->get();
 
-        
+
         // Decode the JSON data into an associative array
         $coupon_data = json_decode($preview_advertisements->coupons_id, true);
-        
+
         // Extract the keys (coupon IDs)
         $coupon_ids = array_keys($coupon_data);
-        
+
         // Fetch the coupons based on the extracted IDs
-        $coupons = Coupon::whereIn('id', $coupon_ids)->get();   
+        $coupons = Coupon::whereIn('id', $coupon_ids)->get();
         // $advertisement_count= Advertisement::where("store_id", $storeId)
         // ->count(); 
         // $advertisement_count_for_name =  $advertisement_count + 1;  
@@ -1369,7 +1384,7 @@ class StoresController extends BackendBaseController
         }
 
         // Create an HTML view with the QR code image, store name, and campaign name
-        $html = View::make('stores::backend.stores.qr_code_template', compact('campaign','store'))->render();
+        $html = View::make('stores::backend.stores.qr_code_template', compact('campaign', 'store'))->render();
 
         // Convert HTML to image (You can use a package like DomPDF to convert HTML to image)
         $pdf = PDF::loadHTML($html);
@@ -1384,6 +1399,6 @@ class StoresController extends BackendBaseController
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
     }
-    
+
 
 }

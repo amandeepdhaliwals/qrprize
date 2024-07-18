@@ -57,7 +57,45 @@
     text-align: center;
   }
 }
-</style>
+
+  .theme-selection {
+    display: flex;
+    /* justify-content: center; */
+    gap: 20px;
+    /* margin-top: 20px; */
+}
+
+.theme-box {
+    width: 150px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    color: #fff;
+    font-weight: bold;
+}
+
+.theme-box:hover {
+    transform: scale(1.1);
+}
+
+.green-theme {
+    background-color: #28a745;
+}
+
+.red-theme {
+    background-color: #dc3545;
+}
+
+.selected {
+    border: 5px solid #000; /* Add a border to indicate selection */
+}
+
+  
+  </style>
 <div class="card">
     <div class="card-body">
         <x-backend.section-header>
@@ -227,6 +265,23 @@
                 </div>
             </div>
             </div>
+
+            <div class="form-group row mb-3">
+             <label class="col-sm-2 form-control-label required-label">Select Theme</label>
+               <div class="col-sm-10">
+            <div class="theme-selection">
+                <div class="theme-box green-theme selected" data-theme="green">
+                    <span>Green</span>
+                </div>
+                <div class="theme-box red-theme" data-theme="red">
+                    <span>Red</span>
+                </div>
+            </div>
+            </div>
+            </div>
+            <input type="hidden" id="selectedTheme" name="selectedTheme" value="green">
+
+
         </div>
 
         <div class="row mt-4">
@@ -312,5 +367,20 @@
             },
         ]
     });
+
+    $(document).ready(function () {
+    $('.theme-box').on('click', function () {
+        $('.theme-box').removeClass('selected');
+        $(this).addClass('selected');
+        
+        const selectedTheme = $(this).data('theme');
+        $('#selectedTheme').val(selectedTheme);
+        
+        // Do something with the selected theme if needed
+        console.log('Selected theme:', selectedTheme);
+    });
+    });
+
+
 </script>
 @endpush
