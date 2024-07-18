@@ -326,8 +326,7 @@
                         </div>
                     </div>
                     <div class="col-12 mt-2 spinner-bottom-text">
-                        <p>Non disperare!</p>
-                        <p>Puoi tornare a provare la fortuna tra:</p>
+                        <p>Guarda gentilmente tutto il video per sbloccare i premi.</p>
                     </div>
                 </div>
             </div>
@@ -350,7 +349,7 @@
             <div class="container">
                <div class="row">
                   <div class="col-12">
-                     <p class="mb-0">@2024 QR Code. All rights reserved.</p>
+                     <p class="mb-0">@2024 QR Prize. All rights reserved.</p>
                   </div>
                </div>
             </div>
@@ -368,7 +367,7 @@
             </div>
             <div class="text-center signinModal-header">
               <img src="{{ asset('assets/redtheme/img/login-lock.svg') }}">
-              <h4 class="mt-3 mb-3">PER FAVORE INSERISCI I TUOL <br>
+              <h4 class="mt-3 mb-3">PER FAVORE INSERISCI I TUOI <br>
                     CONTATTI PER SBLOCCARE I PREMI:</h4>
             </div>
             <form id="modalForm">
