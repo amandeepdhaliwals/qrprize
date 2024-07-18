@@ -443,8 +443,7 @@
         <script src="{{ asset('assets/redtheme/js/main.js') }}"></script>
 
         <script>
-            //////// VIDEO - UPLOAD, VIMEO, YOUTUBE
-			document.addEventListener("DOMContentLoaded", function() {
+
                 function enableSpinner() {
                     var image = document.getElementById("spinning-image");
                     var button = document.querySelector(".spin-button");
@@ -466,6 +465,8 @@
                     button.innerHTML = "&#x1F512;"; // Change the button icon if needed
                 }
 
+            //////// VIDEO - UPLOAD, VIMEO, YOUTUBE
+			document.addEventListener("DOMContentLoaded", function() {
                 /// Uploaded Video
 				// Get the video element
 				var video = document.getElementById("video-player");
