@@ -41,6 +41,22 @@
 
 </head>
 
+<style>
+  .theme-green{
+    color: #eb6169; 
+    font-family: system-ui;
+    text-align:center;
+  }
+  .gt-bold{
+    font-weight: bold;
+  }
+  .theme-red{
+    text-align:center;
+  }
+  </style>
+  
+
+
 <body>
 
   <main id="main">
@@ -64,8 +80,8 @@
             <p class="mb-0" style="text-align:center;">Non disperare!</p>
             <p class="mb-0" style="text-align:center;">Puoi tornare a provare la fortuna tra:</p>
           </div>
-          <h3 id="betterluckcountdown" style="text-align:center;"></h3>
-          <p class="Condizioni" style="text-align:center;">Condizioni d’uso</p>
+          <h2 id="betterluckcountdown" class="{{ $campaign->theme == 0 ? 'theme-green gt-bold' : 'theme-red' }}" ></h2>
+          <p class="Condizioni {{ $campaign->theme == 0 ? 'theme-green' : 'theme-red' }}">Condizioni d’uso</p>
 
 
         </div>
@@ -135,9 +151,9 @@
        } 
       });
 
-      setTimeout(function () {
-              window.location.href = "{{$campaign->qr_code_url }}"; // Redirect after 10 seconds
-            }, 10000);
+      // setTimeout(function () {
+      //         window.location.href = "{{$campaign->qr_code_url }}"; // Redirect after 10 seconds
+      //       }, 10000);
   </script>   
 </body>
 
