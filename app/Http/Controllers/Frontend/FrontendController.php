@@ -113,7 +113,10 @@ class FrontendController extends Controller
             $encryptedValue = Crypt::encryptString($advertisement_detail->store_id . '_' . $campaignId . '_' . $advertisement_detail->id);
 
             // Return the view with the necessary data
-            return view('frontend.campaign', compact('campaignId', 'advertisement_detail', 'advertisement_video', 'primary_images', 'secondary_images', 'other_images', 'coupons', 'lock_time', 'visitor_id','encryptedValue'));
+            $viewName = $campaign_data->theme == '0' ? 'frontend.greenthemecampaign' : 'frontend.redthemecampaign';
+
+            return view($viewName, compact('campaignId', 'advertisement_detail', 'advertisement_video', 'primary_images', 'secondary_images', 'other_images', 'coupons', 'lock_time', 'visitor_id', 'encryptedValue'));
+            
         } catch (DecryptException $e) {
             // Handle decryption error
             return abort(Response::HTTP_BAD_REQUEST);
@@ -157,7 +160,7 @@ class FrontendController extends Controller
         {
         $decrypt_data = Crypt::decryptString($combined_id_lose);
 
-        list($storeId, $salt, $campaignId) = explode('_', $decrypt_data);
+        list($storeId, $salt, $campaignId, $customer_id) = explode('_', $decrypt_data);
 
         } catch (DecryptException $e) {
             //return response()->json(['error' => 'Invalid token'], 400);
@@ -176,10 +179,28 @@ class FrontendController extends Controller
         }
 
         $campaign = Campaign::where('id',$campaignId)->where('store_id',$storeId)->first();
+
         if(!$campaign){
-        return abort(Response::HTTP_NOT_FOUND);
+            return abort(Response::HTTP_NOT_FOUND);
+          }
+
+        $latestCustomerResult = CustomerResult::where('customer_id', $customer_id)
+        ->where('campaign_id', $campaignId)
+        ->latest('created_at')
+        ->value('created_at');
+
+        $lockDateTime = '';
+        if ($latestCustomerResult) {
+            $lockTimeAdded = Carbon::parse($latestCustomerResult)->addHours($campaign->lock_time);
+            $currentDateTime = Carbon::now();
+        
+            if ($lockTimeAdded->greaterThan($currentDateTime)) {
+                $lockDateTime = $lockTimeAdded->format('M j, Y H:i:s');
+            }
         }
-        return view('frontend.betterluck',compact('storeId','campaign','campaignId'));
+        
+        return view('frontend.betterluck', compact('storeId', 'campaign', 'lockDateTime', 'campaignId'));;
+        
     }
 
     public function win($combined_id_win)
@@ -205,8 +226,6 @@ class FrontendController extends Controller
                 'message' => 'An error occurred'
             ]);
         }
-
-
 
         $res = CustomerWin::select('customer_wins.*', 'customer_results.*')
         ->join('customer_results', 'customer_wins.customer_results_id', '=', 'customer_results.id')
@@ -240,7 +259,7 @@ class FrontendController extends Controller
             $advertisement_id = $res->advertisement_id;
             $storeId = $res->store_id;
             $campaignId = $res->campaign_id;
-            $campaign = Campaign::select('qr_code_url')->where('id',$campaignId)->where('store_id',$storeId)->first();
+            $campaign = Campaign::select('qr_code_url', 'theme')->where('id', $campaignId)->where('store_id', $storeId)->first();
             $coupon_category =  $coupon->category;
 
             $claim = Claim::where('customer_id', $res->customer_id)

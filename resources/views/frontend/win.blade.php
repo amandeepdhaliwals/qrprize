@@ -19,9 +19,14 @@
   <link href="{{ asset('assets/Impact/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="{{ asset('assets/Impact/assets/css/main.css')}}" rel="stylesheet">
-  <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet"> 
-  <link href="{{ asset('assets/css/wheel.css') }}" rel="stylesheet"> 
+  @if($campaign->theme == 0)
+  <link href="{{ asset('assets/greentheme/css/main.css') }}" rel="stylesheet">
+  @else
+  <link href="{{ asset('assets/redtheme/css/main.css') }}" rel="stylesheet">
+  @endif
+  <!-- <link href="{{ asset('assets/Impact/assets/css/main.css')}}" rel="stylesheet"> -->
+  <!-- <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">  -->
+  <!-- <link href="{{ asset('assets/css/wheel.css') }}" rel="stylesheet">  -->
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
@@ -55,33 +60,63 @@
   <main id="main">
     <section class="better-luck">
       <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <div class="better-luck-img text-center">
-              <img src="{{ asset('assets/Impact/assets/img/win-badge.svg') }}" alt="Win Badge">
+      <div class="signinModal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <!-- <div class="close-btn">
+              <button type="button" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div> -->
+            @if($campaign->theme == 0)
+          
+            <div class="text-center coupon-modal-header">
+              <h2 class="mt-3 mb-0">HAI</h2>
+              <h1 class=" mb-3">VINTO!</h1>
+              <img src="{{ asset('assets/greentheme/img/coupon-green.png')}}" alt="Coupon Image">
             </div>
-            <h2 class="mt-4 text-center">Congratulations!</h2>
-            <p class="text-center"> You have won a coupon.</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-12">
-            <div class="coupon-details text-center">
-              <h3>{{ $coupon->title }}</h3>
-              <p><strong>Coupon Code:</strong> {{ $coupon->code }} <button id="copyCoupon" class="btn btn-primary"><i style="font-size:12px" class="fa">&#xf0c5;</i></button></p>
-              <div class="description">
-                <p><strong>Description:</strong></p>
-                <p>{!! nl2br(e($coupon->description)) !!}</p>
-              </div>
-              <p id="termsHeading" data-bs-toggle="collapse" data-bs-target="#termsCollapse" aria-expanded="false" aria-controls="termsCollapse" class="text-primary"> Terms and Conditions</p>
+            <div class="coupon-modal-body">
+              <p class="">CONTENUTO: <span>{{ $coupon->title }}</span></p>
+              <p>CODICE: {{ $coupon->code }} <button id="copyCoupon" class="btn btn-secondary btn-sm"><i style="font-size:12px" class="fa">&#xf0c5;</i></button></p>
+              <p class="">DESCRIZIONE: <span>{!! nl2br(e($coupon->description)) !!}</span></p>
+            </div>
+            <div class="coupon-modal-body mt-4">
+              <p>Per riscattare il premio inserisci
+                nome e indirizzo</p>
+            </div>
+            <div class="coupon-modal-footer mt-4">
+              <p id="termsHeading" data-bs-toggle="collapse" data-bs-target="#termsCollapse" aria-expanded="false" aria-controls="termsCollapse" class=""> Condizioni d’uso</p>
               <div class="collapse" id="termsCollapse">
-                <p><strong>Terms and Conditions:</strong></p>
+                <p><strong>Condizioni d’uso:</strong></p>
                 <p>{!! nl2br(e($coupon->terms_and_condition)) !!}</p>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="row countdown-row">
+         
+            @else
+            <div class="text-center coupon-modal-header">
+              <h2 class="mt-3 mb-0">HAI</h2>
+              <h1 class=" mb-3">VINTO!</h1>
+              <img src="{{ asset('assets/redtheme/img/coupon-black.png')}}" alt="Coupon Image">
+            </div>
+            <div class="coupon-modal-body">
+              <p class="">CONTENUTO: <span>{{ $coupon->title }}</span></p>
+              <p>CODICE: {{ $coupon->code }} <button id="copyCoupon" class="btn btn-secondary btn-sm"><i style="font-size:12px" class="fa">&#xf0c5;</i></button></p>
+              <p class="">DESCRIZIONE: <span>{!! nl2br(e($coupon->description)) !!}</span></p>
+            </div>
+            <div class="coupon-modal-body mt-4">
+              <p>Per riscattare il premio inserisci
+                nome e indirizzo</p>
+            </div>
+            <div class="coupon-modal-footer mt-4">
+              <p id="termsHeading" data-bs-toggle="collapse" data-bs-target="#termsCollapse" aria-expanded="false" aria-controls="termsCollapse" class=""> Condizioni d’uso</p>
+              <div class="collapse" id="termsCollapse">
+                <p><strong>Condizioni d’uso:</strong></p>
+                <p>{!! nl2br(e($coupon->terms_and_condition)) !!}</p>
+              </div>
+            </div>
+            @endif
+
+          <div class="row countdown-row">
           <div class="col-12">
             <div id="betterluckcountdown" class="betterluckcountdown"></div>
           </div>
@@ -100,32 +135,47 @@
               <input type="hidden" name="advertisement_id" value="{{ $advertisement_id }}">
               <input type="hidden" name="customer_id" value="{{ $customer_id }}">
               <div class="text-center">
-                <button type="submit" class="btn btn-primary mt-4">Claim Coupon</button>
-            </div>
+                <button type="submit" class="btn btn-secondary mt-4">Claim Coupon</button>  
+              </div>
+              <br>
+              <div class="text-center">
+              <a href="{{$campaign->qr_code_url }}" style="color:#6c757d;">Back to Homepage</a>
+              </div>
 
             </form>
           </div>
           @else
-        <div  class="text-center" style="color: green;"><h1>Claimed</h1></div>
-        <div  class="text-center" id="countdown">Redirecting in <span id="countdown-number">10</span> seconds...</div>
-        <script>
-            // Countdown timer
-            var countdownNumberEl = document.getElementById('countdown-number');
-            var countdown = 10;
+          <div  class="text-center" style="color: green;"><h1>Claimed</h1></div>
+          <div  class="text-center" id="countdown">Redirecting in <span id="countdown-number">10</span> seconds...</div>
+          <script>
+              // Countdown timer
+              var countdownNumberEl = document.getElementById('countdown-number');
+              var countdown = 10;
 
-            function countdownFunc() {
-                countdown = countdown - 1;
-                countdownNumberEl.textContent = countdown;
-            }
+              function countdownFunc() {
+                  countdown = countdown - 1;
+                  countdownNumberEl.textContent = countdown;
+              }
 
-            setInterval(countdownFunc, 1000);
+              setInterval(countdownFunc, 1000);
 
-            setTimeout(function () {
-              window.location.href = "{{$campaign->qr_code_url }}"; // Redirect after 10 seconds
-            }, 10000);
-        </script>
-        @endif
+              setTimeout(function () {
+                window.location.href = "{{$campaign->qr_code_url }}"; // Redirect after 10 seconds
+              }, 10000);
+          </script>
+          @endif
         </div>
+
+
+
+          </div>
+        </div>
+      </div>
+
+        
+
+
+
       </div>
     </section>
   </main><!-- End #main -->

@@ -21,6 +21,7 @@ use Laracasts\Flash\Flash;
 use Modules\Customers\Entities\Customer;
 use Modules\Customers\Entities\OtpVerification;
 use Modules\Customers\Entities\CustomerResult;
+use Modules\Customers\Entities\AuditTrail;
 use Carbon\Carbon;
 use App\Notifications\OTPNotification;
 use Illuminate\Support\Facades\Notification;
@@ -483,116 +484,106 @@ class UserController extends Controller
 
     public function create_user(Request $request)
     {
-        ///the rate limiter ensures that only up to 50 requests are accepted from a single IP address within a 1-minute timeframe
+        // Rate limiter
         $key = 'otp-request-' . $request->ip();
         $maxAttempts = 50;
         $decaySeconds = 60;
-
+    
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             return response()->json([
                 'response_type' => 'failed',
                 'message' => 'Too many requests. Please try again later.'
             ]);
         }
-
+    
         RateLimiter::hit($key, $decaySeconds);
-
+    
         $module_title = $this->module_title;
         $module_name = $this->module_name;
         $module_path = $this->module_path;
         $module_icon = $this->module_icon;
         $module_model = $this->module_model;
         $module_name_singular = Str::singular($module_name);
-
         $module_action = 'Details';
-
+    
         $rolesId = [5];
-
-         // Check if a user already exists with the same email
+    
+        // Check if a user already exists with the same email
         $existingUser = User::where('email', $request->email)
-        ->whereHas('roles', function ($query) use ($rolesId) {
-            $query->where('id', $rolesId);
-        })
-        ->first();
-
+            ->whereHas('roles', function ($query) use ($rolesId) {
+                $query->where('id', $rolesId);
+            })
+            ->first();
+    
         try {
-        $token_user_data = Crypt::decryptString($request->token_user_data);
-
-        list($request->store_id, $request->campaign_id, $request->advertisement_id) = explode('_', $token_user_data);
-
+            $token_user_data = Crypt::decryptString($request->token_user_data);
+            list($request->store_id, $request->campaign_id, $request->advertisement_id) = explode('_', $token_user_data);
         } catch (DecryptException $e) {
-            //return response()->json(['error' => 'Invalid token'], 400);
+            Log::info(label_case($module_title.' '.$module_action). ' Invalid token decrypt attempt.');
+            $this->storeAuditTrail(0, 'invalid_token_decrypt', ['token_user_data' => $request->token_user_data]);
             return response()->json([
                 'status' => 'user_token',
                 'response_type' => 'failed',
                 'message' => 'Invalid token'
             ]);
         } catch (\Throwable $e) {
-           // return response()->json(['error' => 'An error occurred'], 500);
-            return response()->json([
+            Log::info(label_case($module_title.' '.$module_action).' Error during token decrypt attempt.');
+            $this->storeAuditTrail(0, 'error_token_decrypt', ['error_token_decrypt' => $request->token_user_data]);
+           return response()->json([
                 'status' => 'user_token',
                 'response_type' => 'failed',
                 'message' => 'An error occurred'
             ]);
         }
-
-        $campaignsExist = Campaign::where('id', $request->campaign_id)
-        ->where('store_id', $request->store_id)
-        ->whereJsonContains('advertisement_ids', $request->advertisement_id)
-        ->exists();
     
-        if(!$campaignsExist){
+        $campaignsExist = Campaign::where('id', $request->campaign_id)
+            ->where('store_id', $request->store_id)
+            ->whereJsonContains('advertisement_ids', $request->advertisement_id)
+            ->exists();
+    
+        if (!$campaignsExist) {
             return response()->json([
                 'status' => 'user_token',
                 'response_type' => 'failed',
                 'message' => 'Something went wrong'
-            ]);  
-        } 
-
-        if ($existingUser) { 
+            ]);
+        }
+    
+        if ($existingUser) {
             $otpVerificationEmail = OtpVerification::where('user_id', $existingUser->id)
-            ->where('type', 'email')
-            ->first();
-                      
-            if ($otpVerificationEmail && $otpVerificationEmail->is_verified == 0) 
-            {    
-              
-                $otpCodes =   $this->generateAndSendOtp($existingUser->id);
+                ->where('type', 'email')
+                ->first();
+    
+            if ($otpVerificationEmail && $otpVerificationEmail->is_verified == 0) {
+                $otpCodes = $this->generateAndSendOtp($existingUser->id);
                 $encryptedExistingUserId = Crypt::encryptString($existingUser->id);
+                Log::info(label_case($module_title.' '.$module_action).'-'.$existingUser->id.' - OTP sent to existing user.');
+                $this->storeAuditTrail($existingUser->id, 'otp_sent', ['user_id' => $existingUser->id]);
                 return response()->json([
                     'user_id' => $encryptedExistingUserId,
                     'response_type' => 'success',
                     'status' => 'otp_send_customerVerify',
                 ]);
-            }
-            else{  //// customer already verified
-
-                $campaign = Campaign::select('lock_time')->where('id',$request->campaign_id)->where('store_id',$request->store_id)->first();
+            } else {
+                $campaign = Campaign::select('lock_time')->where('id', $request->campaign_id)->where('store_id', $request->store_id)->first();
                 if (!$campaign) {
                     return response()->json(['error' => 'Campaign not found'], 404);
                 }
-
+    
                 $latestCustomerResult = CustomerResult::select('created_at')->where('customer_id', $existingUser->id)
-                ->where('campaign_id', $request->campaign_id)
-                ->latest('created_at') 
-                ->first();
-  
+                    ->where('campaign_id', $request->campaign_id)
+                    ->latest('created_at')
+                    ->first();
+    
                 if ($latestCustomerResult) {
                     $lockTimeAdded = Carbon::createFromFormat('Y-m-d H:i:s', $latestCustomerResult->created_at);
-
-                    // Add 12 hours to the datetime
                     $lockTimeAdded->addHours($campaign->lock_time);
-
-                    // Format the new datetime as needed
                     $lockTimeAdded = $lockTimeAdded->format('Y-m-d H:i:s');
                     $currentDateTime = Carbon::now();
-
-                    if($lockTimeAdded > $currentDateTime)
-                    {
+    
+                    if ($lockTimeAdded > $currentDateTime) {
                         $carbonDate = Carbon::createFromFormat('Y-m-d H:i:s', $lockTimeAdded);
-                        // Format the date to 'Jan 5, 2030 15:37:25'
                         $formattedDate = $carbonDate->format('M j, Y H:i:s');
-
                         return response()->json([
                             'response_type' => 'failed',
                             'message' => 'Customer is locked for some period',
@@ -601,116 +592,112 @@ class UserController extends Controller
                         ]);
                     }
                 }
+    
+                $resultHandleCustomer = $this->handleCustomerWinning($existingUser->id, $request->advertisement_id, $request->campaign_id, $request->store_id);
+                $salt = Str::random(8);
+    
+                if ($resultHandleCustomer['result']) {
+                    $combined_id_win = Crypt::encryptString($resultHandleCustomer['cust_result_id'] . '_' . $salt);
+                    $url = "/win/" . $combined_id_win;
+                } else {
+                    $combined_id_lose = Crypt::encryptString($request->store_id . '_' . $salt . '_' . $request->campaign_id . '_' . $existingUser->id);
+                    $url = "/better_luck/" . $combined_id_lose;
+                }
+    
+                Log::info(label_case($module_title.' '.$module_action).' Customer result handled for existing user.');
+                $this->storeAuditTrail($existingUser->id, 'customer_result_handled', ['user_id' => $existingUser->id, 'result' => $resultHandleCustomer['result']]);
 
-                 //// check customer is win or lose and add entry
-                 $resultHandleCustomer =  $this->handleCustomerWinning($existingUser->id, $request->advertisement_id, $request->campaign_id, $request->store_id);
-
-                  // Generate the appropriate URL based on the result
-                  $salt = Str::random(8);
-
-                  if ($resultHandleCustomer['result']) {
-                     $combined_id_win =  Crypt::encryptString($resultHandleCustomer['cust_result_id'] . '_' . $salt);
-                      $url = "/win/".$combined_id_win;
-                  } else {
-                     $combined_id_lose =  Crypt::encryptString($request->store_id . '_' . $salt . '_' . $request->campaign_id);
-                      $url = "/better_luck/".$combined_id_lose;
-                  }
-
-                 return response()->json([
-                     'response_type' => $resultHandleCustomer['response_type'],
-                     'status' => $resultHandleCustomer['status'],
-                     'redirect_url' => $url,
-                 ]);
-
-            }                      
-        }
-        else{
+                return response()->json([
+                    'response_type' => $resultHandleCustomer['response_type'],
+                    'status' => $resultHandleCustomer['status'],
+                    'redirect_url' => $url,
+                ]);
+            }
+        } else {
             $request->validate([
                 'first_name' => 'required|max:255',
                 'last_name' => 'required|max:255',
                 'email' => 'required|email|unique:users',
                 'mobile' => 'required|numeric|digits_between:10,12|unique:users',
             ]);
+    
+            $data_array = $request->except('_token', 'roles', 'permissions', 'password_confirmation');
+            $data_array['name'] = $request->first_name . ' ' . $request->last_name;
+            $data_array['mobile'] = $request->mobile;
+            $password = Str::random(8);
+            $data_array['password'] = Hash::make($password);
+            $data_array = Arr::add($data_array, 'email_verified_at', null);
+    
+            $$module_name_singular = User::create($data_array);
+            $$module_name_singular->assignRole("user");
+            $id = $$module_name_singular->id;
+            $username = config('app.initial_username') + $id;
+    
+            Userprofile::create([
+                "user_id" => $$module_name_singular->id,
+                "name" => $request->first_name . ' ' . $request->last_name,
+                "first_name" => $request->first_name,
+                "last_name" => $request->last_name,
+                "username" => $username,
+                "email" => $request->email,
+                "mobile" => $request->mobile
+            ]);
+    
+            Customer::create([
+                "user_id" => $$module_name_singular->id,
+                "store_id" => $request->store_id,
+                "campaign_id" => $request->campaign_id,
+                "advertisement_id" => $request->advertisement_id,
+            ]);
+    
+            $updateUser = User::where("id", $$module_name_singular->id)->first();
+            if ($updateUser) {
+                $updateUser->username = $username;
+                $updateUser->save();
+            }
+    
 
-        $data_array = $request->except('_token', 'roles', 'permissions', 'password_confirmation');
-        $data_array['name'] = $request->first_name.' '.$request->last_name;
-        $data_array['mobile'] = $request->mobile;
-        $password = Str::random(8);
-        $data_array['password'] = Hash::make($password);
-
-        $data_array = Arr::add($data_array, 'email_verified_at', null);
-
-        ////User Create
-        $$module_name_singular = User::create($data_array);
-
-        $$module_name_singular->assignRole("user");
-        $id = $$module_name_singular->id;
-        $username = config('app.initial_username') + $id;
-
-        //// User Profile 
-        Userprofile::create([
-            "user_id" => $$module_name_singular->id,
-            "name" => $request->first_name.' '.$request->last_name,
-            "first_name" => $request->first_name,
-            "last_name" => $request->last_name,
-            "username" => $username,
-            "email" => $request->email,
-            "mobile" => $request->mobile
-        ]);
-         // Insert entry into customer
-         Customer::create([
-            "user_id" => $$module_name_singular->id,
-            "store_id" => $request->store_id,
-            "campaign_id" => $request->campaign_id,
-            "advertisement_id" => $request->advertisement_id,
-        ]);
-
-        $updateUser = User::where(
-            "id",
-            $$module_name_singular->id
-        )->first();
-
-        if ($updateUser) {
-            $updateUser->username = $username;
-            $updateUser->save();
+            Log::info(label_case($module_title.' '.$module_action).' - New user created.');
+            $this->storeAuditTrail($id, 'user_created', ['user_id' => $$module_name_singular->id]);
+    
+            $otpCodes = $this->generateAndSendOtp($$module_name_singular->id);
+            $encryptedExistingUserId = Crypt::encryptString($$module_name_singular->id);
+            return response()->json([
+                'user_id' => $encryptedExistingUserId,
+                'response_type' => 'success',
+                'status' => 'otp_send',
+            ]);
         }
-
-        ///Generate and Send Otp
-        $otpCodes =  $this->generateAndSendOtp($$module_name_singular->id);
-        $encryptedExistingUserId = Crypt::encryptString($$module_name_singular->id);
-        return response()->json([
-            'user_id' => $encryptedExistingUserId,
-            'response_type' => 'success',
-            'status' => 'otp_send',
-        ]);
-     }
     }
-
+    
     public function resend_otp(Request $request)
     {
+        $module_title = 'Otp';
+        $module_action = 'resend otp';
         try {
             $userIdEncrypt = $request->user_id;
             $request->user_id = Crypt::decryptString($userIdEncrypt);
-    
-            } catch (DecryptException $e) {
-                //return response()->json(['error' => 'Invalid token'], 400);
-                return response()->json([
-                    'status' => 'user_token',
-                    'response_type' => 'failed',
-                    'message' => 'Invalid token'
-                ]);
-            } catch (\Throwable $e) {
-               // return response()->json(['error' => 'An error occurred'], 500);
-                return response()->json([
-                    'status' => 'user_token',
-                    'response_type' => 'failed',
-                    'message' => 'An error occurred'
-                ]);
+
+        } catch (DecryptException $e) {
+             Log::info(label_case($module_title.' '.$module_action). '- Invalid token in resend_otp.');
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'Invalid token'
+            ]);
+        } catch (\Throwable $e) {
+             Log::info(label_case($module_title.' '.$module_action). '- An error occurred in resend_otp.');
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'An error occurred'
+            ]);
         }
 
         $key = 'otp-request-user-' . $request->user_id;
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
+             Log::info(label_case($module_title.' '.$module_action). '- Too many requests in resend_otp.');
             return response()->json(['message' => 'Too many requests. Please try again later.'], 429);
         }
 
@@ -718,6 +705,7 @@ class UserController extends Controller
         $user = User::find($request->user_id);
 
         if (!$user) {
+             Log::info(label_case($module_title.' '.$module_action). ' - User not found in resend_otp.');
             return response()->json([
                 'message' => 'User not found.'
             ], 404);
@@ -725,10 +713,11 @@ class UserController extends Controller
 
         // Check the creation time of the existing OTP records
         $recentOtp = OtpVerification::where('user_id', $user->id)
-        ->orderBy('created_at', 'desc')
-        ->first();
+            ->orderBy('created_at', 'desc')
+            ->first();
 
         if ($recentOtp && $recentOtp->created_at->addMinutes(2) > now()) {
+            Log::info(label_case($module_title.' '.$module_action). ' - Please wait for 2 minutes before requesting a new OTP.');
             return response()->json([
                 'response_type' => 'failed',
                 'message' => 'Please wait for 2 minutes before requesting a new OTP.'
@@ -736,22 +725,28 @@ class UserController extends Controller
         }
 
         $otpCodes = $this->generateAndSendOtp($user->id);
-   
+
+        Log::info(label_case($module_title.' '.$module_action). ' - OTP resent.');
+        $this->storeAuditTrail($user->id, 'otp_resent', ['user_id' => $user->id]);
+
         return response()->json([
             'user_id' => $userIdEncrypt,
             'response_type' => 'success',
         ]);
     }
 
+
     private function generateAndSendOtp($userId)
     {
+        $module_title = 'Otp';
+        $module_action = 'generate and send otp';
         // Check if there are any OTP verification records for the user
         $existingRecords = OtpVerification::where('user_id', $userId)->exists();
         // If OTP verification records exist for the user, delete them
         if ($existingRecords) {
             OtpVerification::where('user_id', $userId)->delete();
         }
-
+    
         // Generate new OTP code for email
         $otpCodeEmail = rand(100000, 999999);
         OtpVerification::create([
@@ -761,92 +756,95 @@ class UserController extends Controller
             'is_verified' => 0,
             'expires_at' => Carbon::now()->addMinutes(5)
         ]);
-
+    
         // Send the OTP via email or mobile
-         $user = User::find($userId);
-         Notification::send($user, new OTPNotification($otpCodeEmail));
+        $user = User::find($userId);
+        Notification::send($user, new OTPNotification($otpCodeEmail));
+    
+         Log::info(label_case($module_title.' '.$module_action). ' - OTP generated and sent.');
+         $this->storeAuditTrail($userId, 'otp_generated', ['user_id' => $userId]);
+    
         return [
             'email_otp' => $otpCodeEmail,
         ];
     }
-
+        
     public function otp_verify(Request $request)
     {
-        $module_title = $this->module_title;
-        $module_name = $this->module_name;
-        $module_path = $this->module_path;
-        $module_icon = $this->module_icon;
-        $module_model = $this->module_model;
-        $module_name_singular = Str::singular($module_name);
-    
-        $module_action = 'Details';
+        $module_title = 'Otp';
+        $module_action = 'verify otp';
     
         try {
             $token_user_data = Crypt::decryptString($request->token_user_data);
             $userIdEncrypt = $request->user_id;
             $request->user_id = Crypt::decryptString($userIdEncrypt);
-
+    
             list($request->store_id, $request->campaign_id, $request->advertisement_id) = explode('_', $token_user_data);
     
-            } catch (DecryptException $e) {
-                //return response()->json(['error' => 'Invalid token'], 400);
-                return response()->json([
-                    'status' => 'user_token',
-                    'response_type' => 'failed',
-                    'message' => 'Invalid token'
-                ]);
-            } catch (\Throwable $e) {
-               // return response()->json(['error' => 'An error occurred'], 500);
-                return response()->json([
-                    'status' => 'user_token',
-                    'response_type' => 'failed',
-                    'message' => 'An error occurred'
-                ]);
-            }
-          
-          $campaignsExist = Campaign::where('id', $request->campaign_id)
+        } catch (DecryptException $e) {
+            Log::info(auth()->user()->name.' ('.auth()->user()->id.') - Invalid token in otp_verify.');
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'Invalid token'
+            ]);
+        } catch (\Throwable $e) {
+            Log::info(auth()->user()->name.' ('.auth()->user()->id.') - An error occurred in otp_verify.');
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'An error occurred'
+            ]);
+        }
+    
+        $campaignsExist = Campaign::where('id', $request->campaign_id)
             ->where('store_id', $request->store_id)
             ->whereJsonContains('advertisement_ids', $request->advertisement_id)
             ->exists();
-        
-            if(!$campaignsExist){
-                return response()->json([
-                    'status' => 'user_token',
-                    'response_type' => 'failed',
-                    'message' => 'Something went wrong'
-                ]);  
-            }   
-
+    
+        if (!$campaignsExist) {
+            Log::info(auth()->user()->name.' ('.auth()->user()->id.') - Campaign does not exist in otp_verify.');
+            return response()->json([
+                'status' => 'user_token',
+                'response_type' => 'failed',
+                'message' => 'Something went wrong'
+            ]);
+        }
+    
         $verificationResult = $this->verifyOtp($request->user_id, $request->email_otp);
     
         if ($verificationResult['status'] == 'success') {
-            $resultHandleCustomer =  $this->handleCustomerWinning($request->user_id, $request->advertisement_id, $request->campaign_id, $request->store_id);
+            $resultHandleCustomer = $this->handleCustomerWinning($request->user_id, $request->advertisement_id, $request->campaign_id, $request->store_id);
+    
+            // Generate the appropriate URL based on the result
+            $salt = Str::random(8);
+    
+            if ($resultHandleCustomer['result']) {
+                $combined_id_win = Crypt::encryptString($resultHandleCustomer['cust_result_id'] . '_' . $salt);
+                $url = "/win/" . $combined_id_win;
+            } else {
+                $combined_id_lose = Crypt::encryptString($request->store_id . '_' . $salt . '_' . $request->campaign_id . '_' . $request->user_id);
+                $url = "/better_luck/" . $combined_id_lose;
+            }
 
-             // Generate the appropriate URL based on the result
-             $salt = Str::random(8);
-                 
-             if ($resultHandleCustomer['result']) {
-                $combined_id_win =  Crypt::encryptString($resultHandleCustomer['cust_result_id'] . '_' . $salt);
-                 $url = "/win/".$combined_id_win;
-             } else {
-                $combined_id_lose =  Crypt::encryptString($request->store_id . '_' . $salt . '_' . $request->campaign_id);
-                 $url = "/better_luck/".$combined_id_lose;
-             }
-
+    
+            Log::info(label_case($module_title.' '.$module_action). ' - OTP verified successfully.');
+            $this->storeAuditTrail($request->user_id, 'otp_verified', ['user_id' => $request->user_id]);
+    
             return response()->json([
                 'response_type' => $resultHandleCustomer['response_type'],
                 'status' => $resultHandleCustomer['status'],
-                'redirect_url' => $url,
+                'redirect_url' => $url
             ]);
-         
         }
     
+        Log::info(label_case($module_title.' '.$module_action). ' - OTP verification failed.');
         return response()->json([
             'response_type' => 'failed',
             'message' => $verificationResult['message']
         ]);
     }
-    
+
     public function verifyOtp($userId, $otpCodeEmail) {
         // Fetch the OTP record for email
         $otp_email = OtpVerification::where('user_id', $userId)
@@ -881,29 +879,40 @@ class UserController extends Controller
             return ['status' => 'error', 'message' => 'Email OTP is invalid or expired'];
         }
     }
-
+    
     private function handleCustomerWinning($user_id, $advertisement_id, $campaign_id, $store_id)
     {
+        $module_title = 'Result';
+        $module_action = 'handle customer result';
         // Find the advertisement
         $advertisement = Advertisement::find($advertisement_id);
-    
+
         if (!$advertisement) {
+            Log::info(label_case($module_title.' '.$module_action). '- Advertisement not found in handleCustomerWinning.');
             return response()->json(['error' => 'Advertisement not found'], 404);
         }
-    
+
         // Decode coupons from the advertisement
         $coupons = json_decode($advertisement->coupons_id, true);
-    
+
         // Check if the customer has already won
-        $winningCount = CustomerResult::where('advertisement_id', $advertisement_id)
+        $winningCountCustomer = CustomerResult::where('advertisement_id', $advertisement_id)
             ->where('campaign_id', $campaign_id)
             ->where('store_id', $store_id)
             ->where('customer_id', $user_id)
             ->where('win', 1)
             ->count();
 
-        if ($winningCount > 0) { // Customer already won
-           $res =  $this->recordCustomerResult($user_id, $advertisement_id, $campaign_id, $store_id, false, null);
+        if ($winningCountCustomer > 0) { // Customer already won
+            $res = $this->recordCustomerResult($user_id, $advertisement_id, $campaign_id, $store_id, false, null);
+            
+            Log::info(label_case($module_title.' '.$module_action). '- Customer has already won in handleCustomerWinning.');
+            $this->storeAuditTrail($user_id, 'customer_already_won', [
+                'advertisement_id' => $advertisement_id,
+                'campaign_id' => $campaign_id,
+                'store_id' => $store_id
+            ]);
+
             return [
                 'response_type' => 'success',
                 'status' => 'customer_result',
@@ -913,13 +922,22 @@ class UserController extends Controller
                 'cust_result_id' => $res
             ];
         }
-    
+
         // Check for customer win
-        [$win, $coupon_id] = $this->checkCustomerWin($user_id,$advertisement_id,$campaign_id, $store_id, $coupons);
-    
+        [$win, $coupon_id] = $this->checkCustomerWin($user_id, $advertisement_id, $campaign_id, $store_id, $coupons);
+
         // Record customer result
-        $res =  $this->recordCustomerResult($user_id, $advertisement_id, $campaign_id, $store_id, $win, $coupon_id);
-    
+        $res = $this->recordCustomerResult($user_id, $advertisement_id, $campaign_id, $store_id, $win, $coupon_id);
+
+        Log::info(label_case($module_title.' '.$module_action). '- Customer win checked and recorded in handleCustomerWinning.');
+        $this->storeAuditTrail($user_id, 'customer_win_checked', [
+            'advertisement_id' => $advertisement_id,
+            'campaign_id' => $campaign_id,
+            'store_id' => $store_id,
+            'win' => $win,
+            'coupon_id' => $coupon_id
+        ]);
+
         return [
             'response_type' => 'success',
             'status' => 'customer_result',
@@ -929,9 +947,18 @@ class UserController extends Controller
             'cust_result_id' => $res
         ];
     }
-    
-    private function recordCustomerResult($user_id, $advertisement_id, $campaign_id, $store_id, $win, $coupon_id)
-    {
+
+  
+    private function recordCustomerResult(
+        $user_id, 
+        $advertisement_id, 
+        $campaign_id, 
+        $store_id, 
+        $win, 
+        $coupon_id
+    ) {
+        $module_title = 'Result';
+        $module_action = 'record customer result';
         // Create customer result record
         $customerResult = CustomerResult::create([
             'customer_id' => $user_id,
@@ -943,6 +970,7 @@ class UserController extends Controller
     
         // Update customer statistics
         $customerStatistics = CustomerStatistics::firstOrNew(['customer_id' => $user_id]);
+    
         if ($win) {
             $customerStatistics->win_count++;
             $customerStatistics->save();
@@ -954,7 +982,7 @@ class UserController extends Controller
                 'coupon_id' => $coupon_id,
                 'win_time' => now()
             ]);
-
+    
             Claim::create([
                 'customer_id' => $user_id, 
                 'advertisement_id' => $advertisement_id,
@@ -965,46 +993,145 @@ class UserController extends Controller
                 'request_claim' => 0,
                 'email_sent' => 0,
             ]);
-       
+    
+            Log::info(label_case($module_title.' '.$module_action). ' - Customer win recorded in recordCustomerResult.');
+            $this->storeAuditTrail($user_id, 'customer_win_recorded', [
+                'advertisement_id' => $advertisement_id,
+                'campaign_id' => $campaign_id,
+                'store_id' => $store_id,
+                'coupon_id' => $coupon_id
+            ]);
         } else {
             $customerStatistics->lose_count++;
             $customerStatistics->save();
-       
-        }
+    
+            Log::info(label_case($module_title.' '.$module_action). ' - Customer lose recorded in recordCustomerResult.');
+            $this->storeAuditTrail($user_id, 'customer_lose_recorded', [
+                'advertisement_id' => $advertisement_id,
+                'campaign_id' => $campaign_id,
+                'store_id' => $store_id
+            ]);
+        }  
         return $customerResult->id;
     }
     
-    private function checkCustomerWin($user_id, $advertisement_id, $campaign_id, $store_id, $coupons)
+    public function checkCustomerWin($user_id, $advertisement_id, $campaign_id, $store_id, $coupons)
     {
-        $uniqueCustomers = CustomerResult::where('advertisement_id', $advertisement_id)
+        $module_title = 'Result';
+        $module_action = 'check customer win';
+        $isCustomerOld = CustomerResult::where('advertisement_id', $advertisement_id)
             ->where('campaign_id', $campaign_id)
             ->where('store_id', $store_id)
-            ->pluck('customer_id')
-            ->unique()
-            ->toArray();
-  
-        if (!in_array($user_id, $uniqueCustomers)) {
-            $uniqueCustomers[] = $user_id;
-        }
-
+            ->where('customer_id', $user_id)
+            ->exists();
+         
+        $today = Carbon::today()->toDateString(); // Get today's date in Y-m-d format
+    
         foreach ($coupons as $coupon_id => $coupon_details) {
-            $winning_ratio = (int)$coupon_details['winning_ratio'];
-            $count = (int)$coupon_details['count'];
-            $uniquePlays = count($uniqueCustomers);
-
-            // Calculate the total wins for this coupon
-            //$totalWins = CustomerWin::where('coupon_id', $coupon_id)->count();
-            $totalWins = CustomerWin::join('customer_results', 'customer_wins.customer_results_id', '=', 'customer_results.id')
+            $total_coupons_count = (int) $coupon_details['count'];
+            $daily_quota = isset($coupon_details['daily_quota_probability']) ? (int) $coupon_details['daily_quota_probability'] : null;
+            $win_probability = isset($coupon_details['win_probability']) ? (int) $coupon_details['win_probability'] : null;
+    
+            // Calculate total wins for this coupon
+            $totalCouponsWins = CustomerWin::join('customer_results', 'customer_wins.customer_results_id', '=', 'customer_results.id')
                 ->where('customer_results.advertisement_id', $advertisement_id)
                 ->where('customer_wins.coupon_id', $coupon_id)
                 ->count();
-
-            // Check win condition
-            if ($uniquePlays % $winning_ratio == 0 && $totalWins < $count) {
-                return [true, $coupon_id];
+    
+            // Check daily quota limit if provided
+            $dailyQuotaLimitExist = true;
+            if ($daily_quota !== null) {
+                $dailyWinningCount = CustomerWin::join('customer_results', 'customer_wins.customer_results_id', '=', 'customer_results.id')
+                    ->where('customer_results.advertisement_id', $advertisement_id)
+                    ->where('customer_wins.coupon_id', $coupon_id)
+                    ->whereDate('customer_results.created_at', $today) // Compare only the date part of created_at
+                    ->count();        
+    
+                if ($dailyWinningCount >= $daily_quota) {
+                    $dailyQuotaLimitExist = false;
+                }
+            }
+    
+            // Generate a secure random number for probability checks
+            $randomByte = random_bytes(1);
+            $randomInt = ord($randomByte);
+            $randomNumber = $randomInt % 100;
+            if ($win_probability === null) {
+                // Random win scenario if no probabilities are set
+                $randomWin = random_int(0, 1);
+                if ($randomWin === 1 && $dailyQuotaLimitExist && $totalCouponsWins < $total_coupons_count) {
+                    Log::info(label_case($module_title.' '.$module_action). '- Customer win determined by random win in checkCustomerWin.');
+                    $this->storeAuditTrail($user_id, 'random_win', [
+                        'advertisement_id' => $advertisement_id,
+                        'campaign_id' => $campaign_id,
+                        'store_id' => $store_id,
+                        'coupon_id' => $coupon_id
+                    ]);
+                    return [true, $coupon_id];
+                }
+            } else {
+                // Probability-based win scenarios
+                $new_user_probability = isset($coupon_details['new_user_probability']) ? (float) $coupon_details['new_user_probability'] : null;
+                $old_user_probability = isset($coupon_details['old_user_probability']) ? (float) $coupon_details['old_user_probability'] : null;
+    
+                if ($new_user_probability !== null && !$isCustomerOld) {
+                    $new_user_probability_percent = (int)($new_user_probability * $win_probability);
+                    if ($randomNumber < $new_user_probability_percent && $dailyQuotaLimitExist && $totalCouponsWins < $total_coupons_count) {
+                        Log::info(label_case($module_title.' '.$module_action). ' - Customer win determined by new user probability in checkCustomerWin.');
+                        $this->storeAuditTrail($user_id, 'new_user_probability_win', [
+                            'advertisement_id' => $advertisement_id,
+                            'campaign_id' => $campaign_id,
+                            'store_id' => $store_id,
+                            'coupon_id' => $coupon_id
+                        ]);
+                        return [true, $coupon_id];
+                    }
+                }
+    
+                if ($old_user_probability !== null && $isCustomerOld) {
+                    $old_user_probability_percent = (int)($old_user_probability * $win_probability);
+                    if ($randomNumber < $old_user_probability_percent && $dailyQuotaLimitExist && $totalCouponsWins < $total_coupons_count) {
+                        Log::info(label_case($module_title.' '.$module_action). ' - Customer win determined by old user probability in checkCustomerWin.');
+                        $this->storeAuditTrail($user_id, 'old_user_probability_win', [
+                            'advertisement_id' => $advertisement_id,
+                            'campaign_id' => $campaign_id,
+                            'store_id' => $store_id,
+                            'coupon_id' => $coupon_id
+                        ]);
+                        return [true, $coupon_id];
+                    }
+                }
+    
+                // Default win probability scenario
+                if ($new_user_probability === null && $old_user_probability === null) {
+                    if ($randomNumber < $win_probability && $dailyQuotaLimitExist && $totalCouponsWins < $total_coupons_count) {
+                        Log::info(label_case($module_title.' '.$module_action). ' - Customer win determined by default win probability in checkCustomerWin.');
+                        $this->storeAuditTrail($user_id, 'default_probability_win', [
+                            'advertisement_id' => $advertisement_id,
+                            'campaign_id' => $campaign_id,
+                            'store_id' => $store_id,
+                            'coupon_id' => $coupon_id
+                        ]);
+                        return [true, $coupon_id];
+                    }
+                }
             }
         }
-
-        return [false, null];
+        Log::info(label_case($module_title.' '.$module_action). ' - No win condition met in checkCustomerWin.');
+        $this->storeAuditTrail($user_id, 'no_win', [
+            'advertisement_id' => $advertisement_id,
+            'campaign_id' => $campaign_id,
+            'store_id' => $store_id
+        ]);
+        return [false, null]; // No win condition met
+    }  
+    
+    private function storeAuditTrail($userId, $action, $data = [])
+    {
+        AuditTrail::create([
+            'user_id' => $userId,
+            'action' => $action,
+            'data' => json_encode($data),
+        ]);
     }
 }
