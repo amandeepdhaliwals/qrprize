@@ -335,7 +335,7 @@
 
         <section id="div-id-countdown-row" style="display:none;">
             <div class="container">
-                <div class="row countdown-row" >
+                <div class="row">
                     <div class="col-12">
                         <div id="betterluckcountdown" class="betterluckcountdown"></div>
                     </div>
