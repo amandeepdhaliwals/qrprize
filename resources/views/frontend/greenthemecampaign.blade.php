@@ -37,6 +37,9 @@
 </head>
 
 <style>
+     .hidden {
+				display: none;
+			}
 		.video-container {
 			position: relative;
 			padding-bottom: 56.25%;
@@ -112,6 +115,27 @@
           font-size: 150px;
           color: #fff;
       }
+
+
+      .otp-timer {
+            display: inline;
+        }
+        #resend-button {
+          background: none;
+          border: none;
+          color: #21887c;
+          text-decoration: underline;
+          cursor: pointer;
+          font: inherit;
+          padding: 0;
+          margin-left: 5px;
+          font-weight: 800;
+        }
+        #resend-button:disabled {
+            color: gray;
+            text-decoration: none;
+            cursor: default;
+        }
 
 	</style>
 
@@ -297,17 +321,17 @@
             </div>
         </section>
 
-        <section class="spinner">
-				<div class="container">
-					<div class="row countdown-row" id="div-id-countdown-row">
-						<div class="col-12">
-							<div id="betterluckcountdown" class="betterluckcountdown"></div>
-						</div>
-						<div class="col-12">
-							<p id="p-better-luck"></p>
-						</div>
-					</div>
-				<div id="scroll-down-div"></div>
+        <section id="div-id-countdown-row" style="display:none;">
+            <div class="container">
+                <div class="row countdown-row" >
+                    <div class="col-12">
+                        <div id="betterluckcountdown" class="betterluckcountdown"></div>
+                    </div>
+                    <div class="col-12">
+                        <p id="p-better-luck"></p>
+                    </div>
+                </div>
+            <div id="scroll-down-div"></div>
 		</section>
 
     <section id="footer">
@@ -392,9 +416,10 @@
                 <input type="text" name="email_otp">
                 <div id="email_otp_error" style="color:red"></div>
                 </div>  
-                <p class="otp-timer" id="resend-info">Non hai ricevuto il codice OTP?
-                puoi richiederne un altro in <span id="timer">120</span> secondi.</p>
-               	<button id="resend-button" disabled>Resend OTP</button>
+                 <p class="otp-timer" id="resend-info">
+                  Non hai ricevuto il codice OTP? puoi richiederne un altro in <span id="timer">120</span> secondi.
+                  <button id="resend-button"  disabled>inviare di nuovo otp</button>
+              </p>
             </div>
             </form>
             <button id="otp_verification" class="INVIA-btn">INVIA</button>
@@ -753,6 +778,7 @@
 										response.status == 'otp_send') {
 										$('#signinModal').modal('hide');
 										$('#otpModal').modal('show');
+                    resetTimerOtp();
 										startTimer(); //otp timer
 										disableResendButton();
 										document.querySelector('input[name="user_id_otp"]').value = response.user_id;
@@ -816,20 +842,24 @@
 					}
 				});
 
-                $('#otpModal').on('hidden.bs.modal', function () {
-                    // Reset the form
-                    $('#otpForm')[0].reset();
-                    // Clear the countdown timer
-                    clearInterval(countdown);
-                    // Reset the timer display and visibility
-                    document.getElementById('timer').textContent = otpExpiryTime;
-                    document.getElementById('resend-info').classList.add('hidden');
-                    document.getElementById('resend-button').classList.remove('hidden');
-                });
 
-                let countdown;
-				const otpExpiryTime = 120; // 120 seconds
-				const resendDisabledTime = 120; // 120 seconds (2 minutes)
+        function resetTimerOtp()
+        {
+            // Clear the countdown timer
+            clearInterval(countdown);
+            // Reset the timer display and visibility
+            document.getElementById('timer').textContent = otpExpiryTime;
+            document.getElementById('resend-info').classList.add('hidden');
+            document.getElementById('resend-button').classList.remove('hidden');
+        }
+
+        $('#otpModal').on('hidden.bs.modal', function () {
+          resetTimerOtp();
+        });
+
+        let countdown;
+        const otpExpiryTime = 120; // 120 seconds
+        const resendDisabledTime = 120; // 120 seconds (2 minutes)
 
 				function startTimer() {
 					let timeLeft = otpExpiryTime;
