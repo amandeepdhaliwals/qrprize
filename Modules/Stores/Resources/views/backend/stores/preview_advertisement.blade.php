@@ -5,396 +5,473 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>
-    page
-  </title>
+  <title>QrPrize</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-<!--   <link href="" rel="icon">
-  <link href="" rel="apple-touch-icon" -->
+  <!-- <link href="" rel="icon">
+  <link href="" rel="apple-touch-icon"> -->
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:slnt,wght@-10..0,100..900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:slnt,wght@-10..0,100..900&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="{{ asset('assets/Impact/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('assets/Impact/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ asset('assets/greentheme/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset('assets/greentheme/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  
   <!-- Template Main CSS File -->
-  <link href="{{ asset('assets/Impact/assets/css/main.css')}}" rel="stylesheet">
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link href="{{ asset('assets/greentheme/css/main.css') }}" rel="stylesheet">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
 
-<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
- <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
-<!------ Include the above in your HEAD tag ---------->
+  <!------ Include the above in your HEAD tag ---------->
 
 </head>
+
+<style>
+     .hidden {
+				display: none;
+			}
+		.video-container {
+			position: relative;
+			padding-bottom: 56.25%;
+			/* 16:9 aspect ratio */
+			height: 0;
+			overflow: hidden;
+			max-width: 100%;
+			background: #000;
+		}
+
+		.video-container iframe {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+    .spinner {
+      width: 100%;
+      }
+
+      .spinner-box {
+      position: relative;
+      display: inline-block;
+      }
+
+
+      #spinning-image {
+      max-width: 95%%;
+      /* height: auto; */
+      transition: opacity 0.5s ease-in-out; /* Smooth fade-out transition */
+      }
+
+      .fade-out {
+          opacity: 0.5; /* Adjust opacity for fade-out effect */
+      }
+
+      .spin-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border: none;
+      border-radius: 50%;
+      background-color: white;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      }
+
+      .spinner-bottom-text {
+      text-align: center;
+      }
+
+      .spin-button[disabled] {
+      cursor: not-allowed; /* Indicates the button is disabled */
+      color: #999; /* Change the text color as needed */
+      background-color: transparent; /* Change the background color as needed */
+      }
+
+      @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+      }
+
+      i.bi.bi-lock{
+          font-size: 150px;
+          color: #fff;
+      }
+
+
+      .otp-timer {
+            display: inline;
+        }
+        #resend-button {
+          background: none;
+          border: none;
+          color: #21887c;
+          text-decoration: underline;
+          cursor: pointer;
+          font: inherit;
+          padding: 0;
+          margin-left: 5px;
+          font-weight: 800;
+        }
+        #resend-button:disabled {
+            color: gray;
+            text-decoration: none;
+            cursor: default;
+        }
+
+	</style>
 
 <body>
 
   <main id="main">
     <!-- ======= Call To Action Section ======= -->
-
-    <section id="call-to-action" class="call-to-action">
-    <div class="banner-img">
-      <div class="container text-center" data-aos="zoom-out">
-      
-      @if($adv_videos->media_type == "Video" || $adv_videos->media_type == "video") 
-      <video width="100%" height="100%" controls>
-        <source src="{{ Storage::url($adv_videos->media) }}" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-      @elseif($adv_videos->media_type == "Youtube" || $adv_videos->media_type == "youtube") 
-      <iframe width="100%" height="100%" src="{{ $adv_videos->media }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      @elseif($adv_videos->media_type == "Vimeo" || $adv_videos->media_type == "vimeo") 
-      <iframe src="{{ $adv_videos->media }}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
-      @endif
-        <!-- <a href="{{ Storage::url($adv_videos->media) }}" class="glightbox play-btn"></a> -->
-      </div>
-       </div>
-    </section>
- 
-    <!-- End Call To Action Section -->
-
-   
-<section id="crousel2">
-    <div class="container">
-    <div class="section-header">
-          <h4>{{$preview_advertisements->heading}}</h4>
-        </div>
-    <div id="carouselExampleCaptions2" class="carousel slide">
-    <div class="carousel-indicators">
-        @foreach($primary_images as $key => $primary_image)
-            <button type="button" data-bs-target="#carouselExampleCaptions2" data-bs-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $key + 1 }}"></button>
-        @endforeach
-    </div>
-    <div class="carousel-inner">
-        @foreach($primary_images as $key => $primary_image)
-            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                <div class="itinerary-tag">
-                  <div class="itinerary-box">
-                    <ul>
-                    <?php $free_services_str = $primary_image->free_services;
-                    $primary_free_services = explode(",", $free_services_str);
-                    if(in_array('Flight',$primary_free_services)){
-                    ?>
-                    <li><img src="{{ asset('assets/img/airplane.svg') }}"></li>
-                    <?php } 
-                    if(in_array('Visa',$primary_free_services)){
-                    ?>
-                    <li><img src="{{ asset('assets/img/bed.svg') }}"></li>
-                    <?php } 
-                    if(in_array('Documentation',$primary_free_services)){
-                    ?>
-                    <li><img src="{{ asset('assets/img/doc.svg') }}"></li>
-                    <?php } ?>
-                    </ul>
-                  </div>
-                </div> 
-                <img src="{{ Storage::url($primary_image->image) }}" class="d-block w-100" alt="...">
-                <div class="carousel-caption d-md-block">
-            
-                    <!-- Add your dynamic content here if needed -->
-                    <h5>{{ $primary_image->title }}</h5>
-                </div>
-            </div>
-        @endforeach
-    </div>
-  </div>
-  </div>
-  </section>
-
-<section id="crousel">
-    <div class="container">
-    <div id="carouselExampleCaptions" class="carousel slide">
-    <div class="carousel-indicators">
-        @foreach($secondary_images as $key => $secondary_image)
-            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $key + 1 }}"></button>
-        @endforeach
-    </div>
-    <div class="carousel-inner">
-        @foreach($secondary_images as $key => $secondary_image)
-            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                <div class="itinerary-tag">
-                  <div class="itinerary-box">
-                    <ul>
-                    <?php $free_services_str = $secondary_image->free_services;
-                          $secondary_free_services = explode(",", $free_services_str);
-                    ?>
-                    @if(in_array('Flight',$secondary_free_services)) <li><img src="{{ asset('assets/img/airplane.svg') }}"></li>@endif
-                    @if(in_array('Visa',$secondary_free_services))  <li><img src="{{ asset('assets/img/bed.svg') }}"></li>@endif
-                    @if(in_array('Documentation',$secondary_free_services))  <li><img src="{{ asset('assets/img/doc.svg') }}"></li>@endif
-                    </ul>
-                  </div>
-                </div> 
-                <img src="{{ Storage::url($secondary_image->image) }}" class="d-block w-100" alt="...">
-                <div class="carousel-caption d-md-block">
-            
-                    <!-- Add your dynamic content here if needed -->
-                    <h5>{{ $secondary_image->title }}</h5>
-                </div>
-            </div>
-        @endforeach
-    </div>
-  </div>
-  </div>
-  </section>
-
-    <!-- ======= prizes Section ======= -->
-    <section id="prizes" class="prizes">
-      <div class="container" data-aos="fade-up">
-
-        <div class="section-header">
-          <h4>{{$preview_advertisements->other_coupon_prize_heading}}</h4>
-        </div>
-
-        <div class="row gx-lg-0 gy-4">
-          @foreach($other_images as $other_image)
-          <div class="col-4">
-            <!-- <div class="prizes-box"> -->
-              <div>
-              <img src="{{ url('/storage').'/'.$other_image->media }}">
-          </div>
-           <h6>{{$other_image->title}}</h6>
-          </div>
-          @endforeach
-              
-      </div>
-    </div>
-    </section><!-- End Contact Section -->
-
-    <section class="spinner">
+    <section>
       <div class="container">
         <div class="row">
-          <div class="col-12 text-center">
-            <div class="spinner-box">
-              <img src="{{ asset('assets/Impact/assets/img/spin-wheel-2.svg') }}">
+          <div class="col-lg-12 text-center">
+            <div class="logo">
+              <img src="{{ asset('assets/greentheme/img/Benvenuto-Qrprize-logo.png') }}">
             </div>
-            <!-- <button type="button" class="btn btn-primary spin-btn mt-4 butn butn__new" data-toggle="modal" data-target="#loginModal">
-              SPIN!
-            </button> -->
-            <a href="#" data-toggle="modal" data-target="#otpModal" class='butn butn__new mt-4'><span>SPIN!</span></a>
-          </div>
-          <div class="col-12 mt-2">
-            <p class="review-text">Please view the video above to spin the wheel.</p>
           </div>
         </div>
       </div>
     </section>
-    @if($request_action == '2')
-          <section class="better-luck">
-            <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <div class="better-luck-img text-center">
-              <img src="{{ asset('assets/Impact/assets/img/better-luck.svg') }}">
+
+    <section id="call-to-action" class="call-to-action">
+    <div class="">
+          <div class="container text-center video-container" data-aos="zoom-out">
+            <!-- <a href="https://youtu.be/u0bVjCTcfLw?si=JNm8GTJxahkjFtky" class=""></a> -->
+              @if($adv_videos->media_type == "Video" || $adv_videos->media_type == "video")
+              <video id="video-player" style=" position: absolute;top: 0;left: 0; width: 100%; height: 100%;" controls>
+                  <source src="{{ Storage::url($adv_videos->media) }}" type="video/mp4">
+                  Your browser does not support the video tag.
+              </video>
+              @elseif($adv_videos->media_type == "Youtube" || $adv_videos->media_type == "youtube")
+              <iframe width="100%" height="100%" src="{{ $adv_videos->media }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              @elseif($adv_videos->media_type == "Vimeo" || $adv_videos->media_type == "vimeo")
+              <iframe id="vimeo-player" src="{{ $adv_videos->media }}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+              @endif
+          </div>
+      </div>
+    </section>
+    <!-- End Call To Action Section -->
+
+    <section id="second-section" class="second-section">
+      <div class="container" data-aos="zoom-out">
+      <div class="second-section-body">
+                  <p>Guarda gentilmente tutto il Video per sbloccare i premi.</p>
+                  @php
+                    $heading = $preview_advertisements->heading;
+
+                    if (strpos($heading, '&') !== false) {
+                        // Split by '&'
+                        list($part1, $part2) = explode('&', $heading, 2);
+                    } else {
+                        // Split by spaces after 4 words
+                        $words = explode(' ', $heading);
+                        if (count($words) > 4) {
+                            $part1 = implode(' ', array_slice($words, 0, 4));
+                            $part2 = implode(' ', array_slice($words, 4));
+                        } else {
+                            $part1 = $heading;
+                            $part2 = '';
+                        }
+                    }
+                @endphp
+
+                <h2>{{ $part1 }}</h2>
+                @if(!empty($part2))
+                    <h4>{{ $part2 }}</h4>
+                @endif
+
+               </div>
+      </div>
+    </section>
+
+    <section id="crousel">
+      <div class="">
+        <div id="carouselExampleCaptions" class="carousel slide">
+        <div class="carousel-indicators">
+                @foreach($primary_images as $key => $primary_image)
+                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $key + 1 }}"></button>
+                @endforeach
             </div>
-            <h4 class="mt-4 text-center">Better luck next time!</h4>
+            <div class="carousel-inner">
+                @foreach($primary_images as $key => $primary_image)
+                <div class="carousel-item {{ $loop->first ? 'active' : '' }}" data-title="{{ $primary_image->title }}">
+                    <div class="itinerary-tag">
+                        <div class="itinerary-box">
+                            <ul>
+                                <?php
+                                    $free_services_str = $primary_image->free_services;
+                                    $primary_free_services = explode(",", $free_services_str);
+                                    if (in_array("Flight", $primary_free_services)) { ?>
+                                        <li><img src="{{ asset('assets/img/airplane.svg') }}"></li>
+                                        <?php }
+                                    if (in_array("Visa", $primary_free_services)) { ?>
+                                        <li><img src="{{ asset('assets/img/bed.svg') }}"></li>
+                                        <?php }
+                                    if (in_array("Documentation", $primary_free_services)) { ?>
+                                    <li><img src="{{ asset('assets/img/doc.svg') }}"></li>
+                                <?php }
+                                ?>
+                            </ul>
+                        </div>
+                    </div>
+                    <img src="{{ Storage::url($primary_image->image) }}" class="d-block w-100" alt="...">
+                    <div class="carousel-caption d-md-block">
+                        <!-- Add your dynamic content here if needed -->
+                        <!-- <h5>{{ $primary_image->title }}</h5> -->
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="forth-section" class="forth-section">
+      <div class="container" data-aos="zoom-out">
+        <div class="forth-section-body">
+          <h4 class="mb-0" id="dynamic-heading">  {{ $primary_images->first()->title }}</h4>
+        </div>
+      </div>
+    </section>
+
+    <section id="crousel">
+      <div class="">
+        <div id="carouselExampleCaptions1" class="carousel slide">
+        <div class="carousel-indicators">
+              @foreach($secondary_images as $key => $secondary_image)
+              <button type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $key + 1 }}"></button>
+              @endforeach
+          </div>
+          <div class="carousel-inner">
+              @foreach($secondary_images as $key => $secondary_image)
+              <div class="carousel-item {{ $loop->first ? 'active' : '' }}" data-title="{{ $secondary_image->title }}">
+                  <div class="itinerary-tag">
+                      <div class="itinerary-box">
+                          <ul>
+                              <?php
+                                  $free_services_str = $secondary_image->free_services;
+                                  $secondary_free_services = explode(",", $free_services_str);
+                              ?>
+                              @if(in_array('Flight',$secondary_free_services)) <li><img src="{{ asset('assets/img/airplane.svg') }}"></li>@endif
+                              @if(in_array('Visa',$secondary_free_services)) <li><img src="{{ asset('assets/img/bed.svg') }}"></li>@endif
+                              @if(in_array('Documentation',$secondary_free_services)) <li><img src="{{ asset('assets/img/doc.svg') }}"></li>@endif
+                          </ul>
+                      </div>
+                  </div>
+                  <img src="{{ Storage::url($secondary_image->image) }}" class="d-block w-100" alt="...">
+                  <div class="carousel-caption d-md-block">
+                      <!-- Add your dynamic content here if needed -->
+                  </div>
+              </div>
+              @endforeach
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="row countdown-row">
+    <section id="fifth-section" class="fifth-section">
+      <div class="container" data-aos="zoom-out">
+        <div class="fifth-section-body">
+          <h4 class="mb-0" id="fifth-dynamic-heading">  {{$preview_advertisements->other_coupon_prize_heading}}</h4>
+        </div>
+      </div>
+    </section>
+
+    <section class="spinner">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <div class="spinner-box">
+                            <img 
+                                src="{{ asset('assets/greentheme/img/spin-wheel.png') }}" 
+                                alt="Spin Wheel" 
+                                id="spinning-image" 
+                                class="fade-out"
+                            >
+                         <button class="spin-button" disabled><i class="bi bi-lock"></i></button>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-2 spinner-bottom-text">
+                        <p>Guarda gentilmente tutto il video per sbloccare i premi.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <section id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <p class="mb-0">@2024 QR Prize. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+<br/>
+@if($request_action == '2')
+  <div class="signinModal-dialog" role="document">
+       <div class="modal-content">
+        <div class="modal-body">
+          <div class="close-btn">
+
+          </div>
+
+          <div class="text-center vinto-timer-header">
+            <h2 class="mt-3 mb-0">QUESTA VOLTA<br> NON HAI</h2>
+            <h1 class=" mb-3">VINTO!</h1>
+            
+            <img src="{{ asset('assets/redtheme/img/finger-top.jpg') }}" alt="Finger Top Image">
+         
+          </div>
+          <div class="vinto-timer-body">
+            <p class="mb-0" style="text-align:center;">Non disperare!</p>
+            <p class="mb-0" style="text-align:center;">Puoi tornare a provare la fortuna tra:</p>
+          </div>
+          <h2 id="betterluckcountdown" style="color: #eb6169; font-family: system-ui; text-align:center; font-weight: bold;" >03h 24m 05s</h2>
+          <p class="Condizioni" style="color: #eb6169; text-align:center;">Condizioni d’uso</p>
+
+
+        </div>
+      </div>
+    </div>
+    @else
+    <div class="signinModal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <!-- <div class="close-btn">
+              <button type="button" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div> -->
+          
+            <div class="text-center coupon-modal-header">
+              <h2 class="mt-3 mb-0">HAI</h2>
+              <h1 class=" mb-3">VINTO!</h1>
+              <img src="{{ asset('assets/greentheme/img/coupon-green.png')}}" alt="Coupon Image">
+            </div>
+            <div class="coupon-modal-body">
+              <p class="">CONTENUTO: <span>{{ $coupons[0]->title }}</span></p>
+              <p>CODICE: {{ $coupons[0]->code }} <button id="copyCoupon" class="btn btn-secondary btn-sm"><i style="font-size:12px" class="fa">&#xf0c5;</i></button></p>
+              <p class="">DESCRIZIONE: <span>{!! nl2br(e($coupons[0]->description)) !!}</span></p>
+            </div>
+            <div class="coupon-modal-body mt-4">
+              <p>Per riscattare il premio inserisci
+                nome e indirizzo</p>
+            </div>
+            <div class="coupon-modal-footer mt-4">
+              <p id="termsHeading" data-bs-toggle="collapse" data-bs-target="#termsCollapse" aria-expanded="false" aria-controls="termsCollapse" class=""> Condizioni d’uso</p>
+              <div class="collapse" id="termsCollapse">
+                <p><strong>Condizioni d’uso:</strong></p>
+                <p>{!! nl2br(e($coupons[0]->terms_and_condition)) !!}</p>
+              </div>
+            </div>
+         
+
+          <div class="row countdown-row">
           <div class="col-12">
             <div id="betterluckcountdown" class="betterluckcountdown"></div>
           </div>
-          <div class="col-12">
-          <p>Worry not, you can try again after 24 hours.</p>
-          <a href="#" class='butn butn__new mt-4'><span>Back To Homepage</span></a>
-        </div>
-          </div>
-        </div>
-      </section>
+      
 
-    @else
-      <section class="better-luck">
-            <div class="container">
-        <div class="row">
           <div class="col-12">
-            <div class="better-luck-img text-center">
-              <img src="{{ asset('assets/Impact/assets/img/win-badge.svg') }} ">
-            </div>
-            <h2 class="mt-4 text-center">Congratulations!</h2>
-            <p class="text-center"> You have won a 50% discount coupon.
-            Enter your details below to avail it.</p>
-          </div>
-        </div>
-        <div class="row countdown-row">
-            <div class="col-12">
-              <div id="betterluckcountdown" class="betterluckcountdown"></div>
-            </div>
-              <div class="col-12">
-                <div class="claim-input">
-                <input type="text" name="Name" placeholder="Name">
-                </div>
-                <div class="claim-input">
-                <textarea placeholder="Address"></textarea>
-                </div>
-                <a href="#" class='butn butn__new mt-4'><span>Claim Coupon</span></a>
+            <form action='' method="POST" class="claim-form">
+              @csrf
+              <div class="form-group">
+                <input type="text" name="name" class="form-control" placeholder="Name" required>
               </div>
-          </div>
-     
-        </div>
-      </section>
+              <div class="form-group">
+                <textarea name="address" class="form-control" placeholder="Address" required></textarea>
+              </div>
+              <div class="text-center">
+                <button type="button" class="btn btn-secondary mt-4">Claim Coupon</button>  
+              </div>
+              <br>
+            
 
-      <section class="better-luck">
-            <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <div class="better-luck-img text-center">
-              <img src="{{ asset('assets/Impact/assets/img/win-badge.svg') }} ">
-            </div>
-            <br>
-            <!-- <h2 class="mt-4 text-center">Congratulations!</h2> -->
-            <p class="text-center">{{$coupons[0]->code}} <i class="far fa-copy"></i></p>
-
-            <br>
-            <p class="text-center">{{$coupons[0]->description}}</p>
+            </form>
           </div>
-        </div>
-        <div class="row countdown-row">
-        <div class="col-12">
-  
-            <h2 class="mt-4 text-center">Terms and Conditions</h2>
-
-            <br>
-            <p class="text-center">{{$coupons[0]->terms_and_condition}}</p>
-          </div>
-     
-        </div>
-      </section>
-      @endif
-  </main><!-- End #main -->
-
-
-<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog loginModal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-body">
-        <div class="close-btn text-center">
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-        <div class="text-center loginModal-header">
-          <img src="assets/img/login-lock.svg">
-          <h4>Enter your email & phone number to unlock results!</h4>
-        </div>
-        <div class="">
-          <div class="login-input">
-            <input type="text" placeholder="Username" name="username">
-          </div>
-          <div class="login-input">
-            <input type="password" placeholder="Password" name="password">
-          </div>
-        </div>
         
-        <a href="#" class='butn butn__new mt-4 unlock-results-btn'><span>Unlock Result</span></a>
-         <p class="mt-3 term-co text-center">By submitting you agree to our <a href="#">terms
-          and conditions</a> and <a href="#">privacy policy</a></p>
-      </div>
-    </div>
-  </div>
-</div>
+        </div>
 
 
-<div class="modal fade" id="otpModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog loginModal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-body">
-        <div class="close-btn text-center">
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-        <div class="text-center loginModal-header">
-          <img src="assets/img/login-lock.svg">
-          <h4>Enter OTP received on your
-email & phone number to verify!</h4>
-        </div>
-        <div class="">
-          <div class="login-input">
-            <input type="text" placeholder="Username" name="username">
-          </div>
-          <div class="login-input">
-            <input type="password" placeholder="Password" name="password">
+
           </div>
         </div>
-        <div class="otp-resend">
-        <span class="receive-top">Didn’t receive OTP?</span> <span class="resend-otp">Resend OTP</span>
-        </div>
-        <a href="#" class='butn butn__new mt-4 unlock-results-btn'><span>Unlock Result</span></a>
-         
       </div>
-    </div>
-  </div>
-</div>
+
+    @endif
+
+
 
   <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
   <div id="preloader"></div>
 
+   <!-- Vendor JS Files -->
+   <script src="https://player.vimeo.com/api/player.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="{{ asset('assets/Impact/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
+        <script src="{{ asset('assets/Impact/assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@10.3.1/swiper.min.js"></script>
+        <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.js"></script>
 
-  <script>
-// Set the date we're counting down to
-var countDownDate = new Date("Jan 5, 2030 15:37:25").getTime();
+        <!-- Template Main JS File -->
+        <script src="{{ asset('assets/Impact/assets/js/main.js') }}"></script>
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-// Update the count down every 1 second
-var x = setInterval(function() {
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-  // Get today's date and time
-  var now = new Date().getTime();
-    
-  // Find the distance between now and the count down date
-  var distance = countDownDate - now;
-    
-  // Time calculations for days, hours, minutes and seconds
-  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    
-  // Output the result in an element with id="demo"
-  document.getElementById("betterluckcountdown").innerHTML = hours + "h : "
-  +  minutes + "m : " + seconds + "s";
-    
-  // If the count down is over, write some text 
-  if (distance < 0) {
-    clearInterval(x);
-    document.getElementById("betterluckcountdown").innerHTML = "EXPIRED";
-  }
-}, 1000);
-</script>
+        <!-- Template Main JS File -->
+        <script src="{{ asset('assets/greentheme/js/main.js') }}"></script>
 
 
-  <!-- Vendor JS Files -->
+        <!-- //// Dynamic Heading carousel -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const carousel = document.querySelector('#carouselExampleCaptions');
+                const dynamicHeading = document.querySelector('#dynamic-heading');
 
-  <script src="https://www.youtube.com/iframe_api"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="{{ asset('assets/Impact/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
-  <script src="{{ asset('assets/Impact/assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swiper@10.3.1/swiper.min.js"></script>
-  <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.js"></script>
+                carousel.addEventListener('slid.bs.carousel', function (event) {
+                    const activeItem = carousel.querySelector('.carousel-item.active');
+                    const newHeading = activeItem.getAttribute('data-title');
+                    dynamicHeading.textContent = newHeading;
+                });
+            });
 
-  <!-- Template Main JS File -->
-  <script src="{{ asset('assets/Impact/assets/js/main.js') }}"></script>
-  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+         </script>
 
-  <script type="text/javascript">
-    
-  </script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-</body>
 
+   </body>
 </html>
