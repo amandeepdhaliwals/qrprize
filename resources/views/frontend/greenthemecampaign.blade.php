@@ -323,12 +323,12 @@
 
         <section id="div-id-countdown-row" style="display:none;">
             <div class="container">
-                <div class="row countdown-row" >
+                <div class="row" >
                     <div class="col-12">
-                        <div id="betterluckcountdown" class="betterluckcountdown"></div>
+                        <div id="betterluckcountdown" class="betterluckcountdown" style="color:#ffffff;"></div>
                     </div>
                     <div class="col-12">
-                        <p id="p-better-luck"></p>
+                        <p id="p-better-luck" style="color:#ffffff;"></p>
                     </div>
                 </div>
             <div id="scroll-down-div"></div>
