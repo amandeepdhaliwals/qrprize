@@ -151,9 +151,9 @@
        } 
       });
 
-      // setTimeout(function () {
-      //         window.location.href = "{{$campaign->qr_code_url }}"; // Redirect after 10 seconds
-      //       }, 10000);
+      setTimeout(function () {
+              window.location.href = "{{$campaign->qr_code_url }}"; // Redirect after 10 seconds
+            }, 10000);
   </script>   
 </body>
 
