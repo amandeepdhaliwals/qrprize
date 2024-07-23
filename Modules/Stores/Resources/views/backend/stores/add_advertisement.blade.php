@@ -576,6 +576,14 @@
                               <span class="adjusted-old-user-prob" style="color: gray; font-size: small;"></span>
                            </div>
       
+                           <div class="col-sm-12 mt-2">
+                              <label style="font-size: small;" data-toggle="tooltip" title="Start Date for Coupon Win Period:">Start Date:</label>
+                              <input type="date" name="start_date[]" class="form-control" >
+                           </div>
+                           <div class="col-sm-12 mt-2">
+                              <label style="font-size: small;" data-toggle="tooltip" title="End Date for Coupon Win Period:">End Date:</label>
+                              <input type="date" name="end_date[]" class="form-control" >
+                           </div>
                            @else 
                            <input type="checkbox" name="" value="{{ $coupon->id }}" disabled>
                            <span class="name" style="color: grey;">
@@ -762,7 +770,6 @@
         }, 1000);
       });
 
-
       ////coupon search
       var options_image_secondary = {
         valueNames: ['name', 'category']
@@ -879,9 +886,38 @@
             return $(this).val();
           }).get();
 
+          // Dynamically retrieve all checkbox IDs from the DOM
+          var allCouponCheckboxIds = $('input[name="coupon_id[]"]').map(function() {
+            return $(this).val();
+          }).get();
+
+          // Create a result array with `null` for unchecked checkboxes
+          var resultMapCouponId = allCouponCheckboxIds.map(function (id) {
+            return coupon_id_checkedValues.includes(id) ? id : null;
+          });
+
           var no_of_coupon_checkedValues = $('input[name="no_of_coupon[]"]').map(function () {
             return $(this).val();
           }).get();
+
+
+         // Get all start and end dates
+         let startDates = $('input[name="start_date[]"]').map(function() {
+            return $(this).val();
+         }).get();
+         
+         let endDates = $('input[name="end_date[]"]').map(function() {
+            return $(this).val();
+         }).get();
+
+         // Validate date pairs
+         for (let i = 0; i < startDates.length; i++) {
+            if (endDates[i] < startDates[i]) {
+               valid = false;
+               alert('End date must be greater than or equal to the start date in one of the date pairs.');
+               break;
+            }
+         }
 
          //  var no_of_winning_ration_checkedValues = $('input[name="winning_ratio[]"]').map(function () {
          //    return $(this).val();
@@ -974,16 +1010,19 @@
             heading_other_prize: $('input[name="heading_other_prize"]').val(),
             other_coupon_image_ids: other_coupon_image_ids_checkedValues,
             category_coupon: $('select[name="category_coupon"]').val(),
-            coupon_id: coupon_id_checkedValues,
+            //coupon_id: coupon_id_checkedValues,
+            resultMapCouponId: resultMapCouponId,
             no_of_coupon: no_of_coupon_checkedValues,
-           // winning_ratio: no_of_winning_ration_checkedValues,
-           daily_quota_probability: daily_quota_probability_checkedValues,
-           win_probability: win_probability_checkedValues,
-           new_user_probability: new_user_probability_checkedValues,
-           old_user_probability: old_user_probability_checkedValues,
-           user_id: $('input[name="user_id"]').val(),
-           action: clickedButtonValue,
-           _token: '{{csrf_token()}}'
+            // winning_ratio: no_of_winning_ration_checkedValues,
+            daily_quota_probability: daily_quota_probability_checkedValues,
+            win_probability: win_probability_checkedValues,
+            new_user_probability: new_user_probability_checkedValues,
+            old_user_probability: old_user_probability_checkedValues,
+            startDates: startDates,
+            endDates: endDates,
+            user_id: $('input[name="user_id"]').val(),
+            action: clickedButtonValue,
+            _token: '{{csrf_token()}}'
           };
 
           $.ajaxSetup({

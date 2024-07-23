@@ -1076,30 +1076,40 @@ class StoresController extends BackendBaseController
         // Validate the incoming request data
         $requestData->validate([
             "advertisement_name" => "required",
-            "coupon_id" => "required",
+            "resultMapCouponId" => "required",
         ]);
 
-        $couponIdArray = $requestData['coupon_id'];
-        $noOfCouponArray = array_values(array_filter($requestData['no_of_coupon'])); // Remove null values
-        //$winningRatioArray = array_values(array_filter($requestData['winning_ratio'])); // Remove null values
-
+        $couponIdArray = $requestData['resultMapCouponId'];
+       
+        $noOfCouponArray = isset($requestData['no_of_coupon']) ? $requestData['no_of_coupon'] : [];
         $dailyQuotaProbability =  isset($requestData['daily_quota_probability']) ? $requestData['daily_quota_probability'] : [];
         $winProbabilityArray = isset($requestData['win_probability']) ? $requestData['win_probability'] : [];
         $newUserProbabilityArray = isset($requestData['new_user_probability']) ? $requestData['new_user_probability'] : [];
         $oldUserProbabilityArray = isset($requestData['old_user_probability']) ? $requestData['old_user_probability'] : [];
-        
-        $noOfCouponSum = array_sum($noOfCouponArray);
+        $startDates = isset($requestData['startDates']) ? $requestData['startDates'] : [];
+        $endDates = isset($requestData['endDates']) ? $requestData['endDates'] : [];
 
+        //$noOfCouponArray = array_values(array_filter($requestData['no_of_coupon'])); // Remove null values
+        //$winningRatioArray = array_values(array_filter($requestData['winning_ratio'])); // Remove null values
+        // $dailyQuotaProbability = array_values(array_filter($requestData['daily_quota_probability']));
+        // $winProbabilityArray = array_values(array_filter($requestData['win_probability']));
+        // $newUserProbabilityArray = array_values(array_filter($requestData['new_user_probability']));
+        // $oldUserProbabilityArray = array_values(array_filter($requestData['old_user_probability']));
+        // $startDates = array_values(array_filter($requestData['startDates']));
+        // $endDates = array_values(array_filter($requestData['endDates']));
+
+        $noOfCouponSum = array_sum($noOfCouponArray);
         // Check if the lengths of coupon ID and number of coupons arrays are equal
-        if (count($couponIdArray) !== count($noOfCouponArray)) {
-            // Return an error response
-            return response()->json(['error' => 'Mismatch in coupon ID and number of coupons.'], 400);
-        }
+        // if (count($couponIdArray) !== count($noOfCouponArray)) {
+        //     // Return an error response
+        //     return response()->json(['error' => 'Mismatch in coupon ID and number of coupons.'], 400);
+        // }
 
         $combinedDataCoupon = [];
-
+    
         // Combine coupon_id with no_of_coupon and winning_ratio
         foreach ($couponIdArray as $index => $couponId) {
+            if ($couponId !== null) {
             $combinedDataCoupon[$couponId] = [
                 'count' => $noOfCouponArray[$index],
                 // 'winning_ratio' => $winningRatioArray[$index]
@@ -1107,10 +1117,12 @@ class StoresController extends BackendBaseController
                 'new_user_probability' => isset($newUserProbabilityArray[$index]) ? $newUserProbabilityArray[$index] : null,
                 'old_user_probability' => isset($oldUserProbabilityArray[$index]) ? $oldUserProbabilityArray[$index] : null,
                 'daily_quota_probability' => isset($dailyQuotaProbability[$index]) ? $dailyQuotaProbability[$index] : null,
-        
+                'start_date' => isset($startDates[$index]) ? $startDates[$index] : null,
+                'end_date' => isset($endDates[$index]) ? $endDates[$index] : null,
             ];
+          }
         }
-
+    
         // Convert combined data to JSON format
         $jsonDataCoupon = json_encode($combinedDataCoupon);
 
@@ -1193,6 +1205,7 @@ class StoresController extends BackendBaseController
             }
 
             foreach ($couponIdArray as $index => $couponId) {
+                if ($couponId !== null) {
                 // Calculate the new total_coupon count by subtracting the count value
                 $newTotalCouponCount = Coupon::where('id', $couponId)->first()->total_coupons - $noOfCouponArray[$index];
                 $newAssignesCouponCount = Coupon::where('id', $couponId)->first()->noOfCouponArray + $noOfCouponArray[$index];
@@ -1202,6 +1215,7 @@ class StoresController extends BackendBaseController
                     'total_coupons' => $newTotalCouponCount,
                     'no_of_assigned_coupons' => $newAssignesCouponCount
                 ]);
+             }
 
             }
 

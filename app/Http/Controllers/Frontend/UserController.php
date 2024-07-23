@@ -759,7 +759,7 @@ class UserController extends Controller
     
         // Send the OTP via email or mobile
         $user = User::find($userId);
-        Notification::send($user, new OTPNotification($otpCodeEmail));
+       // Notification::send($user, new OTPNotification($otpCodeEmail));
     
          Log::info(label_case($module_title.' '.$module_action). ' - OTP generated and sent.');
          $this->storeAuditTrail($userId, 'otp_generated', ['user_id' => $userId]);
@@ -871,7 +871,7 @@ class UserController extends Controller
                 
                 // Notify user about account creation
                 $data = ['password' => $password];
-                $user->notify(new UserAccountCreated($data));
+                //$user->notify(new UserAccountCreated($data));
                 
                 return ['status' => 'success']; // Both OTPs are valid and verified
         } else {
@@ -948,7 +948,6 @@ class UserController extends Controller
         ];
     }
 
-  
     private function recordCustomerResult(
         $user_id, 
         $advertisement_id, 
@@ -1030,8 +1029,36 @@ class UserController extends Controller
         foreach ($coupons as $coupon_id => $coupon_details) {
             $total_coupons_count = (int) $coupon_details['count'];
             $daily_quota = isset($coupon_details['daily_quota_probability']) ? (int) $coupon_details['daily_quota_probability'] : null;
-            $win_probability = isset($coupon_details['win_probability']) ? (int) $coupon_details['win_probability'] : null;
-    
+            $initialProbability = isset($coupon_details['win_probability']) ? (int) $coupon_details['win_probability'] : null;
+            $startDate = isset($coupon_details['start_date']) ? strtotime($coupon_details['start_date']) : null;
+            $endDate = isset($coupon_details['end_date']) ? strtotime($coupon_details['end_date']) : null;
+            $now = time();
+            // Determine if probability calculation is required
+     
+            // Use initial probability if dates are null
+            $win_probability = $initialProbability;
+
+            if ($initialProbability !== null) {
+                if ($startDate !== null && $endDate !== null) {
+                    // Validate dates
+                    if ($endDate <= $startDate) {
+                        Log::error("End date must be after start date for coupon ID: {$coupon_id}.");
+                        continue; // Skip this coupon
+                    }
+
+                    if ($now < $startDate || $now > $endDate) {
+                        Log::info("Lottery not in progress for coupon ID: {$coupon_id}.");
+                        continue; // Skip this coupon
+                    }
+
+                    // Calculate current probability based on elapsed time
+                    $totalDuration = $endDate - $startDate;
+                    $elapsedTime = $now - $startDate;
+                    $elapsedPercentage = $elapsedTime / $totalDuration;
+                    $win_probability = $initialProbability + ($elapsedPercentage * (100 - $initialProbability));
+                } 
+            }
+           
             // Calculate total wins for this coupon
             $totalCouponsWins = CustomerWin::join('customer_results', 'customer_wins.customer_results_id', '=', 'customer_results.id')
                 ->where('customer_results.advertisement_id', $advertisement_id)
