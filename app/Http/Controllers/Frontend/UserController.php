@@ -759,7 +759,7 @@ class UserController extends Controller
     
         // Send the OTP via email or mobile
         $user = User::find($userId);
-       // Notification::send($user, new OTPNotification($otpCodeEmail));
+        Notification::send($user, new OTPNotification($otpCodeEmail));
     
          Log::info(label_case($module_title.' '.$module_action). ' - OTP generated and sent.');
          $this->storeAuditTrail($userId, 'otp_generated', ['user_id' => $userId]);
@@ -871,7 +871,7 @@ class UserController extends Controller
                 
                 // Notify user about account creation
                 $data = ['password' => $password];
-                //$user->notify(new UserAccountCreated($data));
+                $user->notify(new UserAccountCreated($data));
                 
                 return ['status' => 'success']; // Both OTPs are valid and verified
         } else {
@@ -947,7 +947,6 @@ class UserController extends Controller
             'cust_result_id' => $res
         ];
     }
-
     private function recordCustomerResult(
         $user_id, 
         $advertisement_id, 
