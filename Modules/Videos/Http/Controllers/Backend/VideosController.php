@@ -148,6 +148,11 @@ class VideosController extends BackendBaseController
 
         $$module_name_singular = $module_model::findOrFail($id);
 
+        if($$module_name_singular->media_type == 'youtube'){
+            $$module_name_singular->media_url =  $this->convertYoutubeEmbedToRegular($$module_name_singular->media);
+        }else if($$module_name_singular->media_type == 'vimeo'){
+            $$module_name_singular->media_url =  $this->convertToStandardVimeoLink($$module_name_singular->media);
+        }
         $module_coupons = Coupon::where('status', 1)
         ->where('deleted_at', null)
         ->get();
@@ -372,4 +377,49 @@ class VideosController extends BackendBaseController
 
         return $videoID;
     }
+
+    //////////////////////////convert youtube enmbed to regular url ///////////////////////////////////
+    private function extractEnmbedVideoID($youtubeLink)
+{
+        // Check for the regular YouTube link
+        if (preg_match('/(?:v=|\/embed\/|youtu.be\/|\/v\/|\/vi\/|\/v=|\/e\/|watch\?v=|watch\?vi=|youtu.be\/|\/embed\/)([a-zA-Z0-9_-]{11})/', $youtubeLink, $matches)) {
+            return $matches[1];
+        }
+        
+        return '';
+    
+}
+
+    private function convertYoutubeEmbedToRegular($youtubeLink)
+    {
+        $videoID = $this->extractEnmbedVideoID($youtubeLink);
+
+        // Generate regular YouTube link if video ID is found
+        if ($videoID) {
+            return "https://www.youtube.com/watch?v=" . $videoID;
+        }
+    
+        return '';
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////convert to vimeo regular link//////////////////////
+    private function extractEmbedVimeoID($vimeoLink)
+    {
+         // Check for different Vimeo URL patterns
+    if (preg_match('/vimeo\.com\/(?:.*\/)?(\d+)/', $vimeoLink, $matches)) {
+        return $matches[1];
+    }
+
+        return '';
+    }
+    private function convertToStandardVimeoLink($vimeoLink)
+    {
+        $videoID = $this->extractEmbedVimeoID($vimeoLink);
+        if ($videoID) {
+            return "https://vimeo.com/" . $videoID;
+        }
+
+        return '';
+    }
+///////////////////////////////////////////////////////////////////////////////////////////////
 }
