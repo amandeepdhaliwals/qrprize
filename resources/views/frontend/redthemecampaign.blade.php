@@ -3,14 +3,16 @@
    <head>
       <meta charset="utf-8">
       <meta content="width=device-width, initial-scale=1.0" name="viewport">
-      <title>
-         QrPrize
-      </title>
-      <meta content="" name="description">
-      <meta content="" name="keywords">
-      <!-- Favicons -->
-      <!--   <link href="" rel="icon">
-         <link href="" rel="apple-touch-icon" -->
+      <title>QrPrize - {{ config('app.name', 'Laravel') }}</title>
+
+      <link rel="icon" type="image/png" href="{{asset('img/favicon.png')}}">
+      <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/favicon.png')}}">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="{{ setting('meta_description') }}">
+      <meta name="keyword" content="{{ setting('meta_keyword') }}">
+       <!-- Analytics -->
+       <x-google-analytics config="{{ setting('google_analytics') }}" />
+
       <!-- Google Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -326,7 +328,8 @@
                         </div>
                     </div>
                     <div class="col-12 mt-2 spinner-bottom-text">
-                        <p>Guarda gentilmente tutto il video per sbloccare i premi.</p>
+                        <p>Non disperare!</p>
+                        <p>Puoi tornare a provare la fortuna tra:</p>
                     </div>
                 </div>
             </div>
@@ -334,7 +337,7 @@
 
         <section id="div-id-countdown-row" style="display:none;">
             <div class="container">
-                <div class="row">
+                <div class="row countdown-row" >
                     <div class="col-12">
                         <div id="betterluckcountdown" class="betterluckcountdown"></div>
                     </div>
@@ -349,7 +352,7 @@
             <div class="container">
                <div class="row">
                   <div class="col-12">
-                     <p class="mb-0">@2024 QR Prize. All rights reserved.</p>
+                     <p class="mb-0">@2024 QR Code. All rights reserved.</p>
                   </div>
                </div>
             </div>
@@ -361,13 +364,14 @@
         <div class="modal-content">
           <div class="modal-body">
             <div class="close-btn">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" id="modalClose" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
             <div class="text-center signinModal-header">
               <img src="{{ asset('assets/redtheme/img/login-lock.svg') }}">
-              <h4 class="mt-3 mb-3">PER FAVORE INSERISCI I TUOI <br>
+              <h4 class="mt-3 mb-3">PER FAVORE INSERISCI I TUOL <br>
                     CONTATTI PER SBLOCCARE I PREMI:</h4>
             </div>
             <form id="modalForm">
@@ -409,7 +413,7 @@
         <div class="modal-content">
             <div class="modal-body">
             <div class="close-btn">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" id="modalCloseOtp" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
             </div>
@@ -465,6 +469,16 @@
         <script src="{{ asset('assets/redtheme/js/main.js') }}"></script>
 
         <script>
+               $(function () {
+                    $('#modalClose').on('click', function () {
+                        $('#signinModal').modal('hide');
+                    })
+                });
+                $(function () {
+                    $('#modalCloseOtp').on('click', function () {
+                        $('#otpModal').modal('hide');
+                    })
+                });
 
                 function enableSpinner() {
                     var image = document.getElementById("spinning-image");

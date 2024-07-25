@@ -4,14 +4,15 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>QrPrize - {{ config('app.name', 'Laravel') }}</title>
 
-  <title>QrPrize</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
-
-  <!-- Favicons -->
-  <!-- <link href="" rel="icon">
-  <link href="" rel="apple-touch-icon"> -->
+  <link rel="icon" type="image/png" href="{{asset('img/favicon.png')}}">
+  <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/favicon.png')}}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ setting('meta_description') }}">
+  <meta name="keyword" content="{{ setting('meta_keyword') }}">
+  <!-- Analytics -->
+  <x-google-analytics config="{{ setting('google_analytics') }}" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -345,12 +346,12 @@
 
   </main><!-- End #main -->
 
-  <div class="modal fade" id="signinModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal" id="signinModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog signinModal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-body">
             <div class="close-btn">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" id="modalClose" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
             </div>
@@ -383,12 +384,13 @@
                 <div id="phone_number_error" style="color:red"></div>
               </div>
               <div id="user_data_error" style="color:red"></div>
-			  <input type="hidden" name="token_user_data" value="{{$encryptedValue}}">
+			       <input type="hidden" name="token_user_data" value="{{$encryptedValue}}">
             </div>
             <form id="modalForm">
             <button class="INVIA-btn" id="create_user">INVIA</button>
             <p class="mt-3 term-co text-center">Cliccando INVIA accetti le <a href="#">Condizioni d’uso</a> e <a href="#">privacy</a> del sito web.</p>
           </div>
+           <!-- Modal footer -->
         </div>
       </div>
      </div>
@@ -398,7 +400,7 @@
         <div class="modal-content">
             <div class="modal-body">
             <div class="close-btn">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close"  id="modalCloseOtp" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
             </div>
@@ -454,6 +456,16 @@
         <script src="{{ asset('assets/greentheme/js/main.js') }}"></script>
 
         <script>
+           $(function () {
+              $('#modalClose').on('click', function () {
+                  $('#signinModal').modal('hide');
+              })
+          });
+          $(function () {
+              $('#modalCloseOtp').on('click', function () {
+                  $('#otpModal').modal('hide');
+              })
+          });
           function enableSpinner() {
                 var image = document.getElementById("spinning-image");
                 var button = document.querySelector(".spin-button");
