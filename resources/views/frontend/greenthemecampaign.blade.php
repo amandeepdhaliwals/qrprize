@@ -78,7 +78,7 @@
       .fade-out {
           opacity: 0.5; /* Adjust opacity for fade-out effect */
       }
-
+/*ggg*/
       .spin-button {
       position: absolute;
       top: 50%;
