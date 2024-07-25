@@ -47,10 +47,10 @@
                     {{ html()->input("file", 'video_file')->class('form-control')->attributes(["accept" => "video/mp4, video/MOV, video/WMV"]) }}
                 </div>
                 <div id="youtube-input" style="display: none;">
-                    {{ html()->text("youtube_link")->placeholder('Youtube Link')->class('form-control')->value($data ? $data->media : '' ) }}
+                    {{ html()->text("youtube_link")->placeholder('Youtube Link')->class('form-control')->value($data ? $data->media_url : '' ) }}
                 </div>
                 <div id="vimeo-input" style="display: none;">
-                    {{ html()->text("vimeo_link")->placeholder('Vimeo Link')->class('form-control')->value($data ? $data->media : '' ) }}
+                    {{ html()->text("vimeo_link")->placeholder('Vimeo Link')->class('form-control')->value($data ? $data->media_url : '' ) }}
                 </div>
             </div>
         </div>
