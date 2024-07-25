@@ -215,6 +215,8 @@ class GalleryController extends BackendBaseController
 
         if($request->free_services){
             $requestData['free_services'] = implode(',', $request->free_services);
+        }else{
+            $requestData['free_services'] = '';
         }
 
         $$module_name_singular = $module_model::findOrFail($id);
