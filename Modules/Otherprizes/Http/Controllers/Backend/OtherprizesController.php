@@ -271,8 +271,8 @@ class OtherprizesController extends BackendBaseController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
-        //
-    }
+    // public function destroy($id)
+    // {
+    //     //
+    // }
 }

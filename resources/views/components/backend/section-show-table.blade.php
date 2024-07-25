@@ -1,7 +1,7 @@
 @props(["data"=>"", "module_name"])
-<p>
+<!-- <p>
     @lang("All values of :module_name (Id: :id)", ['module_name'=>ucwords(Str::singular($module_name)), 'id'=>$data->id])
-</p>
+</p> -->
 <table class="table table-responsive-sm table-hover table-bordered">
     <?php
     $all_columns = $data->getTableColumns();
