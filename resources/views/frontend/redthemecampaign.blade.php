@@ -367,7 +367,6 @@
             <button type="button" class="close" id="modalClose" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
             <div class="text-center signinModal-header">
               <img src="{{ asset('assets/redtheme/img/login-lock.svg') }}">

@@ -1075,6 +1075,24 @@
         });
       });
 
+      $(document).ready(function() {
+            $('input[name="new_user_probability[]"]').on('input', function() {
+                const newUserAdjustmentFactor = parseFloat($(this).val());
+                if (newUserAdjustmentFactor > 2 || newUserAdjustmentFactor < 0) {
+                    alert('Please enter a valid adjustment factor between 0 and 2.');
+                    $(this).val('');
+                }
+            });
+
+            $('input[name="old_user_probability[]"]').on('input', function() {
+                const oldUserAdjustmentFactor = parseFloat($(this).val());
+                if (oldUserAdjustmentFactor > 2 || oldUserAdjustmentFactor < 1) {
+                    alert('Please enter a valid adjustment factor between 1 and 2.');
+                    $(this).val('');
+                }
+            });
+        });
+
       document.addEventListener('DOMContentLoaded', function () {
          // Select all win probability inputs
          const winProbInputs = document.querySelectorAll('.win-prob-input');
