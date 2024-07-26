@@ -388,7 +388,7 @@
                      </div>
                      <div class="video-list">
                         <!-- Thumbnails -->
-                        <div id="thumbnails" class="list row small-up-1 medium-up-2 large-up-3">
+                        <div id="thumbnails2" class="list row small-up-1 medium-up-2 large-up-3">
                            @php $firstIteration = true; @endphp
                            @foreach($adv_images as $key => $adv_image)
                         @if($adv_image->image_type == 'secondary')
@@ -456,7 +456,7 @@
                      </div>
                      <div class="video-list">
                         <!-- Thumbnails -->
-                        <div id="thumbnails" class="list row small-up-1 medium-up-2 large-up-3">
+                        <div id="thumbnails3" class="list row small-up-1 medium-up-2 large-up-3">
                            @php $firstIteration = true; @endphp
                            @foreach($other_images as $key => $other_image)
                         <div class="column">
@@ -517,7 +517,7 @@
                      </div>
                      <div class="video-list" id="videoGalleryCoupon">
                      <!-- Thumbnails -->
-                     <div id="thumbnails" class="list row small-up-1 medium-up-2 large-up-3">
+                     <div id="thumbnails4" class="list row small-up-1 medium-up-2 large-up-3">
                         @php $firstIteration_c = true; @endphp
 
                         @foreach($coupons as $key => $coupon)
@@ -720,6 +720,34 @@
           }, 1000);
         });
 
+        $("#search").keyup(function() {
+        // Get the search input value
+        var searchQuery = $(this).val().toLowerCase();
+        
+        // Flag to track if any items match the search query
+        var found = false;
+
+        // Iterate over each thumbnail
+        $("#thumbnails .column").each(function() {
+            var title = $(this).find(".name").text().toLowerCase(); // Get the title text of the item
+            
+            // Check if the title contains the search query
+            if (title.indexOf(searchQuery) > -1) {
+                $(this).show(); // Show matching item
+                found = true;   // Set the flag to true
+            } else {
+                $(this).hide(); // Hide non-matching item
+            }
+        });
+
+        // Show "No items found" message if no items are found
+        if (!found) {
+            $("#adv_video_error").text("No items found.").show();
+        } else {
+            $("#adv_video_error").hide(); // Hide the message if items are found
+        }
+    });
+
         // Filter
         $('#filter').change(function () {
           var selection = this.value;
@@ -754,9 +782,37 @@
       $("#search-image").change(function () {
         // smooth scroll to thumbnails
         $('html, body').animate({
-          scrollTop: $("#thumbnails").offset().top - 60
+          scrollTop: $("#thumbnails1").offset().top - 60
         }, 1000);
       });
+
+        $("#search-image").keyup(function() {
+        // Get the search input value
+        var searchQuery = $(this).val().toLowerCase();
+        
+        // Flag to track if any items match the search query
+        var found = false;
+
+        // Iterate over each thumbnail
+        $("#thumbnails1 .column").each(function() {
+            var title = $(this).find(".name").text().toLowerCase(); // Get the title text of the item
+            
+            // Check if the title contains the search query
+            if (title.indexOf(searchQuery) > -1) {
+                $(this).show(); // Show matching item
+                found = true;   // Set the flag to true
+            } else {
+                $(this).hide(); // Hide non-matching item
+            }
+        });
+
+        // Show "No items found" message if no items are found
+        if (!found) {
+            $("#adv_primary_error").text("No items found.").show();
+        } else {
+            $("#adv_primary_error").hide(); // Hide the message if items are found
+        }
+    });
 
       ////image secondary search
       var options_image_secondary = {
@@ -766,9 +822,37 @@
       $("#search-image-secondary").change(function () {
         // smooth scroll to thumbnails
         $('html, body').animate({
-          scrollTop: $("#thumbnails").offset().top - 60
+          scrollTop: $("#thumbnails2").offset().top - 60
         }, 1000);
       });
+
+      $("#search-image-secondary").keyup(function() {
+        // Get the search input value
+        var searchQuery = $(this).val().toLowerCase();
+        
+        // Flag to track if any items match the search query
+        var found = false;
+
+        // Iterate over each thumbnail
+        $("#thumbnails2 .column").each(function() {
+            var title = $(this).find(".name").text().toLowerCase(); // Get the title text of the item
+            
+            // Check if the title contains the search query
+            if (title.indexOf(searchQuery) > -1) {
+                $(this).show(); // Show matching item
+                found = true;   // Set the flag to true
+            } else {
+                $(this).hide(); // Hide non-matching item
+            }
+        });
+
+        // Show "No items found" message if no items are found
+        if (!found) {
+            $("#secondary_error").text("No items found.").show();
+        } else {
+            $("#secondary_error").hide(); // Hide the message if items are found
+        }
+    });
 
       ////coupon search
       var options_image_secondary = {
@@ -778,21 +862,77 @@
       $("#search-image-coupon").change(function () {
         // smooth scroll to thumbnails
         $('html, body').animate({
-          scrollTop: $("#thumbnails").offset().top - 60
+          scrollTop: $("#thumbnails4").offset().top - 60
         }, 1000);
       });
+
+      $("#search-image-coupon").keyup(function() {
+        // Get the search input value
+        var searchQuery = $(this).val().toLowerCase();
+        
+        // Flag to track if any items match the search query
+        var found = false;
+
+        // Iterate over each thumbnail
+        $("#thumbnails4 .column").each(function() {
+            var title = $(this).find(".name").text().toLowerCase(); // Get the title text of the item
+            
+            // Check if the title contains the search query
+            if (title.indexOf(searchQuery) > -1) {
+                $(this).show(); // Show matching item
+                found = true;   // Set the flag to true
+            } else {
+                $(this).hide(); // Hide non-matching item
+            }
+        });
+
+        // Show "No items found" message if no items are found
+        if (!found) {
+            $("#adv_winning_error").text("No items found.").show();
+        } else {
+            $("#adv_winning_error").hide(); // Hide the message if items are found
+        }
+    });
 
       ////coupon other search
       var options_image_secondary = {
         valueNames: ['name', 'category_coupon']
       };
       var imageListSecondary = new List('imageGalleryOtherCoupon', options_image_secondary);
-      $("#search-image-coupon-other").change(function () {
+      $("#search-image-other-coupon").change(function () {
         // smooth scroll to thumbnails
         $('html, body').animate({
-          scrollTop: $("#thumbnails").offset().top - 60
+          scrollTop: $("#thumbnails3").offset().top - 60
         }, 1000);
       });
+
+      $("#search-image-other-coupon").keyup(function() {
+        // Get the search input value
+        var searchQuery = $(this).val().toLowerCase();
+        
+        // Flag to track if any items match the search query
+        var found = false;
+
+        // Iterate over each thumbnail
+        $("#thumbnails3 .column").each(function() {
+            var title = $(this).find(".name").text().toLowerCase(); // Get the title text of the item
+            
+            // Check if the title contains the search query
+            if (title.indexOf(searchQuery) > -1) {
+                $(this).show(); // Show matching item
+                found = true;   // Set the flag to true
+            } else {
+                $(this).hide(); // Hide non-matching item
+            }
+        });
+
+        // Show "No items found" message if no items are found
+        if (!found) {
+            $("#adv_other_coupon_error").text("No items found.").show();
+        } else {
+            $("#adv_other_coupon_error").hide(); // Hide the message if items are found
+        }
+    });
 
       //Get URL query string
       function getQueryVariable(variable) {
