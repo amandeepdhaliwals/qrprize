@@ -539,6 +539,8 @@ section.better-luck {
 #signinModal .modal-content,
 #otpModal .modal-content {
     border-radius: 32px 32px 0 0;
+    height: 100vh;
+    overflow: auto;
 }
 
 #signinModal .modal-dialog,
