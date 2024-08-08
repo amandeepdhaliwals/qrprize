@@ -328,7 +328,8 @@
                         <div id="betterluckcountdown" class="betterluckcountdown" style="color:#ffffff;"></div>
                     </div>
                     <div class="col-12">
-                        <p id="p-better-luck" style="color:#ffffff;"></p>
+                        <p id="p-better-luck" style="color:#ffffff; text-align: center; font-size: 14px;
+    font-weight: 500;"></p>
                     </div>
                 </div>
             <div id="scroll-down-div"></div>
