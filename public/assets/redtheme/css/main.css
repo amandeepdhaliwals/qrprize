@@ -466,8 +466,10 @@ section.spinner {
     margin-left: auto;
     margin-right: auto;
     width: 340px;
-    height: 100vh;
+}
+#signinModal .modal-dialog .modal-body {
     overflow: auto;
+    height: calc(100vh - 10px);
 }
 #otpModal .modal-dialog {
     margin: 0;
@@ -479,7 +481,9 @@ section.spinner {
     margin-left: auto;
     margin-right: auto;
     width: 340px;
-    height: 100vh;
+}
+#otpModal .modal-dialog .modal-body {
+    height: calc(100vh - 10px);
     overflow: auto;
 }
 .signin-input label {
