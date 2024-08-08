@@ -454,7 +454,7 @@ section.spinner {
 }
 #signinModal .modal-content,
 #otpModal .modal-content {
-    border-radius: 32px 32px 0 0;
+    border-radius: 32px;
 }
 #signinModal .modal-dialog {
     margin: 0;
@@ -466,8 +466,7 @@ section.spinner {
     margin-left: auto;
     margin-right: auto;
     width: 340px;
-    height: 100vh;
-    overflow-y: scroll;
+    overflow: auto;
 }
 #otpModal .modal-dialog {
     margin: 0;
@@ -479,7 +478,7 @@ section.spinner {
     margin-left: auto;
     margin-right: auto;
     width: 340px;
-    overflow-y: scroll;
+    overflow: auto;
 }
 .signin-input label {
     width: 100%;
@@ -604,5 +603,10 @@ section.better-luck {
 @media screen and (max-width: 576px) {
     body {
         width: 100%;
+    }
+}
+@media screen and (min-device-width: 568px) and (max-device-width: 1068px) {
+    #otpModal .modal-dialog {
+        height: 100vh !important;
     }
 }
