@@ -51,7 +51,7 @@
             $required = "required";
             ?>
             {{ html()->label($field_lable, $field_name)->class('form-label') }} {!! fielf_required($required) !!}
-            {{ html()->number($field_name)->placeholder($field_placeholder)->class('form-control')->attributes(["$required"]) }}
+            {{ html()->number($field_name)->placeholder($field_placeholder)->class('form-control')->attributes(["$required"])->attribute('min', 0) }}
         </div>
     </div>
 </div>
@@ -155,3 +155,16 @@
         </div>
     </div>
 </div> -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('input[type="number"]').forEach(function(element) {
+        element.addEventListener('input', function() {
+            if (parseFloat(this.value) < 0) {
+                this.value = '';
+            }
+        });
+    });
+});
+
+
+    </script>
