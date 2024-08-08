@@ -455,10 +455,20 @@ section.spinner {
 #signinModal .modal-content,
 #otpModal .modal-content {
     border-radius: 32px 32px 0 0;
+}
+#signinModal .modal-dialog {
+    margin: 0;
+    pointer-events: none;
+    bottom: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: 340px;
     height: 100vh;
     overflow-y: scroll;
 }
-#signinModal .modal-dialog,
 #otpModal .modal-dialog {
     margin: 0;
     pointer-events: none;
@@ -469,6 +479,7 @@ section.spinner {
     margin-left: auto;
     margin-right: auto;
     width: 340px;
+    overflow-y: scroll;
 }
 .signin-input label {
     width: 100%;
