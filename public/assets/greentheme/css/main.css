@@ -568,7 +568,7 @@ section.better-luck {
     width: 340px;
 }
 #otpModal .modal-dialog .modal-body {
-    height: calc(100vh - 10px);
+    height: calc(60vh - 10px);
     overflow: auto;
 }
 .signin-input label {
