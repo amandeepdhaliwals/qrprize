@@ -483,7 +483,7 @@ section.spinner {
     width: 340px;
 }
 #otpModal .modal-dialog .modal-body {
-    height: calc(100vh - 10px);
+    height: calc(6ss0vh - 10px);
     overflow: auto;
 }
 .signin-input label {
