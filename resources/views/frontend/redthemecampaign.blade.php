@@ -294,15 +294,6 @@
             </div>
         </section>
 
-        <!-- <section id="fifth-section" class="fifth-section">
-            <div class="container" data-aos="zoom-out">
-                <div class="fifth-section-body">
-                    <h4 class="mb-0" id="fifth-dynamic-heading">
-                        {{ $secondary_images->first()->title }}
-                    </h4>
-                </div>
-            </div>
-        </section> -->
         <section id="fifth-section" class="fifth-section">
             <div class="container" data-aos="zoom-out">
                 <div class="fifth-section-body">
