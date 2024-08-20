@@ -34,10 +34,18 @@ class CustomVerifyEmail extends Notification
      */
     public function toMail($notifiable)
     {
+        $verifyUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            [
+                'id' => $notifiable->getKey(),
+                'hash' => sha1($notifiable->getEmailForVerification()),
+            ]
+        );
         return (new MailMessage)
             ->subject('Verify Your Email Address')
             ->line('Please click the button below to verify your email address.')
-            ->action('Verify Email', url('/verify-email/'.$notifiable->id.'/'.$notifiable->email_verification_token))
+            ->action('Verify Email', $verifyUrl)
             ->line('Thank you for using our application!');
     }
 
