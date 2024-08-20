@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\URL;
 
 class VerifyEmailController extends Controller
 {
@@ -28,6 +29,6 @@ class VerifyEmailController extends Controller
         $request->user()->markEmailAsVerified();
 
         // Redirect the user or return a response
-        return redirect()->route('login')->with('status', 'Your email has been verified!');
+        return redirect()->route('/')->with('status', 'Your email has been verified!');
     }
 }
