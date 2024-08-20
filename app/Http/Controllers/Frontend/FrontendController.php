@@ -34,8 +34,8 @@ class FrontendController extends Controller
      */
     public function index()
     {
-        //return view('frontend.index');
-        return redirect()->route('login');
+        return view('frontend.index');
+        //return redirect()->route('login');
     }
 
     /**
@@ -80,7 +80,7 @@ class FrontendController extends Controller
             if (!$advertisement_id) {
                 return abort(Response::HTTP_NOT_FOUND);
             }
-    
+
             // Retrieve advertisement details and related data
             $advertisement_detail = Advertisement::findOrFail($advertisement_id);
             $advertisement_video = Video::findOrFail($advertisement_detail->adv_video_id);

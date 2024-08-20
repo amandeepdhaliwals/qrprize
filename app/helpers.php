@@ -26,12 +26,10 @@ if (! function_exists('user_registration')) {
      */
     function user_registration()
     {
-        $user_registration = false;
-
-        if (env('USER_REGISTRATION') === 'true') {
+        $user_registration = false;   
+        if (env('USER_REGISTRATION') == 'true') {
             $user_registration = true;
         }
-
         return $user_registration;
     }
 }
