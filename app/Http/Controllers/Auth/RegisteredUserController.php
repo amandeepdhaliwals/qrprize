@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
 use Modules\Customers\Entities\OtpVerification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\CustomVerifyEmail;
 
 class RegisteredUserController extends Controller
 {
@@ -103,7 +104,9 @@ class RegisteredUserController extends Controller
             'advertisement_id' => 0, 
         ]);
 
-        event(new Registered($user));
+        // Manually send the custom verification notification
+        $user->notify(new CustomVerifyEmail());
+        // event(new Registered($user));
         // event(new UserRegistered($user));
 
         // Auth::login($user);
