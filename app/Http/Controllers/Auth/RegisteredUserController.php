@@ -102,6 +102,13 @@ class RegisteredUserController extends Controller
             'campaign_id' => 0, 
             'advertisement_id' => 0, 
         ]);
+
+        event(new Registered($user));
+        event(new UserRegistered($user));
+
+        //Auth::login($user);
+
+        return redirect(RouteServiceProvider::HOME);
     
         // $updateUser = User::where("id", $user->id)->first();
         // if ($updateUser) {
@@ -113,12 +120,12 @@ class RegisteredUserController extends Controller
        // Log::info(label_case($module_title.' '.$module_action).' - New user created.');
        // $this->storeAuditTrail($id, 'user_created', ['user_id' => $$module_name_singular->id]);
 
-        $otpCodes = $this->generateAndSendOtp($user->id);
-        return response()->json([
-            'response_type' => 'success',
-            'user_id' => Crypt::encryptString($user->id),
-            'status' => 'otp_send',
-        ]);
+        // $otpCodes = $this->generateAndSendOtp($user->id);
+        // return response()->json([
+        //     'response_type' => 'success',
+        //     'user_id' => Crypt::encryptString($user->id),
+        //     'status' => 'otp_send',
+        // ]);
     }
 
     private function generateAndSendOtp($userId)

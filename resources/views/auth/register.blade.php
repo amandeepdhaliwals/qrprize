@@ -43,7 +43,7 @@
             <div id="message" class="hidden"></div>
 
             <!-- OTP Verification -->
-            <div id="otp-verification" class="hidden mt-4">
+            <!-- <div id="otp-verification" class="hidden mt-4">
                 <x-label for="otp" :value="__('OTP')" />
                 <x-input id="otp" class="block mt-1 w-full" type="text" name="otp" />
                 <x-button id="resend-otp" class="ml-4 mt-2">
@@ -53,10 +53,10 @@
                 <x-button id="verify-otp-button" class="ml-4 mt-2 hidden">
                     {{ __('Verify OTP') }}
                 </x-button>
-            </div>
+            </div> -->
 
             <div class="flex items-center justify-end mt-4">
-                <x-button id="register-button" class="ml-4">
+                <x-button type="submit" id="register-button" class="ml-4">
                     {{ __('Register') }}
                 </x-button>
             </div>
@@ -73,7 +73,7 @@
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
+    <!-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const registerForm = document.getElementById('register-form');
             const otpVerification = document.getElementById('otp-verification');
@@ -179,5 +179,5 @@
                 return `${minutes}:${secondsRemaining < 10 ? '0' : ''}${secondsRemaining}`;
             }
         });
-    </script>
+    </script> -->
 </x-auth-layout>
