@@ -29,6 +29,6 @@ class VerifyEmailController extends Controller
         $request->user()->markEmailAsVerified();
 
         // Redirect the user or return a response
-        return redirect()->route('/')->with('status', 'Your email has been verified!');
+        return redirect()->route('register')->with('status', 'Your email has been verified!');
     }
 }
