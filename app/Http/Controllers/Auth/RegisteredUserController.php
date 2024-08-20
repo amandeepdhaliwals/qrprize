@@ -106,9 +106,10 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
         event(new UserRegistered($user));
 
-        //Auth::login($user);
+        // Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        // return redirect(RouteServiceProvider::HOME);
+        return redirect()->route('register')->with('status', 'Please check your email to verify your account.');
     
         // $updateUser = User::where("id", $user->id)->first();
         // if ($updateUser) {

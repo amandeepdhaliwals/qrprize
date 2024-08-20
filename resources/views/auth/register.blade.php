@@ -9,6 +9,11 @@
                 <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
             </a>
         </x-slot>
+        @if(session('status'))
+            <div class="alert alert-success" style="color:#4DAB5E;">
+                {{ session('status') }}
+            </div>
+        @endif
 
         <!-- Validation Errors -->
         <x-auth-validation-errors class="mb-4" :errors="$errors" />
