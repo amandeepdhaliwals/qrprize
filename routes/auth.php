@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Auth\CustomEmailVerificationController;
 
 // Check if registration is enabled
  if (user_registration()) {
@@ -45,25 +46,17 @@ Route::middleware('guest')->group(function () {
 
 ///////////////////////////////////////////////////////////
 
-// Email verification notice
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
+Route::get('/email/verify', [CustomEmailVerificationController::class, 'showVerifyEmailForm'])
+    ->middleware('auth')
+    ->name('verification.notice');
 
-// Email verification handler
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
+Route::get('/email/verify/{id}/{hash}', [CustomEmailVerificationController::class, 'verifyEmail'])
+    ->middleware(['auth', 'signed'])
+    ->name('verification.verify');
 
-    // Redirect to login page after verification
-    return redirect('/login')->with('status', 'Your email has been verified. You can now log in.');
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
-// Resend verification email
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-
-    return back()->with('status', 'Verification link sent!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+Route::post('/email/verification-notification', [CustomEmailVerificationController::class, 'resendVerificationEmail'])
+    ->middleware(['auth', 'throttle:6,1'])
+    ->name('verification.send');
 
 /////////////////////////////////////////////////////////////////////////
 
