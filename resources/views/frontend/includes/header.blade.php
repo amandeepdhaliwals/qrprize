@@ -54,7 +54,7 @@
             </div>
 
             @guest
-                @if (user_registration())
+             
    
                     <a   class="inline-flex bg-primary cursor-pointer items-center justify-center rounded px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
                         href="{{ route('register') }}">
@@ -72,7 +72,7 @@
                         </span>
                     </a>
 
-                @endif
+              
                 <a class="inline-flex cursor-pointer ml-1 bg-primary items-center justify-center rounded px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
                     href="{{ route('login') }}">
                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-login me-2"

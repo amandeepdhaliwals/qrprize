@@ -16,14 +16,14 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\CustomEmailVerificationController;
 
 // Check if registration is enabled
- if (user_registration()) {
+//  if (user_registration()) {
     Route::middleware('guest')->group(function () {
         Route::get('register', [RegisteredUserController::class, 'create'])
             ->name('register');
 
         Route::post('register', [RegisteredUserController::class, 'store']);
     });
- }
+//  }
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
