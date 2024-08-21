@@ -16,6 +16,7 @@ class CustomEmailVerificationController extends Controller
 
     public function verifyEmail(EmailVerificationRequest $request)
     {
+        dd('hhjfhfh');
         $request->fulfill();
 
         return redirect('/login')->with('status', 'Your email has been verified. You can now log in.');
