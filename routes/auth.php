@@ -51,7 +51,7 @@ Route::get('/email/verify', [CustomEmailVerificationController::class, 'showVeri
     ->name('verification.notice');
 
 Route::get('/email/verify/{id}/{hash}', [CustomEmailVerificationController::class, 'verifyEmail'])
-    ->middleware(['auth', 'signed'])
+    ->middleware(['signed'])
     ->name('verification.verify');
 
 Route::post('/email/verification-notification', [CustomEmailVerificationController::class, 'resendVerificationEmail'])
