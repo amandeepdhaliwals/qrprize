@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use App\Notifications\UserAccountCreated;
 
 class VerifyEmailController extends Controller
 {
@@ -37,7 +38,17 @@ class VerifyEmailController extends Controller
         $user->markEmailAsVerified();
         event(new Verified($user));
 
-        return redirect('/login')->with('status', 'Your email has been verified. You can now log in.');
+        // Generate a new random password
+        $newPassword = Str::random(12);
+
+        // Update user's password
+        $user->password = Hash::make($newPassword);
+        $user->save();
+
+        $data = ['password' => $newPassword];
+        $user->notify(new UserAccountCreated($data));
+
+        return redirect('/login')->with('status', 'Your email has been verified. Credentials sent on your email to login.');
     }
     // public function __invoke(EmailVerificationRequest $request)
     // {
