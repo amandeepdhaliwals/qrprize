@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Route;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Auth\CustomEmailVerificationController;
 
 // Check if registration is enabled
 //  if (user_registration()) {

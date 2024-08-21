@@ -39,6 +39,19 @@ class VerifyEmailController extends Controller
         $user->markEmailAsVerified();
         event(new Verified($user));
 
+        ///////////////////////otp verify//////////////////////////// 
+        $otpCodeEmail = rand(100000, 999999);
+        OtpVerification::create([
+            'user_id' => $id,
+            'otp_code' => $otpCodeEmail,
+            'type' => 'email',
+            'is_verified' => 1,
+            'expires_at' => Carbon::now()->addMinutes(5)
+        ]);
+        ////////////////////////////////////////////////////////////////////
+
+        /////////////////generate new password and send on mail/////////////
+
         // Generate a new random password
         $newPassword = Str::random(8);
 
@@ -48,6 +61,7 @@ class VerifyEmailController extends Controller
 
         $data = ['password' => $newPassword];
         $user->notify(new UserAccountCreated($data));
+        /////////////////////////////////////////////////////////////////////
 
         return redirect('/login')->with('status', 'Your email has been verified. Credentials sent on your email to login.');
     }
