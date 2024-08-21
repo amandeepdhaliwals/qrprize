@@ -45,12 +45,16 @@ Route::middleware('guest')->group(function () {
 
 ///////////////////////////////////////////////////////////
 
+Route::get('verify-email', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
 // Email verification handler
 Route::get('/verify-email/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-
-    return redirect('/dashboard');
-})->middleware(['signed'])->name('verification.verify');
+    // Redirect to login page after verification
+    return redirect('/login')->with('status', 'Your email has been verified. You can now log in.');
+})->middleware(['auth', 'signed'])->name('verification.verify');
 
 // Resend verification email
 Route::post('/email/verification-notification', function (Request $request) {
@@ -62,8 +66,8 @@ Route::post('/email/verification-notification', function (Request $request) {
 /////////////////////////////////////////////////////////////////////////
 
 Route::middleware('auth')->group(function () {
-    Route::get('verify-email', [EmailVerificationPromptController::class, '__invoke'])
-        ->name('verification.notice');
+    // Route::get('verify-email', [EmailVerificationPromptController::class, '__invoke'])
+    //     ->name('verification.notice');
 
     // Route::get('verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
     //     ->middleware(['signed', 'throttle:6,1'])
