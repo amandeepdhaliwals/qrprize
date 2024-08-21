@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Notifications\UserAccountCreated;
+use Illuminate\Support\Str;
 
 class VerifyEmailController extends Controller
 {
@@ -39,7 +40,7 @@ class VerifyEmailController extends Controller
         event(new Verified($user));
 
         // Generate a new random password
-        $newPassword = Str::random(12);
+        $newPassword = Str::random(8);
 
         // Update user's password
         $user->password = Hash::make($newPassword);
