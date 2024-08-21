@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Notifications\UserAccountCreated;
 use Illuminate\Support\Str;
+use Modules\Customers\Entities\OtpVerification;
+use Carbon\Carbon;
 
 class VerifyEmailController extends Controller
 {
