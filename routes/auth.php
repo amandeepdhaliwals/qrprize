@@ -49,7 +49,7 @@ Route::middleware('guest')->group(function () {
 Route::get('/verify-email/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
 
-    return redirect('/login');
+    return redirect('/dashboard');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 // Resend verification email
