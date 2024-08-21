@@ -47,9 +47,11 @@ Route::middleware('guest')->group(function () {
 ///////////////////////////////////////////////////////////
 
 Route::get('/email/verify', [CustomEmailVerificationController::class, 'showVerifyEmailForm'])
+    ->middleware('auth')
     ->name('verification.notice');
 
 Route::get('/email/verify/{id}/{hash}', [CustomEmailVerificationController::class, 'verifyEmail'])
+    ->middleware(['auth', 'signed'])
     ->name('verification.verify');
 
 Route::post('/email/verification-notification', [CustomEmailVerificationController::class, 'resendVerificationEmail'])
