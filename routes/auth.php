@@ -45,13 +45,15 @@ Route::middleware('guest')->group(function () {
 
 ///////////////////////////////////////////////////////////
 
-Route::get('verify-email', function () {
+// Email verification notice
+Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
 // Email verification handler
-Route::get('/verify-email/{id}/{hash}', function (EmailVerificationRequest $request) {
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
+
     // Redirect to login page after verification
     return redirect('/login')->with('status', 'Your email has been verified. You can now log in.');
 })->middleware(['auth', 'signed'])->name('verification.verify');
