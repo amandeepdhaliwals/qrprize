@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Response;
 use PDF;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\URL;
 
 class StoresController extends BackendBaseController
 {
@@ -829,6 +830,27 @@ class StoresController extends BackendBaseController
         );
     }
 
+    function downloadImage($url, $savePath)
+{
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For HTTPS URLs; adjust as necessary
+
+    $data = curl_exec($ch);
+    if (curl_errno($ch)) {
+        throw new \Exception('cURL error: ' . curl_error($ch));
+    }
+    
+    curl_close($ch);
+
+    if ($data === false) {
+        throw new \Exception('Unable to fetch image from ' . $url);
+    }
+
+    file_put_contents($savePath, $data);
+}
+
     /**
      * Store a new campaign in the database.
      *
@@ -878,10 +900,34 @@ class StoresController extends BackendBaseController
 
         $url = url("/campaign/" . $combined_id);
 
-        $qrCode = QrCode::format("png")
+        ///////////////////////////////////////////
+
+            // $qrCode = QrCode::format("png")
+            //     ->size(200)
+            //     ->generate($url);
+            // $qr_code_image = base64_encode($qrCode);
+
+            // Generate the base QR code as a binary string
+
+            // Get the base URL dynamically
+            $logoPath = 'assets/img/play-n-win.png';
+
+            $qrCode = QrCode::format("png")
             ->size(200)
+            ->errorCorrection('H') // Set high error correction level
+            ->merge(public_path($logoPath), 0.3, true)
+            ->style('dot') // Optional: 'dot' style for rounded dots
+            ->eyeColor(0, 0, 128, 0) // Top-left corner (green)
+            ->eyeColor(1, 0, 128, 0) // Top-right corner (green)
+            ->eyeColor(2, 0, 128, 0) // Bottom-left corner (green)
+            ->color(0, 0, 0) // QR code color
+            ->backgroundColor(255, 255, 255) // Background color
             ->generate($url);
-        $qr_code_image = base64_encode($qrCode);
+
+            $qr_code_image = base64_encode($qrCode);
+
+
+        ///////////////////////////////////////////////
 
         $$module_name_singular->update([
             'qr_code_url' => $url,
