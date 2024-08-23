@@ -320,6 +320,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Campaign Name</th>
+                    <th>Advertisement Name</th>
                     <th>QR Code</th>
                     <th>Action</th>
                 </tr>
@@ -356,6 +357,10 @@
             {
                 data: 'campaign_name',
                 name: 'campaign_name'
+            },
+            {
+                data: 'advertisement_names',
+                name: 'advertisement_names'
             },
             {
                 data: 'qr_code_image', 
