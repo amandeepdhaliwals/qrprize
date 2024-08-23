@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Response;
 use PDF;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\DB;
 
 class StoresController extends BackendBaseController
 {
@@ -1026,6 +1027,21 @@ class StoresController extends BackendBaseController
                                 <a href="' . $route . '" class="btn btn-primary">Download</a>
                            </div>';
                 return new HtmlString($button);
+            })
+            ->addColumn("advertisement_names", function ($data) {
+                // Assuming advertisement IDs are stored in a JSON or array format in $data->campaigns
+                //$advertisementIds = json_decode($data->advertisement_ids); // Adjust this depending on how the IDs are stored
+        
+                if (!empty($data->advertisement_ids)) {
+                   // $advertisementNames = Advertisement::fin('id', 1)->get();
+                    $advertisementNames = DB::table('advertisement')
+                        ->whereIn('id', $data->advertisement_ids)
+                        ->pluck('advertisement_name')
+                        ->toArray();
+                    return implode(', ', $advertisementNames); // Concatenate all advertisement names
+                }
+        
+                return 'N/A';
             })
             ->editColumn("store_id", function ($data) {
                 return $data->store_id; // Assuming 'store_id' is a valid column in the 'campaigns' table
