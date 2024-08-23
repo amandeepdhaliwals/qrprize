@@ -910,15 +910,15 @@ class StoresController extends BackendBaseController
             // Generate the base QR code as a binary string
 
             // Get the base URL dynamically
-            $logoPath = 'assets/img/QR_scan_logo.png';
+            $logoPath = 'assets/img/QR_scan_logo_black.png';
 
             $qrCode = QrCode::format("png")
             ->size(200)
             ->errorCorrection('H') // Set high error correction level
             ->merge(public_path($logoPath), 0.3, true)
-            ->eyeColor(0, 255, 172, 28) // Top-left corner (green)
-            ->eyeColor(1, 255, 172, 28) // Top-right corner (green)
-            ->eyeColor(2, 255, 172, 28) // Bottom-left corner (green)
+            // ->eyeColor(0, 255, 172, 28) // Top-left corner (green)
+            // ->eyeColor(1, 255, 172, 28) // Top-right corner (green)
+            // ->eyeColor(2, 255, 172, 28) // Bottom-left corner (green)
             ->color(0, 0, 0) // QR code color
             ->backgroundColor(255, 255, 255) // Background color
             ->generate($url);
