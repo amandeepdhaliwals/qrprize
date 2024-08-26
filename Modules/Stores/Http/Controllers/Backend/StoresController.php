@@ -1028,7 +1028,7 @@ class StoresController extends BackendBaseController
                            </div>';
                 return new HtmlString($button);
             })
-            ->addColumn("advertisement_names", function ($data) {
+            ->addColumn("advertisement_names", function ($data)  {
                 // Assuming advertisement IDs are stored in a JSON or array format in $data->campaigns
                 //$advertisementIds = json_decode($data->advertisement_ids); // Adjust this depending on how the IDs are stored
         
@@ -1036,14 +1036,19 @@ class StoresController extends BackendBaseController
                    // $advertisementNames = Advertisement::fin('id', 1)->get();
                     $advertisementNames = DB::table('advertisement')
                         ->whereIn('id', $data->advertisement_ids)
-                        ->pluck('advertisement_name')
+                        ->pluck('advertisement_name','id')
                         ->toArray();
 
-                        $listItems = array_map(function ($name) {
-                            return "<li>{$name}</li>";
-                        }, $advertisementNames);
             
-                        return '<ul>' . implode('', $listItems) . '</ul>';
+                        $listItems = '';
+                        foreach ($advertisementNames as $id => $name) {
+                            $route = route("backend.stores.view_advertisement", [
+                                "Id" => $id,
+                            ]);
+                            $listItems .= "<li><a href='{$route}'>{$name}</a></li>";
+                        }
+            
+                        return '<ul>' . $listItems . '</ul>';
                     //return implode(', ', $advertisementNames); // Concatenate all advertisement names
                 }
         
@@ -1361,7 +1366,13 @@ class StoresController extends BackendBaseController
             @elseif($media_type == "Vimeo" || $media_type == "vimeo") 
                 <iframe src="{{ $media }}" width="150" height="140" frameborder="0" allowfullscreen></iframe>
             @else <span> No Media </span> @endif')
-            ->rawColumns(["edit_advertisement", "media"])
+            ->editColumn('view', function ($data) use ($module_name) {
+                $route = route("backend.{$module_name}.view_advertisement", [
+                    "Id" => $data->id,
+                ]);
+                return '<button type="button"><a href="' . $route . '">View</a></button>';
+            })
+            ->rawColumns(["edit_advertisement", "media","view"])
             ->make(true);
     }
 
@@ -1479,6 +1490,110 @@ class StoresController extends BackendBaseController
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
+    }
+
+
+
+    public function viewAdvertisement($Id)
+    {
+        $module_title = "View Advertisement";
+        $module_name = $this->module_name;
+        $module_path = $this->module_path;
+        $module_icon = $this->module_icon;
+        $module_model = $this->module_model;
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = "Show";
+
+        $advertisement = Advertisement::find($Id);
+
+        // $winning_type = $request_action == '1' ? 'winning' : 'lose';
+        // $preview_advertisements = Previewadvertisement::where("store_id", $storeId)
+        //     ->where("winning_type", $winning_type)
+        //     ->first();
+        // Find the store by ID
+        $store = Store::where("user_id", $advertisement->store_id)->first();
+
+        $coupons = Coupon::where("status", 1)
+            ->where("deleted_at", null) // Assuming 'isdeleted' is a boolean column
+            ->get();
+
+        $adv_videos = Video::where("status", 1)
+            ->where("deleted_at", null)
+            ->get();
+
+        $adv_images = Gallery::where("status", 1)
+            ->where("deleted_at", null)
+            ->get();
+
+        $other_images = Otherprize::where("status", 1)
+            ->where("deleted_at", null)
+            ->get();
+
+        // $selected_adv_videos = Video::where("status", 1)
+        //     ->where("id", $advertisement->adv_video_id)
+        //     ->where("deleted_at", null)
+        //     ->first();
+
+        // $primary_image_ids = explode(',', $advertisement->primary_image_id);
+
+        // $selected_primary_images = Gallery::whereIn("id", $primary_image_ids)
+        //     ->where("status", 1)
+        //     ->where("deleted_at", null)
+        //     ->get();
+
+        // $secondary_image_ids = explode(',', $advertisement->secondary_images_id);
+
+        // $selected_secondary_images = Gallery::whereIn("id", $secondary_image_ids)
+        //     ->where("status", 1)
+        //     ->whereNull("deleted_at")
+        //     ->get();
+
+        // $other_image_ids = explode(',', $advertisement->other_coupon_images_id);
+
+        // $selected_other_images = Otherprize::whereIn("id", $other_image_ids)
+        //     ->where("status", 1)
+        //     ->whereNull("deleted_at")
+        //     ->get();
+
+
+        // // Decode the JSON data into an associative array
+        // $coupon_data = json_decode($advertisement->coupons_id, true);
+
+        // // Extract the keys (coupon IDs)
+        // $coupon_ids = array_keys($coupon_data);
+
+        // // Fetch the coupons based on the extracted IDs
+        // $selected_coupons = Coupon::whereIn('id', $coupon_ids)->get();
+        // $advertisement_count= Advertisement::where("store_id", $storeId)
+        // ->count(); 
+        // $advertisement_count_for_name =  $advertisement_count + 1;  
+
+        logUserAccess($module_title . " " . $module_action);
+
+        return view(
+            "{$module_path}.{$module_name}.view_advertisement",
+            compact(
+                "module_title",
+                "module_name",
+                "module_path",
+                "module_icon",
+                "module_name_singular",
+                "module_action",
+                "store",
+                // "selected_adv_videos",
+                // "selected_primary_images",
+                // "selected_other_images",
+                "advertisement",
+                // "selected_secondary_images",
+                // "selected_coupons"
+
+                "coupons",
+                "adv_videos",
+                "adv_images",
+                "other_images"
+            )
+        );
     }
 
 
