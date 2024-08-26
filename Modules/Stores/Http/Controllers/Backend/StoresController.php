@@ -1038,7 +1038,13 @@ class StoresController extends BackendBaseController
                         ->whereIn('id', $data->advertisement_ids)
                         ->pluck('advertisement_name')
                         ->toArray();
-                    return implode(', ', $advertisementNames); // Concatenate all advertisement names
+
+                        $listItems = array_map(function ($name) {
+                            return "<li>{$name}</li>";
+                        }, $advertisementNames);
+            
+                        return '<ul>' . implode('', $listItems) . '</ul>';
+                    //return implode(', ', $advertisementNames); // Concatenate all advertisement names
                 }
         
                 return 'N/A';
@@ -1049,7 +1055,7 @@ class StoresController extends BackendBaseController
             ->editColumn("qr_code_image", function ($data) {
                 return '<img src="data:image/png;base64,' . $data->qr_code_image . '" alt="QR Code" />';
             })
-            ->rawColumns(["qr_code_image", "edit_campaign"])
+            ->rawColumns(["qr_code_image", "edit_campaign","advertisement_names"])
             ->make(true);
     }
 
