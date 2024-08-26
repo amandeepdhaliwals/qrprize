@@ -200,15 +200,15 @@
                <div class="col-sm-10">
                   <div class="input-group">
                      <!-- Static read-only text -->
-                     <div class="input-group-prepend">
+                     <!-- <div class="input-group-prepend">
                         <span
-                           class="input-group-text">{{$store->store_name}}{{$advertisement_count_for_name}}_adv-</span>
-                     </div>
+                           class="input-group-text">{{$advertisement->advertisement_name}}</span>
+                     </div> -->
                      <!-- Input text field -->
                      <input type="text" class="form-control" name="advertisement_name"
-                        placeholder="Enter advertisement name" required>
-                     <input type="hidden" class="form-control" name="advertisement_name_hid"
-                        value="{{$store->store_name}}{{$advertisement_count_for_name}}_adv-">
+                        placeholder="Enter advertisement name" value="{{$advertisement->advertisement_name}}" readonly>
+                     <!-- <input type="hidden" class="form-control" name="advertisement_name_hid"
+                        value="{{$advertisement->advertisement_name}}"> -->
                   </div>
                   <!-- Note -->
                   <div class="note">This is used for internal use only.</div>
@@ -280,7 +280,8 @@
          @endif
                           </a>
                           <div style="display:flex; align-items: baseline;"> <input style="margin-right:6px;"
-                              type="radio" id="html" name="video_id" value="{{$adv_video->id}}"><br /><span
+                              type="radio" id="html" name="video_id" value="{{$adv_video->id}}" {{ $adv_video->id == $advertisement->adv_video_id ? 'checked' : '' }} onclick="return false;"><br />
+                              <span
                               style="font-size: 14px;"
                               class="name"><strong>{{$adv_video->title}}</strong></span><br /></div>
                         </div>
@@ -297,7 +298,7 @@
             <div class="form-group row mb-3" id="adv_heading">
                 <label class="col-sm-2 form-control-label required-label">Heading</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="heading" id="heading" placeholder="Enter heading for frontend" required>
+                    <input type="text" class="form-control" name="heading" id="heading" placeholder="Enter heading for frontend" value="{{$advertisement->heading}}" readonly>
                     <div class="note">This heading is used for the frontend. Use '&' to separate the two parts. Otherwise, it will automatically separate after 4 words.</div>
                     <div id="adv_heading_error" style="color: red;"></div>
                 </div>
@@ -333,6 +334,9 @@
                         <!-- Thumbnails -->
                         <div id="thumbnails1" class="list row small-up-1 medium-up-2 large-up-3">
                            @php $firstIteration = true; @endphp
+                           @php
+                                $selectedPrimaryIdsArray = explode(',', $advertisement->primary_image_id); // Convert the comma-separated string to an array
+                            @endphp
                            @foreach($adv_images as $key => $adv_image)
                         @if($adv_image->image_type == 'primary')
                      <div class="column">
@@ -343,7 +347,7 @@
                        </a>
                        <div style="display:flex; align-items: baseline;">
                         <input style="margin-right:6px" type="checkbox" id="html{{ $key }}"
-                          name="primary_image_id[]" value="{{ $adv_image->id }}"><br />
+                          name="primary_image_id[]" value="{{ $adv_image->id }}"  {{ in_array($adv_image->id, $selectedPrimaryIdsArray) ? 'checked' : '' }} onclick="return false;"><br />
                         <span class="name"><strong>{{$adv_image->title}}</strong></span>
                        </div>
                      </div>
@@ -390,6 +394,9 @@
                         <!-- Thumbnails -->
                         <div id="thumbnails2" class="list row small-up-1 medium-up-2 large-up-3">
                            @php $firstIteration = true; @endphp
+                           @php
+                                $selectedSecondaryIdsArray = explode(',', $advertisement->secondary_images_id); // Convert the comma-separated string to an array
+                            @endphp
                            @foreach($adv_images as $key => $adv_image)
                         @if($adv_image->image_type == 'secondary')
                      <div class="column">
@@ -400,7 +407,7 @@
                        </a>
                        <div style="display:flex; align-items: baseline;">
                         <input style="margin-right:6px" type="checkbox" name="secondary_image_id[]"
-                          value="{{$adv_image->id}}"><br />
+                          value="{{$adv_image->id}}" {{ in_array($adv_image->id, $selectedSecondaryIdsArray) ? 'checked' : '' }} onclick="return false;"><br />
                         <span class="name"><strong>{{$adv_image->title}}</strong></span>
                        </div>
                      </div>
@@ -421,7 +428,7 @@
                <label class="col-sm-2 form-control-label required-label">Other Prizes Heading</label>
                <div class="col-sm-10">
                   <input type="text" class="form-control" name="heading_other_prize"
-                     placeholder="Enter other prize heading for frontend" required>
+                     placeholder="Enter other prize heading for frontend" value="{{$advertisement->heading}}" readonly>
                   <div class="note">This heading is used for other prized - on frontend.</div>
                   <div id="adv_other_heading_error" style="color: red;"></div>
                </div>
@@ -457,7 +464,11 @@
                      <div class="video-list">
                         <!-- Thumbnails -->
                         <div id="thumbnails3" class="list row small-up-1 medium-up-2 large-up-3">
-                           @php $firstIteration = true; @endphp
+                           @php $firstIteration = true; 
+                           @endphp
+                           @php
+                                $selectedOtherIdsArray = explode(',', $advertisement->other_coupon_images_id); // Convert the comma-separated string to an array
+                            @endphp
                            @foreach($other_images as $key => $other_image)
                         <div class="column">
                           <a href="#">
@@ -467,7 +478,7 @@
                           </a>
                           <div style="display:flex; align-items: baseline;">
                             <input style="margin-right:6px" type="checkbox" name="other_coupon_image_ids[]"
-                              value="{{$other_image->id}}"><br />
+                              value="{{$other_image->id}}" {{ in_array($other_image->id, $selectedOtherIdsArray) ? 'checked' : '' }} onclick="return false;"><br />
                             <span class="name"><strong>{{$other_image->title}}</strong></span>
                           </div>
                         </div>
@@ -518,9 +529,31 @@
                      <div class="video-list" id="videoGalleryCoupon">
                      <!-- Thumbnails -->
                      <div id="thumbnails4" class="list row small-up-1 medium-up-2 large-up-3">
-                        @php $firstIteration_c = true; @endphp
+                        @php 
+                          $data = json_decode($advertisement->coupons_id, true); // true to get an associative array   
+                        @endphp
+                        @php $firstIteration_c = true;
+                        @endphp
 
                         @foreach($coupons as $key => $coupon)
+                        @php
+                            // Check if the coupon ID exists in the decoded JSON data
+                            $keyEntry = isset($data[$coupon->id]) ? $data[$coupon->id] : null;
+                        @endphp
+
+                        @if($keyEntry)
+                            @php
+                                // Access individual values in the entry
+                                $count = $keyEntry['count'];
+                                $winProbability = $keyEntry['win_probability'];
+                                $newUserProbability = $keyEntry['new_user_probability'];
+                                $oldUserProbability = $keyEntry['old_user_probability'];
+                                $dailyQuotaProbability = $keyEntry['daily_quota_probability'];
+                                $startDate = isset($keyEntry['start_date']) ? $keyEntry['start_date'] : '';
+                                $endDate = isset($keyEntry['end_date']) ? $keyEntry['end_date'] : '';
+                            @endphp
+                        @endif
+
                         <div class="column category_coupon mb-4" data-category="{{ $coupon->category }}">
                            <a href="#">
                            @if($coupon->category == "physical" || $coupon->category == "Physical")
@@ -530,7 +563,7 @@
                            @endif
                            </a>
                            @if($coupon->total_coupons > 0)
-                           <input type="checkbox" name="coupon_id[]" value="{{ $coupon->id }}" class="mr-2">
+                           <input type="checkbox" name="coupon_id[]" value="{{ $coupon->id }} " class="mr-2" {{ $keyEntry ? 'checked' : '' }} onclick="return false;">
                            <span class="name">
                               <strong>
                                  @if(strlen($coupon->title) > 12)
@@ -545,44 +578,44 @@
 
                               <span style="color: {{ $color }}">available-<span>{{ $coupon->total_coupons }}</span></span>
                            </span><br />
-                        
+                          
                            <div class="col-sm-12 mt-2">
                               <label style="font-size: small;" data-toggle="tooltip" title="Enter the number of coupons you wish to allocate. This field is required.">
                                  Enter no. of coupons: <span style="color: red;">*</span>
                               </label>
-                              <input type="number" name="no_of_coupon[]" class="coupon-input mt-2" data-max="{{ $coupon->total_coupons }}" required><br />
+                              <input type="number" name="no_of_coupon[]" class="coupon-input mt-2" data-max="{{ $coupon->total_coupons }}"  value="{{ $keyEntry ? $count : '' }}" readonly><br />
                            </div>
 
                            <div class="col-sm-12 mt-2">
                               <label style="font-size: small;" data-toggle="tooltip" title="Set the daily limit for the number of wins. This specifies the maximum number of coupons that users can win in a single day. For example, if set to 5, only 5 users can win in a day.">Daily Quota Limit for Winning:</label>
-                              <input type="number" name="daily_quota_probability[]" class="daily-quota-input" value="" data-toggle="tooltip" disabled title="Enter a number to specify the maximum number of wins allowed per day">
+                              <input type="number" name="daily_quota_probability[]" class="daily-quota-input"  data-toggle="tooltip" disabled title="Enter a number to specify the maximum number of wins allowed per day" value="{{ $keyEntry ? $dailyQuotaProbability : '' }}">
                            </div>
 
                            <div class="col-sm-12 mt-2">
                               <label style="font-size: small;" data-toggle="tooltip" title="Enter base win probability.">Win Probability %: </label>
-                              <input type="number" name="win_probability[]" min="1" max="100" placeholder="" class="win-prob-input mt-2" required>
+                              <input type="number" name="win_probability[]" min="1" max="100" placeholder="" class="win-prob-input mt-2" value="{{ $keyEntry ? $winProbability : '' }}" readonly>
                               <span class="lose-prob" style="color: gray;"></span>
                            </div>
 
                            <div class="col-sm-12 mt-2">
                               <label style="font-size: small;" data-toggle="tooltip" title="Adjustment factor applied to the base probability for new users. Enter a value between 0 and 2. This factor reduces the winning probability for new users. Formula: Adjusted Probability = Base Probability * Adjustment Factor. Example: If Base Probability is 30% and Adjustment Factor is 0.8, Adjusted Probability = 30% * 0.8 = 24%.">Adjustment Factor for New Users: </label>
-                              <input type="number" name="new_user_probability[]" step="0.01" min="0" max="2" value="" data-toggle="tooltip" title="Adjustment factor for new users" disabled>
+                              <input type="number" name="new_user_probability[]" step="0.01" min="0" max="2"  data-toggle="tooltip" title="Adjustment factor for new users" value="{{ $keyEntry ? $newUserProbability : '' }}" disabled>
                               <span class="adjusted-new-user-prob" style="color: gray;font-size: small;"></span>
                            </div>
 
                            <div class="col-sm-12 mt-2">
                               <label style="font-size: small;" data-toggle="tooltip" title="Adjustment factor applied to the base probability for returning users. Enter a value between 1 and 2. This factor increases the winning probability for returning users. Formula: Adjusted Probability = Base Probability * Adjustment Factor. Example: If Base Probability is 30% and Adjustment Factor is 1.1, Adjusted Probability = 30% * 1.1 = 33%.">Adjustment Factor for Old Users: </label>
-                              <input type="number" name="old_user_probability[]" step="0.01" min="1" max="2" value="" data-toggle="tooltip" title="Adjustment factor for returning users" disabled>
+                              <input type="number" name="old_user_probability[]" step="0.01" min="1" max="2"  data-toggle="tooltip" title="Adjustment factor for returning users" value="{{ $keyEntry ? $oldUserProbability : '' }}" disabled>
                               <span class="adjusted-old-user-prob" style="color: gray; font-size: small;"></span>
                            </div>
       
                            <div class="col-sm-12 mt-2">
                               <label style="font-size: small;" data-toggle="tooltip" title="Start Date for Coupon Win Period:">Start Date:</label>
-                              <input type="date" name="start_date[]" class="form-control" >
+                              <input type="date" name="start_date[]" class="form-control" value="{{ $keyEntry ? $startDate : '' }}" readonly>
                            </div>
                            <div class="col-sm-12 mt-2">
                               <label style="font-size: small;" data-toggle="tooltip" title="End Date for Coupon Win Period:">End Date:</label>
-                              <input type="date" name="end_date[]" class="form-control" >
+                              <input type="date" name="end_date[]" class="form-control" value="{{ $keyEntry ? $endDate : '' }}" readonly>
                            </div>
                            @else 
                            <input type="checkbox" name="" value="{{ $coupon->id }}" disabled>
@@ -619,8 +652,8 @@
       <div class="row mt-4">
          <div class="col">
             <div class="form-group">
-               <!-- Buttons for submitting and canceling the form -->
-               <button type="submit" id="preview_winning" name="action" value="preview_winning"
+          
+               <!-- <button type="submit" id="preview_winning" name="action" value="preview_winning"
                   class="adv_btn btn btn-warning">
                   Preview Winning
                </button>
@@ -630,12 +663,12 @@
                </button>
                <x-buttons.create title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" class="adv_btn">
                   {{__('Create')}}
-               </x-buttons.create>
-               <div class="float-end">
+               </x-buttons.create> -->
+               <!-- <div class="float-end">
                   <div class="form-group">
                      <x-buttons.cancel />
                   </div>
-               </div>
+               </div> -->
             </div>
          </div>
       </div>
@@ -649,23 +682,7 @@
       </div>
    </div>
 </div>
-<div class="card mt-4">
-   <div class="card-body table-responsive">
-      <h5 class="card-title">Advertisement List</h5>
-      <table id="datatable" class="table table-bordered table-hover table-responsive-sm">
-         <thead>
-            <tr>
-               <th>ID</th>
-               <th>Advertisement Name</th>
-               <th>Video</th>
-               <th>Action</th>
-            </tr>
-         </thead>
-         <tbody>
-         </tbody>
-      </table>
-   </div>
-</div>
+
 @endsection
 @push ('after-styles')
    <!-- DataTables Core and Extensions -->
@@ -683,31 +700,6 @@
         if (enteredValue > maxAllowed) {
           $(this).val(maxAllowed);
         }
-      });
-
-      $('#datatable').DataTable({
-        processing: true,
-        serverSide: true,
-        autoWidth: true,
-        responsive: true,
-        ajax: '{{ route("backend.$module_name.advertisement_index", ['storeId' => ':storeId']) }}'.replace(':storeId', '{{ $store->user_id }}'),
-        columns: [{
-          data: 'id',
-          name: 'id'
-        },
-        {
-          data: 'advertisement_name',
-          name: 'advertisement_name'
-        },
-        {
-          data: 'media',
-          name: 'media',
-        },
-        {
-          data: 'view',
-          name: 'view',
-        },
-        ]
       });
 
       $(function () {

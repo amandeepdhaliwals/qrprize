@@ -59,6 +59,6 @@ Route::group(['namespace' => '\Modules\Stores\Http\Controllers\Backend','as' => 
     Route::get("{$module_name}/{storeId}/{request_action}/preview_advertisement", ['as' => "{$module_name}.preview_advertisement", 'uses' => "{$controller_name}@previewAdvertisement"]);
 
     Route::get("{$module_name}/{storeId}/download-qr-code/{campaignId}", ['as' => "{$module_name}.downloadQrCode", 'uses' => "{$controller_name}@downloadQrCode"]);
-
+    Route::get("{$module_name}/view_advertisement/{Id}", ['as' => "{$module_name}.view_advertisement", 'uses' => "{$controller_name}@viewAdvertisement"]);
 
 });
