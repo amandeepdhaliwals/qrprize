@@ -27,32 +27,6 @@ class AuthenticatedSessionController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    // public function store(LoginRequest $request)
-    // {
-    //     $request->validate([
-    //         'email' => ['required', 'email'],
-    //         'password' => ['required'],
-    //     ]);
-
-    //     $email = $request->email;
-    //     $password = $request->password;
-    //     $remember = $request->remember_me;
-        
-    //     Cache::flush();
-
-    //     if (Auth::attempt(['email' => $email, 'password' => $password, 'status' => 1], $remember)) {
-    //         $request->session()->regenerate();
-
-    //         event(new UserLoginSuccess($request, auth()->user()));
-
-    //         return redirect()->intended(RouteServiceProvider::HOME);
-    //     }
-
-    //     return back()->withErrors([
-    //         'email' => 'The provided credentials do not match our records.',
-    //     ])->onlyInput('email');
-    // }
-
     public function store(LoginRequest $request)
     {
         $request->validate([
@@ -66,28 +40,79 @@ class AuthenticatedSessionController extends Controller
         
         Cache::flush();
 
-        if (Auth::attempt(['email' => $email, 'password' => $password, 'status' => 1, 'email_verified_at' => ['!=', null]], $remember)) {
+     
+        if (Auth::attempt(['email' => $email, 'password' => $password, 'status' => 1], $remember)) {
             $request->session()->regenerate();
 
             event(new UserLoginSuccess($request, auth()->user()));
 
-            return redirect()->intended(RouteServiceProvider::HOME);
-        }else {
-            // Handle the case where the login fails due to unverified email
-            if (Auth::attempt(['email' => $email, 'password' => $password, 'status' => 1])) {
+            $user = Auth::user();
+    
+            if ($user->hasRole('user')) {
                 if (auth()->user()->email_verified_at === null) {
                     Auth::logout();
                     return redirect()->back()->withErrors([
                         'email' => 'You need to verify your email address before logging in.',
                     ]);
                 }
-            }
 
-            return back()->withErrors([
-                'email' => 'The provided credentials do not match our records.',
-            ])->onlyInput('email');
+               return redirect()->intended(RouteServiceProvider::USERHOME);
+            }
+            else{
+                return redirect()->intended(RouteServiceProvider::HOME); 
+            }
+            //return redirect()->intended(RouteServiceProvider::HOME);
         }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
+
+    // public function store(LoginRequest $request)
+    // {
+    //     $request->validate([
+    //         'email' => ['required', 'email'],
+    //         'password' => ['required'],
+    //     ]);
+
+    //     $email = $request->email;
+    //     $password = $request->password;
+    //     $remember = $request->remember_me;
+        
+    //     Cache::flush();
+
+    //     if (Auth::attempt(['email' => $email, 'password' => $password, 'status' => 1, 'email_verified_at' => ['!=', null]], $remember)) {
+    //         $request->session()->regenerate();
+
+    //         event(new UserLoginSuccess($request, auth()->user()));
+
+    //         $user = Auth::user();
+    
+    //         if ($user->hasRole('user')) {
+    //         return redirect()->intended(RouteServiceProvider::USERHOME);
+    //         }
+    //         else{
+    //             return redirect()->intended(RouteServiceProvider::HOME); 
+    //         }
+
+    //     }else {
+    //         // Handle the case where the login fails due to unverified email
+    //         if (Auth::attempt(['email' => $email, 'password' => $password, 'status' => 1])) {
+    //             if (auth()->user()->email_verified_at === null) {
+    //                 Auth::logout();
+    //                 return redirect()->back()->withErrors([
+    //                     'email' => 'You need to verify your email address before logging in.',
+    //                 ]);
+    //             }
+    //         }
+   
+    //         Auth::logout();
+    //         return back()->withErrors([
+    //             'email' => 'The provided credentials do not match our records.',
+    //         ])->onlyInput('email');
+    //     }
+    // }
 
     /**
      * Destroy an authenticated session.

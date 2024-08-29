@@ -832,25 +832,25 @@ class StoresController extends BackendBaseController
     }
 
     function downloadImage($url, $savePath)
-{
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For HTTPS URLs; adjust as necessary
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For HTTPS URLs; adjust as necessary
 
-    $data = curl_exec($ch);
-    if (curl_errno($ch)) {
-        throw new \Exception('cURL error: ' . curl_error($ch));
+        $data = curl_exec($ch);
+        if (curl_errno($ch)) {
+            throw new \Exception('cURL error: ' . curl_error($ch));
+        }
+        
+        curl_close($ch);
+
+        if ($data === false) {
+            throw new \Exception('Unable to fetch image from ' . $url);
+        }
+
+        file_put_contents($savePath, $data);
     }
-    
-    curl_close($ch);
-
-    if ($data === false) {
-        throw new \Exception('Unable to fetch image from ' . $url);
-    }
-
-    file_put_contents($savePath, $data);
-}
 
     /**
      * Store a new campaign in the database.
@@ -1030,8 +1030,7 @@ class StoresController extends BackendBaseController
             })
             ->addColumn("advertisement_names", function ($data)  {
                 // Assuming advertisement IDs are stored in a JSON or array format in $data->campaigns
-                //$advertisementIds = json_decode($data->advertisement_ids); // Adjust this depending on how the IDs are stored
-        
+      
                 if (!empty($data->advertisement_ids)) {
                    // $advertisementNames = Advertisement::fin('id', 1)->get();
                     $advertisementNames = DB::table('advertisement')
@@ -1049,7 +1048,6 @@ class StoresController extends BackendBaseController
                         }
             
                         return '<ul>' . $listItems . '</ul>';
-                    //return implode(', ', $advertisementNames); // Concatenate all advertisement names
                 }
         
                 return 'N/A';
@@ -1060,10 +1058,14 @@ class StoresController extends BackendBaseController
             ->editColumn("qr_code_image", function ($data) {
                 return '<img src="data:image/png;base64,' . $data->qr_code_image . '" alt="QR Code" />';
             })
+            ->editColumn("campaign_name", function ($data) use ($module_name) {
+                $button = '<a href="' . $data->qr_code_url . '" target="_blank">'.$data->campaign_name.'</a>';
+                return new HtmlString($button);
+            })
+                   
             ->rawColumns(["qr_code_image", "edit_campaign","advertisement_names"])
             ->make(true);
     }
-
 
     /**
      * Show form to add advertisment for a store.
@@ -1376,7 +1378,6 @@ class StoresController extends BackendBaseController
             ->make(true);
     }
 
-
     /**
      * Show form to show preview adv for a store.
      *
@@ -1492,8 +1493,6 @@ class StoresController extends BackendBaseController
         ]);
     }
 
-
-
     public function viewAdvertisement($Id)
     {
         $module_title = "View Advertisement";
@@ -1507,10 +1506,6 @@ class StoresController extends BackendBaseController
 
         $advertisement = Advertisement::find($Id);
 
-        // $winning_type = $request_action == '1' ? 'winning' : 'lose';
-        // $preview_advertisements = Previewadvertisement::where("store_id", $storeId)
-        //     ->where("winning_type", $winning_type)
-        //     ->first();
         // Find the store by ID
         $store = Store::where("user_id", $advertisement->store_id)->first();
 
@@ -1530,45 +1525,7 @@ class StoresController extends BackendBaseController
             ->where("deleted_at", null)
             ->get();
 
-        // $selected_adv_videos = Video::where("status", 1)
-        //     ->where("id", $advertisement->adv_video_id)
-        //     ->where("deleted_at", null)
-        //     ->first();
-
-        // $primary_image_ids = explode(',', $advertisement->primary_image_id);
-
-        // $selected_primary_images = Gallery::whereIn("id", $primary_image_ids)
-        //     ->where("status", 1)
-        //     ->where("deleted_at", null)
-        //     ->get();
-
-        // $secondary_image_ids = explode(',', $advertisement->secondary_images_id);
-
-        // $selected_secondary_images = Gallery::whereIn("id", $secondary_image_ids)
-        //     ->where("status", 1)
-        //     ->whereNull("deleted_at")
-        //     ->get();
-
-        // $other_image_ids = explode(',', $advertisement->other_coupon_images_id);
-
-        // $selected_other_images = Otherprize::whereIn("id", $other_image_ids)
-        //     ->where("status", 1)
-        //     ->whereNull("deleted_at")
-        //     ->get();
-
-
-        // // Decode the JSON data into an associative array
-        // $coupon_data = json_decode($advertisement->coupons_id, true);
-
-        // // Extract the keys (coupon IDs)
-        // $coupon_ids = array_keys($coupon_data);
-
-        // // Fetch the coupons based on the extracted IDs
-        // $selected_coupons = Coupon::whereIn('id', $coupon_ids)->get();
-        // $advertisement_count= Advertisement::where("store_id", $storeId)
-        // ->count(); 
-        // $advertisement_count_for_name =  $advertisement_count + 1;  
-
+        
         logUserAccess($module_title . " " . $module_action);
 
         return view(
@@ -1581,13 +1538,7 @@ class StoresController extends BackendBaseController
                 "module_name_singular",
                 "module_action",
                 "store",
-                // "selected_adv_videos",
-                // "selected_primary_images",
-                // "selected_other_images",
                 "advertisement",
-                // "selected_secondary_images",
-                // "selected_coupons"
-
                 "coupons",
                 "adv_videos",
                 "adv_images",
