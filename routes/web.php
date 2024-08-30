@@ -163,13 +163,16 @@ Route::group(['namespace' => 'App\Http\Controllers\Backend', 'prefix' => 'admin'
 * These routes need view-backend permission
 * --------------------------------------------------------------------
 */
-Route::group(['namespace' => 'App\Http\Controllers\Backend', 'prefix' => 'customer', 'as' => 'backend.', 'middleware' => ['auth', 'can:view_backend']], function () {
+Route::group(['namespace' => 'App\Http\Controllers\Backend', 'prefix' => 'customer', 'as' => 'customerbackend.', 'middleware' => ['auth', 'can:view_backend']], function () {
     /**
      * Backend Customer Dashboard
      * Namespaces indicate folder structure.
      */
    // Route::get('/', 'BackendController@index')->name('home');
     Route::get('dashboard', 'CustomerBackendController@index')->name('dashboard');
+
+    Route::get("campaign_index", 'CustomerBackendController@campaign_index')->name('campaigns_index');
+    Route::get("campaigns", 'CustomerBackendController@currentCampaigns')->name('campaigns');
 
 
 });
