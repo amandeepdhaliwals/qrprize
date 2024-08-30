@@ -37,40 +37,25 @@ class CustomerBackendController extends Controller
         return view('customerbackend.campaigns.current_campaigns');
     }
 
-    public function currentCampaigns()
+    public function currentCampaigns2()
     {
-        //$campaigns = Campaign::where("deleted_at", null)->get();
+     
+        $campaigns = Campaign::whereNull('campaign.deleted_at')
+            ->leftJoin('customer_results as cr1', function($join) {
+                $join->on('campaign.id', '=', 'cr1.campaign_id')
+                    ->where('cr1.customer_id', '=', Auth::id());
+            })
+            ->select('campaign.*', 'cr1.created_at as customer_result_created_at',
+                        DB::raw('CASE 
+                        WHEN TIMESTAMPDIFF(SECOND, cr1.created_at, NOW()) <= (campaign.lock_time * 3600)
+                        THEN SEC_TO_TIME((campaign.lock_time * 3600) - TIMESTAMPDIFF(SECOND, cr1.created_at, NOW()))
+                        ELSE NULL 
+                    END as countdown_time'))
+                    ->where(function($query) {
+                        $query->whereRaw('cr1.created_at = (select max(cr2.created_at) from customer_results as cr2 where cr2.campaign_id = cr1.campaign_id and cr2.customer_id = cr1.customer_id)')
+                        ->orWhereNull('cr1.created_at');
+                    })->get();
 
-
-        // $campaigns = Campaign::whereNull('campaign.deleted_at')
-        //     ->leftJoin('customer_results as cr1', function($join) {
-        //         $join->on('campaign.id', '=', 'cr1.campaign_id')
-        //             ->where('cr1.customer_id', '=', Auth::id());
-        //     })
-        //     ->select('campaign.*', 'cr1.created_at as customer_result_created_at')
-        //     ->where(function($query) {
-        //         $query->whereRaw('cr1.created_at = (select max(cr2.created_at) from customer_results as cr2 where cr2.campaign_id = cr1.campaign_id and cr2.customer_id = cr1.customer_id)')
-        //             ->orWhereNull('cr1.created_at');
-        //     })
-        //     ->get();
-
-            $campaigns = Campaign::whereNull('campaign.deleted_at')
-                ->leftJoin('customer_results as cr1', function($join) {
-                    $join->on('campaign.id', '=', 'cr1.campaign_id')
-                        ->where('cr1.customer_id', '=', Auth::id());
-                })
-                ->select('campaign.*', 'cr1.created_at as customer_result_created_at',
-                            DB::raw('CASE 
-                            WHEN TIMESTAMPDIFF(SECOND, cr1.created_at, NOW()) <= (campaign.lock_time * 3600)
-                            THEN SEC_TO_TIME((campaign.lock_time * 3600) - TIMESTAMPDIFF(SECOND, cr1.created_at, NOW()))
-                            ELSE NULL 
-                        END as countdown_time'))
-                        ->where(function($query) {
-                            $query->whereRaw('cr1.created_at = (select max(cr2.created_at) from customer_results as cr2 where cr2.campaign_id = cr1.campaign_id and cr2.customer_id = cr1.customer_id)')
-                            ->orWhereNull('cr1.created_at');
-                        })->get();
-
-          // dd($campaigns);
 
         return Datatables::of($campaigns)
         ->editColumn('play', function ($data) {
@@ -106,8 +91,37 @@ class CustomerBackendController extends Controller
             }
         })
         ->rawColumns(['play'])
-        ->make(true);
+        ->make(true);  
+    }
 
-        
+    public function currentCampaigns()
+    {
+     
+        $campaigns = Campaign::where("deleted_at", null)->get();
+        // $campaigns = Campaign::whereNull('campaign.deleted_at')
+        //     ->leftJoin('customer_results as cr1', function($join) {
+        //         $join->on('campaign.id', '=', 'cr1.campaign_id')
+        //             ->where('cr1.customer_id', '=', Auth::id());
+        //     })
+        //     ->select('campaign.*', 'cr1.created_at as customer_result_created_at',
+        //                 DB::raw('CASE 
+        //                 WHEN TIMESTAMPDIFF(SECOND, cr1.created_at, NOW()) <= (campaign.lock_time * 3600)
+        //                 THEN SEC_TO_TIME((campaign.lock_time * 3600) - TIMESTAMPDIFF(SECOND, cr1.created_at, NOW()))
+        //                 ELSE NULL 
+        //             END as countdown_time'))
+        //             ->where(function($query) {
+        //                 $query->whereRaw('cr1.created_at = (select max(cr2.created_at) from customer_results as cr2 where cr2.campaign_id = cr1.campaign_id and cr2.customer_id = cr1.customer_id)')
+        //                 ->orWhereNull('cr1.created_at');
+        //             })->get();
+
+
+        return Datatables::of($campaigns)
+        ->editColumn('play', function ($data) {
+            // if (is_null($data->countdown_time)) {
+                 return '<button type="button"><a href="">Play</a></button>';
+            // }
+        })
+        ->rawColumns(['play'])
+        ->make(true);  
     }
 }
