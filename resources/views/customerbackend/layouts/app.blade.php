@@ -41,12 +41,12 @@
 
 <body>
     <!-- Sidebar -->
-    @include('backend.includes.sidebar')
+    @include('customerbackend.includes.sidebar')
     <!-- /Sidebar -->
 
     <div class="wrapper d-flex flex-column min-vh-100 bg-light">
         <!-- Header -->
-        @include('backend.includes.header')
+        @include('customerbackend.includes.header')
         <!-- /Header -->
 
         <div class="body flex-grow-1">
@@ -55,7 +55,7 @@
                 @include('flash::message')
 
                 <!-- Errors block -->
-                @include('backend.includes.errors')
+                @include('customerbackend.includes.errors')
                 <!-- / Errors block -->
 
                 <!-- Main content block -->
@@ -66,7 +66,7 @@
         </div>
 
         <!-- Footer block -->
-        @include('backend.includes.footer')
+        @include('customerbackend.includes.footer')
         <!-- / Footer block -->
 
     </div>
