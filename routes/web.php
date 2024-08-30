@@ -174,5 +174,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Backend', 'prefix' => 'custom
     Route::get("campaign_index", 'CustomerBackendController@campaign_index')->name('campaigns_index');
     Route::get("campaigns", 'CustomerBackendController@currentCampaigns')->name('campaigns');
 
+    Route::get("history", 'CustomerBackendController@history_index')->name('history');
+    Route::get("history_data", 'CustomerBackendController@campaignsHistory')->name('history_data');
+
 
 });

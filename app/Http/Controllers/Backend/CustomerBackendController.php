@@ -110,4 +110,48 @@ class CustomerBackendController extends Controller
 
         
     }
+
+    public function history_index()
+    {
+        return view('customerbackend.campaigns.history_campaigns');
+    }
+
+    public function campaignsHistory()
+    {
+
+        $campaigns = DB::table('campaign')
+        ->join('customer_results', 'campaign.id', '=', 'customer_results.campaign_id')
+        ->leftJoin('customer_wins', 'customer_results.id', '=', 'customer_wins.customer_results_id')
+        ->leftJoin('coupons', 'customer_wins.coupon_id', '=', 'coupons.id')
+        ->select(
+            'campaign.campaign_name',
+            'customer_results.*',
+            'customer_wins.coupon_id',
+            'coupons.code as coupon_code'
+        )
+        ->where('customer_results.customer_id', Auth::id())
+        ->get();
+
+          // dd($campaigns);
+
+        return Datatables::of($campaigns)
+        ->editColumn('status', function ($data) {
+            if ($data->win == 0) {
+                return '<span style="color:red;">Lose</span>';
+            } else {
+                return '<span style="color:green;">Win</span>';
+            }
+        })
+        ->editColumn('coupon_code', function ($data) {
+            if (is_null($data->coupon_code)) {
+                return '-';
+            } else {
+                return $data->coupon_code;
+            }
+        })
+        ->rawColumns(['status'])
+        ->make(true);
+
+        
+    }
 }

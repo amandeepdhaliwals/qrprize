@@ -16,6 +16,7 @@
                         <div class="simplebar-content" style="padding: 0px;">
                             <li class="nav-item active show"><a class="nav-link active" href="{{ route('customerbackend.dashboard') }}"><i class="nav-icon fa-solid fa-cubes"></i> Dashboard</a></li>
                             <li class="nav-item active show"><a class="nav-link active" href="{{ route('customerbackend.campaigns_index') }}"><i class="nav-icon fa-solid fa-cubes"></i> Campaigns</a></li>
+                            <li class="nav-item active show"><a class="nav-link active" href="{{ route('customerbackend.history') }}"><i class="nav-icon fa-solid fa-cubes"></i> History</a></li>
                         </div>
                     </div>
                 </div>
