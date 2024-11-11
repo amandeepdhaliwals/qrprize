@@ -21,9 +21,10 @@ use App\Http\Controllers\Api\LoginController;
 
 
 Route::post('login', [LoginController::class, 'login']);
+Route::post('register', [LoginController::class, 'register']);
 
 // routes/api.php
-Route::middleware('api')->group(function () {
+Route::middleware('auth:api')->group(function () {
     Route::post('logout', [LoginController::class, 'logout']);
     Route::post('refresh', [LoginController::class, 'refresh']);
     Route::post('me', [LoginController::class, 'me']);

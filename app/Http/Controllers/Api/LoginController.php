@@ -8,6 +8,11 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+use App\Models\Userprofile;
+use Modules\Customers\Entities\Customer;
+use Illuminate\Support\Str;
+use App\Notifications\CustomVerifyEmail;
 
 class LoginController extends Controller
 {
@@ -48,6 +53,63 @@ class LoginController extends Controller
         }
 
         return $this->respondWithToken($token,'Successfully logged in.');
+    }
+
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|max:255',
+            'last_name' => 'required|max:255',
+            'email' => 'required|email|unique:users,email',
+        ]);
+        if ($validator->fails()) {
+            $errorMessage = $validator->errors()->first();
+            $response = [
+                'status'  => false,
+                'message' => $errorMessage,
+            ];
+        return response()->json($response, 401);
+        }
+        // Check if the email already exists manually (not required since 'unique' validation will handle it)
+        if (User::where('email', $request->email)->exists()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email already exists.'
+            ], 409); // Conflict status code
+        }
+        $password = Str::random(12);
+        $user = User::create([
+            'email' => $request->email,
+            'password' => Hash::make($password),
+            "name" => $request->first_name . ' ' . $request->last_name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            // other user attributes here
+        ]);
+        $user->assignRole('user');
+
+         // Create user profile and customer records
+         Userprofile::create([
+            'user_id' => $user->id,
+            "name" => $request->first_name . ' ' . $request->last_name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'username' => config('app.initial_username') + $user->id,
+            'email' => $request->email,
+            'mobile' => $request->mobile,
+        ]);
+    
+        Customer::create([
+            'user_id' => $user->id,
+            'store_id' => 0, 
+            'campaign_id' => 0, 
+            'advertisement_id' => 0, 
+        ]);
+
+        $user->notify(new CustomVerifyEmail());
+    
+    
+        return response()->json(['message' => 'Please check your email to verify your account.']);
     }
 
     protected function respondWithToken($token,$message = null)
