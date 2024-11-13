@@ -46,8 +46,8 @@ class profileDashboardController extends Controller
         // Validate the incoming request
         $validator = Validator::make($request->all(), [
             'name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255|unique:userprofiles,email,' . $userProfile->id, // Exclude current user's email
-            'mobile' => 'nullable|numeric|unique:userprofiles,mobile,' . $userProfile->id, // Exclude current user's mobile
+            'email' => 'nullable|email|max:255|unique:users,email,' . $userProfile->id, // Exclude current user's email
+            'mobile' => 'nullable|numeric|unique:users,mobile,' . $userProfile->id, // Exclude current user's mobile
             'gender' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:255',
             'interests' => 'nullable|array',
