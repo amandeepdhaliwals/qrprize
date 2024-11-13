@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\ProfileDashboardController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -29,5 +30,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('refresh', [LoginController::class, 'refresh']);
     Route::post('me', [LoginController::class, 'me']);
     Route::post('change-password', [LoginController::class, 'changePassword']);
-    // Your routes here
+   
+    //profile dashboard api's
+    Route::get('dashboard', [ProfileDashboardController::class, 'dashboard']);
+    Route::get('userprofile/{id}/completion', [ProfileDashboardController::class, 'getProfileCompletion']);
+    Route::put('userprofile/{id}/update', [ProfileDashboardController::class, 'updateProfile']);
 });
