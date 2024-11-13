@@ -33,6 +33,6 @@ Route::middleware('auth:api')->group(function () {
    
     //profile dashboard api's
     Route::get('dashboard', [ProfileDashboardController::class, 'dashboard']);
-    Route::get('userprofile/{id}/completion', [ProfileDashboardController::class, 'getProfileCompletion']);
-    Route::put('userprofile/{id}/update', [ProfileDashboardController::class, 'updateProfile']);
+    Route::get('userprofile/completion', [ProfileDashboardController::class, 'getProfileCompletion']);
+    Route::put('userprofile/update', [ProfileDashboardController::class, 'updateProfile']);
 });

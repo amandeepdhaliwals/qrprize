@@ -15,9 +15,14 @@ use Modules\Customers\Entities\Customer;
 
 class profileDashboardController extends Controller
 {
-    public function getProfileCompletion($id)
+    public function getProfileCompletion()
     {
-        $userProfile = UserProfile::where('user_id', $id)->first();
+        $user = Auth::user(); // or JWTAuth::parseToken()->authenticate();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+        $userProfile = UserProfile::where('user_id', $user->id)->first();
         
         if (!$userProfile) {
             return response()->json(['message' => 'User not found'], 404);
@@ -28,10 +33,15 @@ class profileDashboardController extends Controller
     }
 
 
-    public function updateProfile(Request $request, $id)
+    public function updateProfile(Request $request)
     {
+        $user = Auth::user(); // or JWTAuth::parseToken()->authenticate();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+        $id = $user->id;
         // Find the user profile by ID
-        $user = User::findOrFail($id);
         $userProfile = UserProfile::where('user_id', $id)->first();
         // Validate the incoming request
         $validator = Validator::make($request->all(), [
