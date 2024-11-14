@@ -52,7 +52,7 @@ class LoginController extends Controller
             return response()->json(['error' => 'Unauthorized - Invalid Role'], 401);
         }
 
-        return $this->respondWithToken($token,'Successfully logged in.');
+        return $this->respondWithToken($token,'Successfully logged in.', $user->first_time_login);
     }
 
     public function register(Request $request)
@@ -112,13 +112,14 @@ class LoginController extends Controller
         return response()->json(['message' => 'Please check your email to verify your account.']);
     }
 
-    protected function respondWithToken($token,$message = null)
+    protected function respondWithToken($token,$message = null,$new_user=null)
     {
         return response()->json([
             'message' => $message,
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::guard('api')->factory()->getTTL() * 60,
+            'first_time_login' => $new_user,
         ]);
     }
 
@@ -167,6 +168,39 @@ class LoginController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Password successfully changed']);
+    }
+
+    public function setUpNewPassword(Request $request)
+    {
+        
+        $validator = Validator::make($request->all(), [
+            'new_password' => 'required|min:6',
+            'confirm_new_password' => 'required|same:new_password|min:6',
+        ]);
+        if ($validator->fails()) {
+            $errorMessage = $validator->errors()->first();
+            $response = [
+                'status'  => false,
+                'message' => $errorMessage,
+            ];
+        return response()->json($response, 401);
+        }
+
+        $user = Auth::guard('api')->user();   
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }     
+        // Check if the new password is the same as the current password
+        if (Hash::check($request->new_password, $user->password)) {
+            return response()->json(['error' => 'New password cannot be the same as the current password'], 400);
+        }
+
+        // Update the password
+        $user->password = Hash::make($request->new_password);
+        $user->first_time_login = false;
+        $user->save();
+
+        return response()->json(['message' => 'Password changed successfully']);
     }
 
 }

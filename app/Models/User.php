@@ -35,6 +35,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail, JWTSubj
         'deleted_at' => 'datetime',
         'date_of_birth' => 'datetime',
         'email_verified_at' => 'datetime',
+        'first_time_login' => 'boolean',
     ];
 
     /**

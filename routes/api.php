@@ -30,6 +30,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('refresh', [LoginController::class, 'refresh']);
     Route::post('me', [LoginController::class, 'me']);
     Route::post('change-password', [LoginController::class, 'changePassword']);
+    Route::post('set-up-new-password', [LoginController::class, 'SetUpNewPassword']);
    
     //profile dashboard api's
     Route::get('dashboard', [ProfileDashboardController::class, 'dashboard']);
