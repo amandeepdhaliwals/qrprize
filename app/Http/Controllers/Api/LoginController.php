@@ -13,6 +13,7 @@ use App\Models\Userprofile;
 use Modules\Customers\Entities\Customer;
 use Illuminate\Support\Str;
 use App\Notifications\CustomVerifyEmail;
+use App\Notifications\MobileAppNotification;
 
 class LoginController extends Controller
 {
@@ -21,6 +22,8 @@ class LoginController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|min:6',
+            'device_token' => 'required|min:6',
+            'platform' => 'required|in:android,ios',
         ]);
         if ($validator->fails()) {
             $errorMessage = $validator->errors()->first();
@@ -51,6 +54,19 @@ class LoginController extends Controller
             Auth::guard('api')->logout();
             return response()->json(['error' => 'Unauthorized - Invalid Role'], 401);
         }
+
+        // Update device_token and platform in the user record
+        $user->device_token = $request->device_token;
+        $user->platform = $request->platform;
+        $user->save();
+
+        $notificationData = [
+            'title' => 'Login Activity Detected',
+            'body' => 'We have detected login activity on your account.',
+            'additional_data' => [],
+        ];
+
+        $user->notify(new MobileAppNotification($notificationData));
 
         return $this->respondWithToken($token,'Successfully logged in.', $user->first_time_login);
     }
