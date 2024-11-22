@@ -1,0 +1,11 @@
+{
+    "name": "Mobilesettings",
+    "alias": "mobilesettings",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Mobilesettings\\Providers\\MobilesettingsServiceProvider"
+    ],
+    "files": []
+}
