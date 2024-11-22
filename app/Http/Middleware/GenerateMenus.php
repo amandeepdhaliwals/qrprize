@@ -89,7 +89,7 @@ class GenerateMenus
                     })->sortBy('order'); 
 
                     \Menu::make('admin_sidebar', function ($menu) {
-                        // gallery images
+                        // Main group: Customer
                         $accessControl = $menu->add('<i class="nav-icon fa-solid fas fa-users"></i> Customer', [
                             'class' => 'nav-group',
                         ])
@@ -100,69 +100,132 @@ class GenerateMenus
                                 ],
                                 'permission' => ['view_customers'],
                             ]);
+                    
                         $accessControl->link->attr([
                             'class' => 'nav-link nav-group-toggle',
                             'href' => '#',
                         ]);
-            
+                    
+                        // Submenu: Statistics
                         $accessControl->add('<i class="nav-icon fa-solid fa-bar-chart"></i> Statistics', [
                             'route' => 'backend.customers.stats',
                             'class' => 'nav-item',
                         ])
                             ->data([
-                                'order' => 100,
-                                'activematches' => 'admin/customers*',
+                                'order' => 101,
+                                'activematches' => [
+                                    'admin/customers/stats',
+                                ],
                                 'permission' => ['view_customers'],
                             ])
-                                ->link->attr([
-                                    'class' => 'nav-link',
-                                ]);
-
-                                $accessControl->add('<i class="nav-icon fa-solid fa-bar-chart"></i> Visitor Activity', [
-                                    'route' => 'backend.customers.visitor',
-                                    'class' => 'nav-item',
-                                ])
-                                    ->data([
-                                        'order' => 100,
-                                        'activematches' => 'admin/customers*',
-                                        'permission' => ['view_visitor'],
-                                    ])
-                                ->link->attr([
-                                    'class' => 'nav-link',
-                                ]);       
+                            ->link->attr([
+                                'class' => 'nav-link',
+                            ]);
                     
-                        /// Submenu Customer
+                        // Submenu: Visitor Activity
+                        $accessControl->add('<i class="nav-icon fa-solid fa-bar-chart"></i> Visitor Activity', [
+                            'route' => 'backend.customers.visitor',
+                            'class' => 'nav-item',
+                        ])
+                            ->data([
+                                'order' => 102,
+                                'activematches' => [
+                                    'admin/customers/visitor',
+                                ],
+                                'permission' => ['view_visitor'],
+                            ])
+                            ->link->attr([
+                                'class' => 'nav-link',
+                            ]);
+                    
+                        // Submenu: List
                         $accessControl->add('<i class="nav-icon fa-solid fa-list"></i> List', [
                             'route' => 'backend.customers.index',
                             'class' => 'nav-item',
                         ])
                             ->data([
-                                'order' => 100,
-                                'activematches' => 'admin/customers*',
+                                'order' => 103,
+                                'activematches' => [
+                                    'admin/customers/index',
+                                ],
                                 'permission' => ['view_customers'],
                             ])
                             ->link->attr([
                                 'class' => 'nav-link',
-                            ]); 
-
-                             /// Submenu Claimed
+                            ]);
+                    
+                        // Submenu: Claimed
                         $accessControl->add('<i class="nav-icon fa-solid fa-list"></i> Claimed', [
                             'route' => 'backend.customers.claimed',
                             'class' => 'nav-item',
                         ])
                             ->data([
-                                'order' => 100,
-                                'activematches' => 'admin/customers*',
+                                'order' => 104,
+                                'activematches' => [
+                                    'admin/customers/claimed',
+                                ],
                                 'permission' => ['view_claimed'],
                             ])
                             ->link->attr([
                                 'class' => 'nav-link',
-                            ]); 
-                                
-                        })->sortBy('order'); 
-
-            // // Notifications
-            // $menu->add('<i class="nav-icon fas fa-bell"></i> Notifications', [
+                            ]);
+                    })->sortBy('order');
+                    
+                    \Menu::make('admin_sidebar', function ($menu) {
+                        // Main group: Mobile App Settings
+                        $accessControl = $menu->add('<i class="nav-icon fa-solid fa-mobile-alt"></i> Mobile App Settings', [
+                            'class' => 'nav-group',
+                        ])
+                        ->data([
+                            'order' => 101,
+                            'activematches' => [
+                                'admin/mobilesetting*',
+                            ],
+                            'permission' => ['view_mobilesettings'],
+                        ]);
+                    
+                        $accessControl->link->attr([
+                            'class' => 'nav-link nav-group-toggle',
+                            'href' => '#',
+                        ]);
+                    
+                        // Submenu: Coins
+                        $accessControl->add('<i class="nav-icon fa-solid fa-bar-chart"></i> Coins', [
+                            'route' => 'backend.mobilesettings.coins',
+                            'class' => 'nav-item',
+                        ])
+                        ->data([
+                            'order' => 102,
+                            'activematches' => [
+                                'admin/mobilesetting/coins',
+                            ],
+                            'permission' => ['view_mobilesettings'],
+                        ])
+                        ->link->attr([
+                            'class' => 'nav-link',
+                        ]);
+                    
+                        // New Submenu: Site Info
+                        $accessControl->add('<i class="nav-icon fa-solid fa-info-circle"></i> Site Info', [
+                            'route' => 'backend.mobilesettings.site_info',
+                            'class' => 'nav-item',
+                        ])
+                        ->data([
+                            'order' => 103,
+                            'activematches' => [
+                                'admin/mobilesetting/site-info',
+                            ],
+                            'permission' => ['view_mobilesettings'],
+                        ])
+                        ->link->attr([
+                            'class' => 'nav-link',
+                        ]);
+                    
+                    })->sortBy('order');
+                    
+                                          
+             // // Notifications
+             // $menu->add('<i class="nav-icon fas fa-bell"></i> Notifications', [
             //     'route' => 'backend.notifications.index',
             //     'class' => 'nav-item',
             // ])
