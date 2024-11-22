@@ -1,0 +1,31 @@
+{
+    "name": "nasirkhan/mobilesettings",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nasir Khan",
+            "email": "nasir8891@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Mobilesettings\\": "",
+            "Modules\\Mobilesettings\\App\\": "app/",
+            "Modules\\Mobilesettings\\Database\\Factories\\": "database/factories/",
+            "Modules\\Mobilesettings\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Mobilesettings\\Tests\\": "tests/"
+        }
+    }
+}
