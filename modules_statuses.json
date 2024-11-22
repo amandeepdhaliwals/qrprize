@@ -4,5 +4,6 @@
     "Stores": true,
     "Customers": true,
     "Gallery": true,
-    "Otherprizes": true
+    "Otherprizes": true,
+    "Mobilesettings": true
 }
