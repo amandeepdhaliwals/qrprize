@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\ProfileDashboardController;
+use App\Http\Controllers\Api\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -36,4 +37,13 @@ Route::middleware('auth:api')->group(function () {
     Route::get('dashboard', [ProfileDashboardController::class, 'dashboard']);
     Route::get('userprofile/completion', [ProfileDashboardController::class, 'getProfileCompletion']);
     Route::put('userprofile/update', [ProfileDashboardController::class, 'updateProfile']);
+    Route::post('push-notification-status/update', [ProfileDashboardController::class, 'changePushNotificationStatus']);
+    Route::post('email-notification-status/update', [ProfileDashboardController::class, 'changeEmailNotificationStatus']);
+
+    Route::get('notifications', [NotificationController::class, 'index']); // Fetch all notifications
+    Route::get('notifications/count', [NotificationController::class, 'notificationCount']); // Fetch all notifications
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead']); // Mark as read
+    Route::post('notifications/{id}/unread', [NotificationController::class, 'markAsUnread']); // Mark as unread
+    Route::post('notifications/read-all', [NotificationController::class, 'markAsReadAll']); // Mark as read
+    Route::post('notifications/unread-all', [NotificationController::class, 'markAsUnreadAll']); // Mark as read
 });

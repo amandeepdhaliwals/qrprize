@@ -162,6 +162,56 @@ class profileDashboardController extends Controller
          return response()->json(['ads' => $ads, 'offers'=> $offers, 'rewards'=> $rewards ], 200);
     }
 
+    public function changePushNotificationStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|boolean',
+        ]);
+
+        // If validation fails, return the errors
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+         // Retrieve the authenticated user from the JWT token
+         $user = Auth::user(); // or JWTAuth::parseToken()->authenticate();
+
+         if (!$user) {
+             return response()->json(['error' => 'User not authenticated'], 401);
+         }
+
+         $user->push_notifications_enabled = $request->status;
+         $user->save();
+         return response()->json([
+            'message' => 'data updated successfully.'
+        ],200);
+ 
+    }
+
+    public function changeEmailNotificationStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|boolean',
+        ]);
+
+        // If validation fails, return the errors
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+         // Retrieve the authenticated user from the JWT token
+         $user = Auth::user(); // or JWTAuth::parseToken()->authenticate();
+
+         if (!$user) {
+             return response()->json(['error' => 'User not authenticated'], 401);
+         }
+
+         $user->email_notifications_enabled = $request->status;
+         $user->save();
+         return response()->json([
+            'message' => 'data updated successfully.'
+        ],200);
+ 
+    }
+
 
    
 
