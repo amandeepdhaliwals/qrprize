@@ -6,7 +6,7 @@ use App\Http\Controllers\Backend\BackendBaseController;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Modules\Mobilesettings\Entities\Coin;
-use Modules\Mobilesettings\Entities\Appinformation;
+use Modules\Mobilesettings\Entities\Appinformation; //
 
 class MobilesettingsController extends BackendBaseController
 {
