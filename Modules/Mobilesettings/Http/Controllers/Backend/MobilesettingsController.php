@@ -93,19 +93,19 @@ class MobilesettingsController extends BackendBaseController
             ]);
 
             // Update About Us
-            AppSiteInformation::updateOrCreate(
+            Appinformation::updateOrCreate(
                 ['type' => 'about_us'],
                 ['content' => $request->input('about_us')]
             );
 
             // Update Privacy Policy
-            AppSiteInformation::updateOrCreate(
+            Appinformation::updateOrCreate(
                 ['type' => 'privacy_policy'],
                 ['content' => $request->input('privacy_policy')]
             );
 
             // Update Help & Support
-            AppSiteInformation::updateOrCreate(
+            Appinformation::updateOrCreate(
                 ['type' => 'help_support'],
                 [
                     'mobile' => $request->input('mobile'),
