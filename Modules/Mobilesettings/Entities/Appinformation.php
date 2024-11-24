@@ -4,11 +4,11 @@ namespace Modules\Mobilesettings\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Mobilesettings\Database\factories\AppinformationFactory;
 
-class Appsiteinformation extends Model
+class Appinformation extends Model
 {
     use HasFactory;
-
     protected $table = 'app_site_information';  // Define the coins table explicitly
 
     /**
@@ -17,6 +17,9 @@ class Appsiteinformation extends Model
     protected $fillable = [
         'type', 'content', 'mobile', 'email'
     ];
-
-    // /If needed, you can add any other relationships or methods to fetch specific data related to 'Coin'
+    
+    protected static function newFactory(): AppinformationFactory
+    {
+        //return AppinformationFactory::new();
+    }
 }
