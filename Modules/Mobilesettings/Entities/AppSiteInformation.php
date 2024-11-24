@@ -18,5 +18,5 @@ class Appsiteinformation extends Model
         'type', 'content', 'mobile', 'email'
     ];
 
-    // If needed, you can add any other relationships or methods to fetch specific data related to 'Coin'
+    // /If needed, you can add any other relationships or methods to fetch specific data related to 'Coin'
 }
