@@ -6,7 +6,7 @@ use App\Http\Controllers\Backend\BackendBaseController;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Modules\Mobilesettings\Entities\Coin;
-use Modules\MobileSettings\Entities\Appsiteinformation;
+use Modules\MobileSettings\Entities\Appinformation;
 
 class MobilesettingsController extends BackendBaseController
 {
@@ -72,9 +72,9 @@ class MobilesettingsController extends BackendBaseController
 
     public function manageSiteInfo()
     {
-        $aboutUs = Appsiteinformation::where('type', 'about_us')->first();
-        $privacyPolicy = Appsiteinformation::where('type', 'privacy_policy')->first();
-        $helpSupport = Appsiteinformation::where('type', 'help_support')->first();
+        $aboutUs = Appinformation::where('type', 'about_us')->first();
+        $privacyPolicy = Appinformation::where('type', 'privacy_policy')->first();
+        $helpSupport = Appinformation::where('type', 'help_support')->first();
 
         $module_title = 'Manage Site Information'; // Title name
         $module_icon = 'fa fa-cogs'; // Example icon class
