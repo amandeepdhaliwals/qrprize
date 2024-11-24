@@ -5,7 +5,7 @@ namespace Modules\Mobilesettings\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class AppSiteInformation extends Model
+class Appsiteinformation extends Model
 {
     use HasFactory;
 
