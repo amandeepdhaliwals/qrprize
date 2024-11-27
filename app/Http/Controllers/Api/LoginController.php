@@ -14,6 +14,7 @@ use Modules\Customers\Entities\Customer;
 use Illuminate\Support\Str;
 use App\Notifications\CustomVerifyEmail;
 use App\Notifications\MobileAppNotification;
+use Modules\Mobilesettings\Entities\Appinformation; 
 
 class LoginController extends Controller
 {
@@ -217,6 +218,24 @@ class LoginController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Password changed successfully']);
+    }
+
+    public function AboutUs(Request $request)
+    {
+        $aboutUs = Appinformation::where('type', 'about_us')->first();
+        return response()->json(['message' => 'Data get successfully', 'data'=>$aboutUs]);
+    }
+
+    public function privacyPolicy(Request $request)
+    {
+        $privacyPolicy = Appinformation::where('type', 'privacy_policy')->first();
+        return response()->json(['message' => 'Data get successfully', 'data'=>$privacyPolicy]);
+    }
+
+    public function helpSupport(Request $request)
+    {
+        $helpSupport = Appinformation::where('type', 'help_support')->first();
+        return response()->json(['message' => 'Data get successfully', 'data'=>$helpSupport]);
     }
 
 }

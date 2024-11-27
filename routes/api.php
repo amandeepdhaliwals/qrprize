@@ -25,6 +25,10 @@ use App\Http\Controllers\Api\NotificationController;
 Route::post('login', [LoginController::class, 'login']);
 Route::post('register', [LoginController::class, 'register']);
 
+Route::get('about-us', [LoginController::class, 'AboutUs']);
+Route::get('privacy-policy', [LoginController::class, 'privacyPolicy']);
+Route::get('help-and-support', [LoginController::class, 'helpSupport']);
+
 // routes/api.php
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [LoginController::class, 'logout']);
