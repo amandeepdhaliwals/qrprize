@@ -69,6 +69,7 @@ class VerifyEmailController extends Controller
         /////////////////////////////////////////////////////////////////////
         /////////////////////////Check referal//////////////////////////
         // Extract the referral code from the request
+        dd($request->query('referral_code'));
     $referralCode = $request->query('referral_code');
     if ($referralCode) {
             $referrer = User::where('referral_code', $referralCode)->first();
