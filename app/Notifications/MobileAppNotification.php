@@ -35,6 +35,16 @@ class MobileAppNotification extends Notification
         return $via;
     }
 
+    // Function to send notifications to both users when referral is triggered
+    public function sendReferralNotifications($referrer, $referred)
+    {
+        // Send notification to the referrer
+        $referrer->notify($this);
+
+        // Send notification to the referee
+        $referred->notify($this);
+    }
+
     // Define Database notification structure
     public function toDatabase($notifiable)
     {

@@ -18,6 +18,9 @@ use App\Notifications\UserAccountCreated;
 use Illuminate\Support\Str;
 use Modules\Customers\Entities\OtpVerification;
 use Carbon\Carbon;
+use App\Notifications\MobileAppNotification;
+use App\Models\Referral;
+use App\Models\ReferralMilestone;
 
 class VerifyEmailController extends Controller
 {
@@ -64,8 +67,55 @@ class VerifyEmailController extends Controller
         $data = ['password' => $newPassword];
         $user->notify(new UserAccountCreated($data));
         /////////////////////////////////////////////////////////////////////
+        /////////////////////////Check referal//////////////////////////
+        // Extract the referral code from the request
+    $referralCode = $request->query('referral_code');
+    if ($referralCode) {
+            $referrer = User::where('referral_code', $request->input('referral_code'))->first();
+
+            if ($referrer) {
+                $referral = Referral::create([
+                    'referrer_id' => $referrer->id,
+                    'referred_id' => $user->id,
+                    'referral_code' => $request->input('referral_code'),
+                ]);
+    
+                // Call the reward function
+                $this->rewardReferral($referral);
+            }
+        }
+        /////////////////////////////////////////////////////////////
 
         return redirect('/login')->with('status', 'Your email has been verified. Credentials sent on your email to login.');
+    }
+
+    protected function rewardReferral(Referral $referral)
+    {
+        $referrer = $referral->referrer;
+        $referred = $referral->referred;
+    
+        $referrer->increment('qr_coins', 5);
+        $referred->increment('qr_coins', 5);
+
+        // Update the rewarded_at column
+        $referral->rewarded_at = now(); // Set the current timestamp
+        $referral->save(); // Save the updated record
+
+        // Assuming $referrer and $referee are the User instances involved in the referral
+        $notification = new MobileAppNotification([
+            'title' => 'Referral Reward!',
+            'body' => 'You have received 5 Qr Coins as referral reward.',
+            'additional_data' => [
+                // Add any additional data needed for the notification
+            ],
+        ]);
+
+        // Send notifications to both users
+        $notification->sendReferralNotifications($referrer, $referred);
+    
+        // // Notify the referrer and referred user
+        // $referrer->notify(new ReferralRewardNotification($referrer, $referred));
+        // $referred->notify(new ReferralRewardNotification($referrer, $referred));
     }
     // public function __invoke(EmailVerificationRequest $request)
     // {

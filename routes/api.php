@@ -50,4 +50,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('notifications/{id}/unread', [NotificationController::class, 'markAsUnread']); // Mark as unread
     Route::post('notifications/read-all', [NotificationController::class, 'markAsReadAll']); // Mark as read
     Route::post('notifications/unread-all', [NotificationController::class, 'markAsUnreadAll']); // Mark as read
+
+    Route::get('/referral-link', [ProfileDashboardController::class, 'getReferralLink']);
 });

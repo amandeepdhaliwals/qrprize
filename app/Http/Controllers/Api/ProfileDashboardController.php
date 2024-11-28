@@ -212,6 +212,13 @@ class profileDashboardController extends Controller
  
     }
 
+    public function getReferralLink(Request $request)
+    {
+        $user = auth()->user();
+        $referral_link = url('/register?referral_code=' . $user->referral_code);
+        return response()->json(['message' => 'Referral link generated successfully', 'referral_link'=>$referral_link]);
+    }
+
 
    
 
