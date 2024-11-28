@@ -77,7 +77,7 @@ class VerifyEmailController extends Controller
                 $referral = Referral::create([
                     'referrer_id' => $referrer->id,
                     'referred_id' => $user->id,
-                    'referral_code' => $request->input('referral_code'),
+                    'referral_code' => $referralCode,
                 ]);
     
                 // Call the reward function
