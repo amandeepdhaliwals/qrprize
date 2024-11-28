@@ -72,6 +72,7 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request)
     {
+   
         $request->validate([
             'first_name' => 'required|max:255',
             'last_name' => 'required|max:255',
@@ -85,6 +86,7 @@ class RegisteredUserController extends Controller
         $data['password'] = Hash::make(Str::random(8)); // Generate random password
         $user = User::create($data);
         $user->assignRole('user');
+        $user->generateReferralCode();
     
         // Create user profile and customer records
         Userprofile::create([
@@ -103,9 +105,10 @@ class RegisteredUserController extends Controller
             'campaign_id' => 0, 
             'advertisement_id' => 0, 
         ]);
+        $referralCode = $request->input('referral_code') ?? null;
 
         // Manually send the custom verification notification
-        $user->notify(new CustomVerifyEmail());
+        $user->notify(new CustomVerifyEmail($referralCode));
         // event(new Registered($user));
         // event(new UserRegistered($user));
 

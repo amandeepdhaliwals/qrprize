@@ -11,13 +11,14 @@ use Illuminate\Support\Facades\URL;
 class CustomVerifyEmail extends Notification
 {
     use Queueable;
+    protected $referralCode;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct($referralCode)
     {
-        //
+        $this->referralCode = $referralCode;
     }
 
     /**
@@ -41,6 +42,7 @@ class CustomVerifyEmail extends Notification
             [
                 'id' => $notifiable->getKey(),
                 'hash' => sha1($notifiable->getEmailForVerification()),
+                'referral_code' => $this->referralCode, 
             ]
         );
         return (new MailMessage)

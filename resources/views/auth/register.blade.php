@@ -3,6 +3,9 @@
         @lang('Register')
     </x-slot>
 
+    @php
+    $referralCode = request()->query('referral_code');
+    @endphp
     <x-auth-card>
         <x-slot name="logo">
             <a href="/">
@@ -20,7 +23,8 @@
 
         <form method="POST" action="{{ route('register') }}" id="register-form">
             @csrf
-
+            <!-- Add the referral code as a hidden input field -->
+            <input type="hidden" name="referral_code" value="{{ $referralCode }}">
             <!-- First Name -->
             <div class="mt-4">
                 <x-label for="first_name" :value="__('First Name')" />

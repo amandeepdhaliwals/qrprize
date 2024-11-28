@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable implements HasMedia, MustVerifyEmail, JWTSubject
 {
@@ -151,5 +152,16 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail, JWTSubj
             $table->deleted_by = Auth::id();
             $table->save();
         });
+    }
+
+    public function generateReferralCode()
+    {
+        do {
+            // Generate a random 3-character code
+            $code = strtoupper(Str::random(5)); // E.g., "A1B", "C3D"
+        } while (self::where('referral_code', $code)->exists()); // Ensure uniqueness
+
+        $this->referral_code = $code;
+        $this->save();
     }
 }
