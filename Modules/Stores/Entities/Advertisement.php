@@ -5,6 +5,7 @@ namespace Modules\Stores\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Stores\Database\factories\AdvertisementFactory;
+use Modules\Mobilesettings\Entities\CampaignAdsMeta; 
 
 class Advertisement extends Model
 {
@@ -34,5 +35,10 @@ class Advertisement extends Model
     protected static function newFactory(): AdvertisementFactory
     {
         //return AdvertisementFactory::new();
+    }
+
+    public function campaignAdsMeta()
+    {
+        return $this->hasOne(CampaignAdsMeta::class, 'advertisement_id');
     }
 }
