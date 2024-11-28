@@ -84,9 +84,13 @@ class RegisteredUserController extends Controller
         $data = $request->except('_token');
         $data['name'] = $request->first_name . ' ' . $request->last_name;
         $data['password'] = Hash::make(Str::random(8)); // Generate random password
+        do {
+            $referral_code = strtoupper(Str::random(5));
+        } while (User::where('referral_code', $referral_code)->exists()); // Ensure uniqueness
+        
+        $data['referral_code'] = $referral_code;
         $user = User::create($data);
         $user->assignRole('user');
-        $user->generateReferralCode();
     
         // Create user profile and customer records
         Userprofile::create([
