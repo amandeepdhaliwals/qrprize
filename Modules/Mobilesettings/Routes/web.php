@@ -42,6 +42,17 @@ Route::group([
         'uses' => 'MobilesettingsController@updateSiteInfo'
     ]);
 
+     // Route for managing Ads 
+     Route::get('mobilesettings/manage-ads', [
+        'as' => 'manage-ads',
+        'uses' => 'MobilesettingsController@manageAds'
+    ]);
+
+    Route::post('mobilesettings/update-ad-status', [
+        'as' => 'update.ad.status',  // Named route for easier URL generation
+        'uses' => 'MobilesettingsController@updateAdStatus'  // Method to handle the update status
+    ]);
+
     // Route::get('mobilesettings/site-info', [ MobilesettingsController::class, 'manageSiteInfo'])->name('mobilesettings.manage_site_info');
 
 });
