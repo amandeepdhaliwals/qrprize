@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\ProfileDashboardController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\AdsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -52,4 +53,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('notifications/unread-all', [NotificationController::class, 'markAsUnreadAll']); // Mark as read
 
     Route::get('/referral-link', [ProfileDashboardController::class, 'getReferralLink']);
+
+    Route::get('trending-new-ads', [AdsController::class, 'trendingAds']);
+    // Route::get('ads-of-the-day', [AdsController::class, 'adsOfTheDay']);
+    // Route::get('new-ads', [AdsController::class, 'newAds']);
 });
