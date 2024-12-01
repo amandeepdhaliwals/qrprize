@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Stores\Database\factories\AdvertisementFactory;
 use Modules\Mobilesettings\Entities\CampaignAdsMeta; 
+use Modules\Videos\Entities\Video;
 
 class Advertisement extends Model
 {
@@ -40,5 +41,10 @@ class Advertisement extends Model
     public function campaignAdsMeta()
     {
         return $this->hasOne(CampaignAdsMeta::class, 'advertisement_id');
+    }
+
+    public function video()
+    {
+        return $this->belongsTo(Video::class, 'adv_video_id'); // Foreign key 'adv_video_id' in advertisements table
     }
 }

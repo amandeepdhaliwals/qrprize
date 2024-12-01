@@ -131,59 +131,31 @@ class MobilesettingsController extends BackendBaseController
     /**
      * Manage advertisement selection.
      */                                                
-    public function manageAds2(Request $request)
-    {
-        // Fetch campaigns and their related advertisements
-        $campaigns = Campaign::all()->map(function ($campaign) {
-            // Decode advertisement_ids array and fetch related advertisements
-            $campaign->advertisements = Advertisement::whereIn('id', $campaign->advertisement_ids)->get();
-            return $campaign;
-        });
-
-        // Fetch the current statuses of advertisements
-       //  $campaignAdsMeta = CampaignAdsMeta::all();
-         $campaignAdsMeta = CampaignAdsMeta::with(['advertisement', 'campaign'])->get();
-         $campaignAdsMeta = $campaignAdsMeta->map(function ($meta) {
-            return [
-                'campaign_ad_meta_id' => $meta->id,
-                'advertisement_name' => $meta->advertisement ? $meta->advertisement->advertisement_name : 'N/A',  // Assuming 'name' is a column in advertisements table
-                'campaign_name' => $meta->campaign ? $meta->campaign->campaign_name : 'N/A',  // Assuming 'name' is a column in campaigns table
-                'is_new_ad' => $meta->is_new_ad,
-                'is_trending_ad' => $meta->is_trending_ad,
-                'is_ad_of_the_day' => $meta->is_ad_of_the_day,
-                'created_at' => $meta->created_at,
-                'updated_at' => $meta->updated_at,
-            ];
-        });
-
-        
-
-         return view('mobilesettings::mobilesettings.manage_ads.index', compact('campaigns', 'campaignAdsMeta'));
-    }
-
     public function manageAds(Request $request)
     {
-        // Fetch campaigns and their related advertisements
-        $campaigns = Campaign::all()->map(function ($campaign) {
-            // Decode advertisement_ids array and fetch related advertisements
-            $campaign->advertisements = Advertisement::whereIn('id', $campaign->advertisement_ids)->get();
-            return $campaign;
-        });
-
-        // Fetch the current statuses of advertisements with their relationships
+        // Paginate campaigns
+        $campaigns = Campaign::paginate(5);
+    
+        // Attach paginated advertisements to each campaign
+        foreach ($campaigns as $campaign) {
+            $campaign->advertisements = Advertisement::whereIn('id', $campaign->advertisement_ids)
+                                                     ->with('video') // eager load the associated video
+                                                     ->get();
+        }
+    
+        // Fetch CampaignAdsMeta data, eager load the related advertisement and campaign
         $campaignAdsMeta = CampaignAdsMeta::with(['advertisement', 'campaign'])->get();
-
+    
+        // Pass campaigns and campaignAdsMeta to the view
         return view('mobilesettings::mobilesettings.manage_ads.index', compact('campaigns', 'campaignAdsMeta'));
     }
-
-
+    
     public function updateAdStatus(Request $request)
     {
-     
         $validated = $request->validate([
             'adId' => 'required|integer|exists:advertisement,id', // Ensure advertisement_id exists
             'type' => 'required|string|in:is_new_ad,is_trending_ad,is_ad_of_the_day', // Ensure valid types
-            'status' => 'required', // Status should be true/false
+             'status' => 'required', // Ensure status is true/false (0 or 1)
             'cmId' => 'required|integer|exists:campaign,id', // Ensure campaign_id exists
         ]);
     
@@ -193,9 +165,9 @@ class MobilesettingsController extends BackendBaseController
                                          ->first();
     
         $type = $validated['type'];
-     
-        if ($validated['status']) {
-            dd('aman',$validated['status']);
+        $status = $validated['status']; 
+       
+        if ($status == "1") {
             // If status is true, create or update the entry
             if (!$campaignAdMeta) {
                 $campaignAdMeta = new CampaignAdsMeta();
@@ -210,7 +182,7 @@ class MobilesettingsController extends BackendBaseController
             // If status is false, remove the specific type or delete the entry
             if ($campaignAdMeta) {
                 $campaignAdMeta->{$type} = false; // Set the field to false
-              
+                
                 // Check if all type fields are false; if so, delete the record
                 if (!$campaignAdMeta->is_new_ad && !$campaignAdMeta->is_trending_ad && !$campaignAdMeta->is_ad_of_the_day) {
                     $campaignAdMeta->delete();
@@ -223,9 +195,4 @@ class MobilesettingsController extends BackendBaseController
         return response()->json(['success' => true, 'message' => 'Campaign advertisement meta updated successfully']);
     }
     
-    
-    
-    
-
-
 }
