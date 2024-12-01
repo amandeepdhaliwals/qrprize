@@ -71,13 +71,13 @@ class VerifyEmailController extends Controller
         // Extract the referral code from the request
     $referralCode = $request->query('referral_code');
     if ($referralCode) {
-            $referrer = User::where('referral_code', $request->input('referral_code'))->first();
+            $referrer = User::where('referral_code', $referralCode)->first();
 
             if ($referrer) {
                 $referral = Referral::create([
                     'referrer_id' => $referrer->id,
                     'referred_id' => $user->id,
-                    'referral_code' => $request->input('referral_code'),
+                    'referral_code' => $referralCode,
                 ]);
     
                 // Call the reward function

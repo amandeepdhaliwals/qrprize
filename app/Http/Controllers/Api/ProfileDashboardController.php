@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Userprofile;
 use Modules\Customers\Entities\Customer;
+use Modules\Stores\Entities\Campaign; 
+use Modules\Stores\Entities\Advertisement; 
+use Modules\Mobilesettings\Entities\CampaignAdsMeta; 
 
 
 class profileDashboardController extends Controller
@@ -154,12 +157,12 @@ class profileDashboardController extends Controller
          if (!$user) {
              return response()->json(['error' => 'User not authenticated'], 401);
          }
-
-         $ads =[];
+         $ads_of_the_day = CampaignAdsMeta::where('is_ad_of_the_day', 1)->with(['advertisement', 'campaign'])->get();
+         
          $offers=[];
          $rewards=[];
  
-         return response()->json(['ads' => $ads, 'offers'=> $offers, 'rewards'=> $rewards ], 200);
+         return response()->json(['ads' => $ads_of_the_day, 'offers'=> $offers, 'rewards'=> $rewards ], 200);
     }
 
     public function changePushNotificationStatus(Request $request)
@@ -219,6 +222,24 @@ class profileDashboardController extends Controller
         return response()->json(['message' => 'Referral link generated successfully', 'referral_link'=>$referral_link]);
     }
 
+    public function checkReferralMilestones($userId)
+    {
+        $referralCount = Referral::where('referrer_id', $userId)->count();
+
+        $milestones = ReferralMilestone::where('referral_count', '<=', $referralCount)->get();
+
+        foreach ($milestones as $milestone) {
+            // Reward based on milestone type
+            switch ($milestone->reward_type) {
+                case 'extra_spin':
+                    User::find($userId)->increment('spins', 1);
+                    break;
+                case 'premium_draw_entry':
+                    User::find($userId)->increment('premium_entries', 1);
+                    break;
+            }
+        }
+    }
 
    
 
