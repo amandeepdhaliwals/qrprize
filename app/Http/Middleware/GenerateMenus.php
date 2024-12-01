@@ -220,6 +220,22 @@ class GenerateMenus
                         ->link->attr([
                             'class' => 'nav-link',
                         ]);
+
+                        $accessControl->add('<i class="nav-icon fa-solid fa-ad"></i> Manage Ads', [
+                            'route' => 'backend.mobilesettings.manage-ads',  // Update the route for managing ads
+                            'class' => 'nav-item',
+                        ])
+                        ->data([
+                            'order' => 104,  // Change the order if necessary
+                            'activematches' => [
+                                'admin/mobilesetting/manage-ads',  // Match the active route for manage ads
+                            ],
+                            'permission' => ['view_manageads'],  // Adjust permission as needed
+                        ])
+                        ->link->attr([
+                            'class' => 'nav-link',
+                        ]);
+
                     
                     })->sortBy('order');
                     
