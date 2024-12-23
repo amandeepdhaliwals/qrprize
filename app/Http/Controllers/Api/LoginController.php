@@ -95,12 +95,17 @@ class LoginController extends Controller
             ], 409); // Conflict status code
         }
         $password = Str::random(12);
+        do {
+            $referral_code = strtoupper(Str::random(5));
+        } while (User::where('referral_code', $referral_code)->exists()); // Ensure uniqueness
+        
         $user = User::create([
             'email' => $request->email,
             'password' => Hash::make($password),
             "name" => $request->first_name . ' ' . $request->last_name,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
+            'referral_code' => $referral_code,
             // other user attributes here
         ]);
         $user->assignRole('user');
@@ -123,7 +128,7 @@ class LoginController extends Controller
             'advertisement_id' => 0, 
         ]);
 
-        $user->notify(new CustomVerifyEmail());
+        $user->notify(new CustomVerifyEmail($referral_code));
     
     
         return response()->json(['message' => 'Please check your email to verify your account.']);
